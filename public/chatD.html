@@ -3,156 +3,167 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MSC-D · 确认·留存·异常</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<title>MSC-D · 确认·留存·异常 (Demo版)</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #0a0a12;
-  --bg-card: #13131f;
-  --bg-hover: #1a1a2a;
-  --bg-el: #1e1e30;
-  --border: #2a2a3e;
-  --text: #e8e8f0;
-  --text2: #8888a0;
-  --text3: #555570;
-  --blue: #4a90d9;
-  --amber: #d4a04a;
-  --red: #e85d5d;
-  --green: #4caf7d;
-  --orange: #e8923d;
-  --purple: #9b6dff;
+  --bg:#0a0a12;--bg2:#13131f;--bg3:#1a1a2a;--bg4:#1e1e30;
+  --brd:#2a2a3e;--text:#e8e8f0;--t2:#8888a0;--t3:#555570;
+  --blue:#4a90d9;--amber:#d4a04a;--red:#e85d5d;--green:#4caf7d;
+  --orange:#e8923d;--purple:#9b6dff;
 }
-* { margin:0; padding:0; box-sizing:border-box; }
-html { scroll-behavior:smooth; }
-body { background:var(--bg); color:var(--text); font-family:'Noto Sans SC',sans-serif; font-size:15px; line-height:1.75; -webkit-font-smoothing:antialiased; }
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',sans-serif;font-size:15px;line-height:1.75;-webkit-font-smoothing:antialiased}
 
-/* ─ sticky header ─ */
-.header { position:sticky; top:36px; z-index:100; background:rgba(10,10,18,0.92); backdrop-filter:blur(20px); border-bottom:1px solid var(--border); padding:14px 20px; display:flex; align-items:center; justify-content:space-between; }
-.header-title { font-size:15px; font-weight:700; }
-.header-badge { font-size:11px; padding:3px 10px; background:rgba(155,109,255,0.12); color:var(--purple); border:1px solid rgba(155,109,255,0.25); border-radius:20px; }
+.header{position:sticky;top:36px;z-index:100;background:rgba(10,10,18,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--brd);padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+.header-title{font-size:15px;font-weight:700}
+.header-badge{font-size:11px;padding:3px 10px;background:rgba(155,109,255,.12);color:var(--purple);border:1px solid rgba(155,109,255,.25);border-radius:20px}
+.nav{position:sticky;top:88px;z-index:90;background:rgba(10,10,18,.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--brd);padding:8px 20px;overflow-x:auto;display:flex;gap:6px;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav a{display:inline-block;padding:5px 14px;font-size:12px;font-weight:500;color:var(--t2);text-decoration:none;border-radius:6px;border:1px solid transparent;transition:all .2s;white-space:nowrap}
+.nav a:hover{color:var(--text);background:var(--bg4)}
 
-/* ─ nav ─ */
-.nav { position:sticky; top:88px; z-index:90; background:rgba(10,10,18,0.95); backdrop-filter:blur(16px); border-bottom:1px solid var(--border); padding:8px 20px; overflow-x:auto; display:flex; gap:6px; scrollbar-width:none; }
-.nav::-webkit-scrollbar { display:none; }
-.nav a { display:inline-block; padding:5px 14px; font-size:12px; font-weight:500; color:var(--text2); text-decoration:none; border-radius:6px; border:1px solid transparent; transition:all .2s; white-space:nowrap; }
-.nav a:hover { color:var(--text); background:var(--bg-el); }
-.nav a.n-red { border-color:rgba(232,93,93,0.3); color:var(--red); }
-.nav a.n-amber { border-color:rgba(212,160,74,0.3); color:var(--amber); }
-.nav a.n-blue { border-color:rgba(74,144,217,0.3); color:var(--blue); }
-.nav a.n-green { border-color:rgba(76,175,125,0.3); color:var(--green); }
+.wrap{max-width:800px;margin:0 auto;padding:28px 20px 100px}
+.sec{margin-bottom:56px}
+.sec-label{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
+.sec-title{font-size:24px;font-weight:900;line-height:1.3;margin-bottom:12px}
+.sec-desc{color:var(--t2);margin-bottom:28px}
+.sec-desc strong{color:var(--text)}
 
-/* ─ layout ─ */
-.wrap { max-width:800px; margin:0 auto; padding:28px 20px 100px; }
-.sec { margin-bottom:56px; }
-.sec-label { font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; margin-bottom:6px; }
-.sec-label.red { color:var(--red); } .sec-label.amber { color:var(--amber); } .sec-label.blue { color:var(--blue); } .sec-label.green { color:var(--green); } .sec-label.purple { color:var(--purple); }
-.sec-title { font-size:24px; font-weight:900; line-height:1.3; margin-bottom:12px; }
-.sec-desc { color:var(--text2); margin-bottom:28px; }
+.card{background:var(--bg2);border:1px solid var(--brd);border-radius:12px;margin-bottom:16px;overflow:hidden}
+.card-head{padding:16px 20px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:background .2s}
+.card-head:hover{background:var(--bg3)}
+.card-num{font-size:12px;font-weight:700;padding:3px 10px;border-radius:6px;flex-shrink:0}
+.card-num.red{background:rgba(232,93,93,.12);color:var(--red)}
+.card-num.amber{background:rgba(212,160,74,.12);color:var(--amber)}
+.card-num.blue{background:rgba(74,144,217,.12);color:var(--blue)}
+.card-num.green{background:rgba(76,175,125,.12);color:var(--green)}
+.card-name{font-size:15px;font-weight:700;flex:1}
+.card-arrow{font-size:16px;color:var(--t3);transition:transform .3s}
+.card.open .card-arrow{transform:rotate(180deg)}
+.card-body{max-height:0;overflow:hidden;transition:max-height .5s ease}
+.card.open .card-body{max-height:12000px}
+.card-inner{padding:0 20px 20px;border-top:1px solid var(--brd)}
 
-/* ─ collapsible spec card ─ */
-.card { background:var(--bg-card); border:1px solid var(--border); border-radius:12px; margin-bottom:16px; overflow:hidden; }
-.card-head { padding:16px 20px; display:flex; align-items:center; gap:12px; cursor:pointer; transition:background .2s; }
-.card-head:hover { background:var(--bg-hover); }
-.card-num { font-size:12px; font-weight:700; padding:3px 10px; border-radius:6px; flex-shrink:0; }
-.card-num.red { background:rgba(232,93,93,0.12); color:var(--red); }
-.card-num.amber { background:rgba(212,160,74,0.12); color:var(--amber); }
-.card-num.blue { background:rgba(74,144,217,0.12); color:var(--blue); }
-.card-num.green { background:rgba(76,175,125,0.12); color:var(--green); }
-.card-name { font-size:15px; font-weight:700; flex:1; }
-.card-arrow { font-size:16px; color:var(--text3); transition:transform .3s; }
-.card.open .card-arrow { transform:rotate(180deg); }
-.card-body { max-height:0; overflow:hidden; transition:max-height .5s ease; }
-.card.open .card-body { max-height:6000px; }
-.card-inner { padding:0 20px 20px; border-top:1px solid var(--border); }
+.p{color:var(--t2);font-size:13px;line-height:1.8;margin-bottom:10px}
+.p strong{color:var(--text)}
+.st{font-size:13px;font-weight:700;margin:16px 0 8px;display:flex;align-items:center;gap:8px}
+.th-tag{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;background:rgba(155,109,255,.1);color:var(--purple);border:1px solid rgba(155,109,255,.15);margin-right:4px;vertical-align:middle}
+.tg{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;margin-right:4px}
+.tg.new{background:rgba(76,175,125,.12);color:var(--green)}
+.tg.chg{background:rgba(212,160,74,.12);color:var(--amber)}
 
-/* ─ content elements ─ */
-.st { font-size:13px; font-weight:700; margin:18px 0 8px; display:flex; align-items:center; gap:8px; }
-.st .d { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
-.d.red { background:var(--red); } .d.amber { background:var(--amber); } .d.blue { background:var(--blue); } .d.green { background:var(--green); } .d.purple { background:var(--purple); }
-.p { color:var(--text2); font-size:14px; line-height:1.8; margin-bottom:12px; }
-.p strong { color:var(--text); }
+.tb{width:100%;border-collapse:collapse;margin:12px 0;font-size:12px}
+.tb th{text-align:left;padding:8px 10px;background:var(--bg4);font-weight:600;border-bottom:1px solid var(--brd)}
+.tb td{padding:8px 10px;border-bottom:1px solid rgba(42,42,62,.5);color:var(--t2);vertical-align:top}
 
-/* theory tag — inline, compact */
-.th-tag { display:inline-block; font-size:11px; font-weight:600; padding:2px 8px; border-radius:4px; background:rgba(155,109,255,0.1); color:var(--purple); border:1px solid rgba(155,109,255,0.2); margin-right:4px; vertical-align:middle; }
+.vs{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;margin:12px 0;align-items:start}
+.vs-c{background:var(--bg);border:1px solid var(--brd);border-radius:8px;padding:12px;font-size:13px}
+.vs-l{font-size:10px;font-weight:700;letter-spacing:1px;margin-bottom:4px}
+.vs-l.old{color:var(--red)}.vs-l.new{color:var(--green)}
+.vs-m{font-size:12px;color:var(--t3);align-self:center;font-weight:700}
 
-/* wireframe */
-.wf { background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:16px; margin:12px 0; font-family:'Courier New',monospace; font-size:12px; line-height:1.6; color:var(--text2); white-space:pre-wrap; overflow-x:auto; }
+/* phone mockup */
+.phone{width:100%;max-width:340px;margin:16px auto;background:#0d0d18;border:2px solid var(--brd);border-radius:28px;padding:8px 12px 12px;position:relative}
+.phone-bar{height:24px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--t3);margin-bottom:8px}
+.phone-scr{background:var(--bg2);border-radius:16px;overflow:hidden}
+.phone-nav{display:flex;align-items:center;padding:10px 14px;font-size:14px;font-weight:600;gap:8px;border-bottom:1px solid var(--brd)}
+.phone-nav .back{font-size:18px;color:var(--t2)}
+.phone-body{padding:14px;min-height:260px;font-size:13px;line-height:1.6}
+.phone-label{text-align:center;margin-top:10px;font-size:12px;font-weight:600;color:var(--t2)}
+.phone-label-sub{text-align:center;font-size:11px;color:var(--t3);margin-top:3px}
+.phones{display:flex;gap:20px;flex-wrap:wrap;justify-content:center;margin:14px 0}
 
-/* comparison */
-.vs { display:grid; grid-template-columns:1fr auto 1fr; gap:12px; margin:12px 0; align-items:start; }
-.vs-card { background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:14px; }
-.vs-l { font-size:11px; font-weight:700; letter-spacing:1px; margin-bottom:6px; }
-.vs-l.old { color:var(--red); } .vs-l.new { color:var(--green); }
-.vs-mid { font-size:12px; color:var(--text3); align-self:center; font-weight:700; }
+/* mock UI atoms */
+.m-card{background:var(--bg4);border:1px solid var(--brd);border-radius:10px;padding:12px;margin:8px 0}
+.m-row{display:flex;justify-content:space-between;padding:6px 0;font-size:12px;border-bottom:1px solid rgba(42,42,62,.4)}
+.m-row:last-child{border:none}
+.m-row .k{color:var(--t2)}.m-row .v{font-weight:600}
+.m-btn{display:block;padding:12px;border-radius:10px;font-size:14px;font-weight:600;text-align:center;margin:8px 0;cursor:pointer;border:none;width:100%;font-family:inherit;transition:all .2s}
+.m-btn:active{transform:scale(.98)}
+.m-btn-red{background:var(--red);color:#fff}
+.m-btn-blue{background:var(--blue);color:#fff}
+.m-btn-green{background:var(--green);color:#fff}
+.m-btn-amber{background:var(--amber);color:#fff}
+.m-btn-ghost{background:transparent;border:1px solid var(--brd);color:var(--t2)}
+.m-btn-disabled{background:var(--bg4);color:var(--t3);cursor:not-allowed}
+.m-tag{display:inline-block;font-size:10px;padding:2px 8px;border-radius:4px;font-weight:600}
+.m-sep{border:none;border-top:1px solid var(--brd);margin:10px 0}
+.m-trust{display:flex;align-items:center;gap:6px;padding:8px 12px;background:rgba(76,175,125,.08);border-radius:8px;font-size:11px;color:var(--green);margin:8px 0}
+.m-dim{color:var(--t2);font-size:11px}
+.m-big{font-size:28px;font-weight:900}
+.m-center{text-align:center}
 
-/* table */
-.tb { width:100%; border-collapse:collapse; margin:12px 0; font-size:13px; }
-.tb th { text-align:left; padding:8px 10px; background:var(--bg-el); font-weight:600; font-size:12px; border-bottom:1px solid var(--border); }
-.tb td { padding:8px 10px; border-bottom:1px solid rgba(42,42,62,0.5); color:var(--text2); vertical-align:top; }
+/* slide confirm */
+.slide-track{position:relative;height:48px;background:var(--bg4);border-radius:24px;margin:10px 0;overflow:hidden;user-select:none;touch-action:none}
+.slide-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--t3);pointer-events:none}
+.slide-thumb{position:absolute;left:4px;top:4px;width:40px;height:40px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:grab;transition:left .1s;z-index:1}
+.slide-track.done{background:rgba(76,175,125,.15)}
+.slide-track.done .slide-label{color:var(--green);font-weight:600}
+.slide-track.done .slide-thumb{background:var(--green);left:calc(100% - 44px)!important}
 
-/* tag */
-.tg { display:inline-block; font-size:11px; font-weight:600; padding:2px 8px; border-radius:4px; margin-right:4px; }
-.tg.new { background:rgba(76,175,125,0.12); color:var(--green); }
-.tg.chg { background:rgba(212,160,74,0.12); color:var(--amber); }
+/* progress bar */
+.prog{height:6px;background:var(--bg);border-radius:3px;margin:6px 0;overflow:hidden}
+.prog-fill{height:100%;border-radius:3px;transition:width .5s}
 
-/* highlight */
-.hl { border-radius:8px; padding:14px 16px; margin:12px 0; font-size:13px; line-height:1.7; }
-.hl.purple { background:rgba(155,109,255,0.08); border:1px solid rgba(155,109,255,0.15); }
-.hl.blue { background:rgba(74,144,217,0.08); border:1px solid rgba(74,144,217,0.15); }
-.hl.amber { background:rgba(212,160,74,0.08); border:1px solid rgba(212,160,74,0.15); }
-.hl.green { background:rgba(76,175,125,0.08); border:1px solid rgba(76,175,125,0.15); }
-.hl.red { background:rgba(232,93,93,0.08); border:1px solid rgba(232,93,93,0.15); }
+/* level card */
+.lvl{display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg4);border-radius:10px;margin:8px 0}
+.lvl-icon{font-size:28px;flex-shrink:0}
+.lvl-info{flex:1}
+.lvl-name{font-size:14px;font-weight:700}
+.lvl-meta{font-size:11px;color:var(--t2)}
 
-/* ─ CEO feedback ─ */
-.fb { background:var(--bg-el); border:1px solid var(--border); border-radius:8px; padding:14px 16px; margin:16px 0; }
-.fb-t { font-size:11px; font-weight:600; color:var(--text3); margin-bottom:8px; }
-.fb-btns { display:flex; gap:6px; margin-bottom:8px; flex-wrap:wrap; }
-.fb-b { padding:7px 16px; border-radius:6px; border:1px solid var(--border); background:transparent; color:var(--text2); font-size:13px; cursor:pointer; transition:all .2s; font-family:inherit; }
-.fb-b:hover { background:var(--bg-hover); color:var(--text); }
-.fb-b.s-a { background:rgba(76,175,125,0.12); border-color:var(--green); color:var(--green); }
-.fb-b.s-d { background:rgba(212,160,74,0.12); border-color:var(--amber); color:var(--amber); }
-.fb-b.s-x { background:rgba(232,93,93,0.12); border-color:var(--red); color:var(--red); }
-.fb-n { width:100%; padding:7px 10px; background:var(--bg); border:1px solid var(--border); border-radius:6px; color:var(--text); font-size:13px; font-family:inherit; resize:vertical; min-height:32px; }
-.fb-n::placeholder { color:var(--text3); }
+/* reward animation */
+@keyframes shake{0%,100%{transform:rotate(0)}25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}
+.shake{animation:shake .4s ease-in-out}
+@keyframes pop{0%{transform:scale(0)}50%{transform:scale(1.2)}100%{transform:scale(1)}}
+.pop{animation:pop .5s ease-out}
 
-/* ─ summary bar ─ */
-.sbar { position:fixed; bottom:0; left:0; right:0; background:rgba(10,10,18,0.95); backdrop-filter:blur(16px); border-top:1px solid var(--border); padding:10px 20px; display:flex; align-items:center; justify-content:center; gap:20px; font-size:13px; z-index:100; }
-.si { display:flex; align-items:center; gap:5px; }
-.sd { width:8px; height:8px; border-radius:50%; }
+/* CEO feedback */
+.fb{background:var(--bg4);border:1px solid var(--brd);border-radius:8px;padding:14px 16px;margin:16px 0}
+.fb-t{font-size:11px;font-weight:600;color:var(--t3);margin-bottom:8px}
+.fb-btns{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+.fb-b{padding:7px 14px;border-radius:20px;border:1px solid var(--brd);background:transparent;color:var(--t2);font-size:12px;cursor:pointer;transition:all .2s;font-family:inherit}
+.fb-b:hover{background:var(--bg3);color:var(--text)}
+.fb-b.s-a{background:rgba(76,175,125,.12);border-color:var(--green);color:var(--green)}
+.fb-b.s-d{background:rgba(212,160,74,.12);border-color:var(--amber);color:var(--amber)}
+.fb-b.s-x{background:rgba(232,93,93,.12);border-color:var(--red);color:var(--red)}
+.fb-n{width:100%;padding:7px 10px;background:var(--bg);border:1px solid var(--brd);border-radius:6px;color:var(--text);font-size:12px;font-family:inherit;resize:vertical;min-height:28px}
+.fb-n::placeholder{color:var(--t3)}
 
-@media(max-width:600px) {
-  .sec-title { font-size:20px; }
-  .vs { grid-template-columns:1fr; }
-  .vs-mid { text-align:center; }
-}
+.sbar{position:fixed;bottom:0;left:0;right:0;background:rgba(10,10,18,.95);backdrop-filter:blur(16px);border-top:1px solid var(--brd);padding:10px 20px;display:flex;align-items:center;justify-content:center;gap:20px;font-size:13px;z-index:100}
+.si{display:flex;align-items:center;gap:5px}
+.sd{width:8px;height:8px;border-radius:50%}
+
+@media(max-width:600px){.sec-title{font-size:20px}.vs{grid-template-columns:1fr}.vs-m{text-align:center}.phones{flex-direction:column;align-items:center}}
 </style>
 </head>
 <body>
-<!-- MSC.AI SITE NAV --><div style="position:sticky;top:0;z-index:9999;background:rgba(10,12,16,.95);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.08);padding:8px 16px;display:flex;align-items:center;gap:12px;font-family:Noto Sans SC,sans-serif;font-size:12px;overflow-x:auto;scrollbar-width:none"><a href="index.html" style="color:#34d399;text-decoration:none;font-weight:700;white-space:nowrap;display:flex;align-items:center;gap:4px"><span style="display:inline-flex;width:20px;height:20px;background:linear-gradient(135deg,#34d399,#60a5fa);border-radius:5px;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:#000">M</span>首页</a><span style="color:#5a6478">│</span><a href="chatA.html" style="color:#8b95a8;text-decoration:none;white-space:nowrap;padding:3px 8px;border-radius:4px" class="snav">1·信任</a><a href="chatB.html" style="color:#8b95a8;text-decoration:none;white-space:nowrap;padding:3px 8px;border-radius:4px" class="snav">2+3·空状态反馈</a><a href="chatC.html" style="color:#8b95a8;text-decoration:none;white-space:nowrap;padding:3px 8px;border-radius:4px" class="snav">4+5·卡片金额</a><a href="chatD.html" style="color:#8b95a8;text-decoration:none;white-space:nowrap;padding:3px 8px;border-radius:4px" class="snav";background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);color:#f87171">6+7+8·确认留存</a></div><!-- END NAV -->
+<!-- MSC NAV --><div style="position:sticky;top:0;z-index:9999;background:rgba(10,12,16,.95);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.08);padding:8px 16px;display:flex;align-items:center;gap:12px;font-family:Noto Sans SC,sans-serif;font-size:12px;overflow-x:auto;scrollbar-width:none"><a href="index.html" style="color:#34d399;text-decoration:none;font-weight:700;white-space:nowrap;display:flex;align-items:center;gap:4px"><span style="display:inline-flex;width:20px;height:20px;background:linear-gradient(135deg,#34d399,#60a5fa);border-radius:5px;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:#000">M</span>首页</a><span style="color:#5a6478">│</span><a href="chatA.html" style="color:#8b95a8;text-decoration:none;white-space:nowrap;padding:3px 8px;border-radius:4px">1·信任</a><a href="chatB.html" style="color:#8b95a8;text-decoration:none;white-space:nowrap;padding:3px 8px;border-radius:4px">2+3·空状态反馈</a><a href="chatC.html" style="color:#8b95a8;text-decoration:none;white-space:nowrap;padding:3px 8px;border-radius:4px">4+5·卡片金额</a><a href="chatD.html" style="color:#f87171;text-decoration:none;white-space:nowrap;padding:3px 8px;border-radius:4px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2)">6+7+8·确认留存</a></div>
 
 <div class="header">
-  <span class="header-title">MSC-D · 确认 · 留存 · 异常</span>
+  <span class="header-title">MSC-D · 确认·留存·异常（Demo版）</span>
   <span class="header-badge">维度 6+7+8</span>
 </div>
 
 <nav class="nav">
-  <a href="#d6" class="n-red">操作确认</a>
-  <a href="#d7" class="n-amber">留存激励</a>
-  <a href="#d8" class="n-blue">异常处理</a>
-  <a href="#oct" class="n-green">驱动力覆盖</a>
+  <a href="#d6">6·操作确认</a>
+  <a href="#d7">7·留存激励</a>
+  <a href="#d8">8·异常处理</a>
 </nav>
 
 <div class="wrap">
 
-<!-- ════════════════════════════════════════ -->
+<!-- ══════════════════════════════ -->
 <!-- 维度6：操作确认 -->
-<!-- ════════════════════════════════════════ -->
+<!-- ══════════════════════════════ -->
 <section class="sec" id="d6">
-<div class="sec-label red">DIMENSION 6</div>
+<div class="sec-label" style="color:var(--red)">DIMENSION 6</div>
 <div class="sec-title">操作确认与防误触</div>
-<div class="sec-desc">核心原则：<strong>摩擦力与决策后果成正比</strong>。接取任务（可退出）用低摩擦滑动确认；发布任务（扣费）用中摩擦弹窗；提现（资金离开平台）用高摩擦倒计时。</div>
+<div class="sec-desc">核心原则：<strong>摩擦力与决策后果成正比</strong>。接取（可退出）→ 低摩擦滑动；发布（扣费）→ 中摩擦弹窗；提现（资金离开）→ 高摩擦倒计时。</div>
 
-<!-- 6.1 发布确认 -->
+<!-- 6.1 -->
 <div class="card">
 <div class="card-head" onclick="tog(this)">
   <span class="card-num red">6.1</span>
@@ -160,36 +171,43 @@ body { background:var(--bg); color:var(--text); font-family:'Noto Sans SC',sans-
   <span class="card-arrow">▼</span>
 </div>
 <div class="card-body"><div class="card-inner">
-
 <div class="p"><span class="tg new">新增</span> ROI预估行 + 行业均价锚点 <span class="tg chg">优化</span> 按钮文案"确认支付"→"确认投入"</div>
 
-<div class="wf">┌───────────────────────────────┐
-│        确认发布任务             │
-│───────────────────────────────│
-│ 📋 抖音涨粉 · 目标+500粉丝     │
-│    接取人数：10人               │
-│───────────────────────────────│
-│ 费用明细                       │
-│ 单次费用          ¥15.00       │
-│ × 接取人数           10        │
-│ ───────────────────────       │
-│ 任务总费用        ¥150.00      │
-│ 平台服务费(0.5%)    ¥0.75      │
-│ ═══════════════════════       │
-│ 总投入金额        ¥150.75      │ ← 琥珀色 20px
-│                                │
-│ 📊 预计回报                    │ ← 锚定效应
-│ 预计获得    500个精准粉丝       │
-│ 单个获客    ¥0.30（行业¥0.80+）│ ← 绿色
-│                                │
-│ 💰 账户余额：¥320.50           │
-│ 🔒 资金由平台托管，完成后结算   │
-│───────────────────────────────│
-│ [取消]       [确认投入 ¥150.75] │
-│              （警示红底白字）    │
-└───────────────────────────────┘</div>
+<div class="phone">
+  <div class="phone-bar">MSC.AI</div>
+  <div class="phone-scr" style="position:relative;min-height:480px">
+    <div class="phone-nav" style="opacity:.3"><span class="back">‹</span> 发布任务</div>
+    <div style="padding:14px;opacity:.1;font-size:14px">任务配置表单…</div>
+    <div style="position:absolute;inset:0;background:rgba(0,0,0,.6);border-radius:16px;display:flex;align-items:center;justify-content:center;padding:14px">
+      <div style="background:var(--bg2);border-radius:14px;padding:20px 16px;width:100%;border:1px solid var(--brd)">
+        <div style="text-align:center;font-size:16px;font-weight:700;margin-bottom:14px">确认发布任务</div>
+        <div class="m-card">
+          <div class="m-row"><span class="k">任务类型</span><span class="v">抖音涨粉 · 目标+500</span></div>
+          <div class="m-row"><span class="k">接取人数</span><span class="v">10人</span></div>
+          <hr class="m-sep">
+          <div class="m-row"><span class="k">任务总费用</span><span class="v">¥150.00</span></div>
+          <div class="m-row"><span class="k">平台服务费 (0.5%)</span><span class="v" style="color:var(--t3)">¥0.75</span></div>
+          <div class="m-row" style="padding-top:8px;border-top:1px solid var(--brd)"><span class="k" style="font-weight:600;color:var(--text)">总投入金额</span><span class="v" style="color:var(--amber);font-size:16px">¥150.75</span></div>
+        </div>
+        <div class="m-card" style="border-color:rgba(76,175,125,.3);background:rgba(76,175,125,.04)">
+          <div style="font-size:11px;color:var(--green);font-weight:600;margin-bottom:4px">📊 预计回报</div>
+          <div class="m-row"><span class="k">预计获得</span><span class="v" style="color:var(--green)">500个精准粉丝</span></div>
+          <div class="m-row"><span class="k">单个获客</span><span class="v" style="color:var(--green)">¥0.30 <span style="color:var(--t3);font-weight:400">(行业¥0.80+)</span></span></div>
+        </div>
+        <div style="font-size:11px;color:var(--t2);margin:6px 0">💰 账户余额：¥320.50</div>
+        <div class="m-trust">🔒 资金由平台托管，完成后结算</div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="m-btn m-btn-ghost" style="flex:1">取消</button>
+          <button class="m-btn m-btn-red" style="flex:2">确认投入 ¥150.75</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="phone-label">费用确认弹窗</div>
+<div class="phone-label-sub">费用分解 + ROI预估 + 托管保障</div>
 
-<div class="p"><span class="th-tag">锚定效应</span> 行业均价¥0.80+作为参照，让¥0.30显得超值。<span class="th-tag">框架效应</span> "总投入"替代"扣款"，将支出重新定义为投资。</div>
+<div class="p"><span class="th-tag">锚定效应</span> 行业均价¥0.80+作为参照让¥0.30显得超值。<span class="th-tag">框架效应</span> "总投入"替代"扣款"，支出→投资。红色按钮=不可撤销扣费操作。</div>
 
 <div class="fb" data-id="6.1">
   <div class="fb-t">CEO 反馈</div>
@@ -203,7 +221,7 @@ body { background:var(--bg); color:var(--text); font-family:'Noto Sans SC',sans-
 </div></div>
 </div>
 
-<!-- 6.2 接取确认 -->
+<!-- 6.2 -->
 <div class="card">
 <div class="card-head" onclick="tog(this)">
   <span class="card-num blue">6.2</span>
@@ -211,26 +229,46 @@ body { background:var(--bg); color:var(--text); font-family:'Noto Sans SC',sans-
   <span class="card-arrow">▼</span>
 </div>
 <div class="card-body"><div class="card-inner">
+<div class="p"><span class="tg chg">重大变更</span> 从弹窗改为底部滑动确认条，不打断浏览节奏。试试下面的交互demo：</div>
 
-<div class="p"><span class="tg chg">重大变更</span> 从弹窗改为<strong>底部滑动确认条</strong>，不打断浏览节奏</div>
+<div class="phone">
+  <div class="phone-bar">MSC.AI</div>
+  <div class="phone-scr">
+    <div class="phone-nav"><span class="back">‹</span> 任务详情</div>
+    <div class="phone-body">
+      <div class="m-center" style="padding:8px 0">
+        <div class="m-dim">完成可获得</div>
+        <div style="font-size:32px;font-weight:900;color:var(--green)">¥15.00</div>
+        <div class="m-dim">≈ ¥30/时 · <span style="color:var(--green)">↑22% 高于均值</span></div>
+      </div>
+      <hr class="m-sep">
+      <div style="font-size:14px;font-weight:700;margin:8px 0 4px">抖音涨粉</div>
+      <div class="m-dim">关注指定账号并保持7天 · 约30分钟</div>
+      <div style="display:flex;gap:4px;margin:10px 0">
+        <span class="m-tag" style="background:rgba(76,175,125,.1);color:var(--green)">AI可完成</span>
+        <span class="m-tag" style="background:rgba(74,144,217,.1);color:var(--blue)">🥇 4.9分</span>
+      </div>
+    </div>
+    <div style="padding:0 14px 14px">
+      <div class="slide-track" id="slide1" onmousedown="startSlide(event,'slide1')" ontouchstart="startSlide(event,'slide1')">
+        <div class="slide-label" id="slide1-label">➜ 滑动确认接取</div>
+        <div class="slide-thumb" id="slide1-thumb">➜</div>
+      </div>
+      <div id="slide1-before" class="m-dim m-center">98%接单者成功完成此类任务</div>
+      <div id="slide1-after" style="display:none">
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="m-btn m-btn-blue" style="flex:2;font-size:12px">开始执行</button>
+          <button class="m-btn m-btn-ghost" style="flex:1;font-size:12px;color:var(--red);border-color:rgba(232,93,93,.3)" onclick="resetSlide('slide1')">取消任务</button>
+        </div>
+        <div class="m-dim m-center" style="margin-top:6px">接取后24h内可免责取消</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="phone-label">滑动确认接取</div>
+<div class="phone-label-sub">拖动滑块试试 · 松手可回弹</div>
 
-<div class="wf">任务详情页固定底栏（非弹窗）：
-
-┌──────────────────────────────┐
-│ 💰 ¥15 · ⏱≈30min · 时薪≈¥30  │
-│ ┌─────────────────────────┐  │
-│ │  ➜ 滑动确认接取 ─────→   │  │ ← 滑动条
-│ └─────────────────────────┘  │
-│ 98%接单者成功完成此类任务     │ ← 社会证明
-└──────────────────────────────┘
-
-滑动完成后底栏变为：
-┌──────────────────────────────┐
-│ ✅ 已接取 · 请在 24h 内完成   │
-│ [开始执行]     [查看要求]     │
-└──────────────────────────────┘</div>
-
-<div class="p"><span class="th-tag">渐进式摩擦</span> 滑动确认比弹窗轻量（参考微信支付），但比单击按钮多一层意向确认。<span class="th-tag">社会证明</span> "98%成功完成"消除新手能力焦虑。<span class="th-tag">时薪锚定</span> 将¥15/30min转为"时薪¥30"——更直观的收益感知。</div>
+<div class="p"><span class="th-tag">渐进式摩擦</span> 滑动确认比弹窗轻量（参考微信支付），比单击多一层意向确认。<span class="th-tag">社会证明</span> "98%成功完成"消除新手能力焦虑。</div>
 
 <div class="fb" data-id="6.2">
   <div class="fb-t">CEO 反馈</div>
@@ -244,7 +282,7 @@ body { background:var(--bg); color:var(--text); font-family:'Noto Sans SC',sans-
 </div></div>
 </div>
 
-<!-- 6.3 提现确认 -->
+<!-- 6.3 -->
 <div class="card">
 <div class="card-head" onclick="tog(this)">
   <span class="card-num red">6.3</span>
@@ -252,27 +290,36 @@ body { background:var(--bg); color:var(--text); font-family:'Noto Sans SC',sans-
   <span class="card-arrow">▼</span>
 </div>
 <div class="card-body"><div class="card-inner">
+<div class="p"><span class="tg new">新增</span> 3秒倒计时冷静期 + AI收益机会成本展示。点击下方demo的"确认提现"体验倒计时：</div>
 
-<div class="p"><span class="tg new">新增</span> 3秒倒计时冷静期 <span class="tg new">新增</span> AI收益机会成本展示</div>
+<div class="phone">
+  <div class="phone-bar">MSC.AI</div>
+  <div class="phone-scr">
+    <div class="phone-nav"><span class="back">‹</span> 确认提现</div>
+    <div class="phone-body">
+      <div class="m-card">
+        <div class="m-row"><span class="k">提现金额</span><span class="v" style="font-size:18px;color:var(--amber)">¥100.00</span></div>
+        <div class="m-row"><span class="k">到账方式</span><span class="v">微信零钱</span></div>
+        <div class="m-row"><span class="k">到账账户</span><span class="v">昵称：小明</span></div>
+        <div class="m-row"><span class="k">预计到账</span><span class="v">24小时内</span></div>
+        <div class="m-row"><span class="k">手续费</span><span class="v" style="color:var(--green)">¥0（本月免费3次）</span></div>
+      </div>
+      <div class="m-card" style="border-color:rgba(74,144,217,.3);background:rgba(74,144,217,.04)">
+        <div style="font-size:11px;color:var(--blue);font-weight:600;margin-bottom:4px">💡 提现后余额 ¥185.50</div>
+        <div class="m-dim">📊 余额留在平台？本月AI已为你赚取 <strong style="color:var(--green)">¥48.20</strong></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button class="m-btn m-btn-ghost" style="flex:1">取消</button>
+        <button class="m-btn m-btn-disabled" id="withdraw-btn" style="flex:2" onclick="startCountdown()">确认提现（3s）</button>
+      </div>
+      <div class="m-dim m-center" style="margin-top:6px" id="withdraw-hint">3秒冷静期后可点击</div>
+    </div>
+  </div>
+</div>
+<div class="phone-label">提现确认 · 倒计时按钮</div>
+<div class="phone-label-sub">点击按钮体验3秒倒计时</div>
 
-<div class="wf">┌──────────────────────────────┐
-│         确认提现               │
-│──────────────────────────────│
-│ 提现金额      ¥100.00         │
-│ 到账方式      微信零钱         │
-│ 到账账户      昵称：小明       │
-│ 预计到账      24小时内         │
-│ 手续费        ¥0（本月免费3次）│
-│ ────────────────────────     │
-│ 💡 提现后余额 ¥185.50         │
-│ 📊 余额留在平台？本月AI已      │
-│    为你赚取 ¥48.20            │ ← 机会成本
-│ ────────────────────────     │
-│ [取消]    [确认提现（3…2…1）]  │ ← 倒计时
-│           3秒后可点击          │
-└──────────────────────────────┘</div>
-
-<div class="p"><span class="th-tag">损失厌恶</span> "本月AI已为你赚¥48.20"让用户意识到余额留在平台有隐形收益——是知情决策引导，不是阻止提现。<span class="th-tag">渐进摩擦</span> 3秒倒计时创造冷静期，防冲动操作但不像验证码那样繁琐。</div>
+<div class="p"><span class="th-tag">损失厌恶</span> "本月AI已为你赚¥48.20"让用户知道余额留在平台有隐形收益。<span class="th-tag">渐进摩擦</span> 3秒倒计时=冷静期，防冲动但不繁琐。</div>
 
 <div class="fb" data-id="6.3">
   <div class="fb-t">CEO 反馈</div>
@@ -286,25 +333,23 @@ body { background:var(--bg); color:var(--text); font-family:'Noto Sans SC',sans-
 </div></div>
 </div>
 
-<!-- 6.4 按钮规范 -->
+<!-- 6.4 -->
 <div class="card">
 <div class="card-head" onclick="tog(this)">
   <span class="card-num red">6.4</span>
-  <span class="card-name">按钮颜色规范：不可撤销 vs 可撤销</span>
+  <span class="card-name">按钮颜色规范</span>
   <span class="card-arrow">▼</span>
 </div>
 <div class="card-body"><div class="card-inner">
+<div class="p"><strong>一句话：红色=钱要离开账户。路径色=正向推进。灰色=条件不满足。</strong></div>
 
-<div class="p">一句话原则：<strong>红色=钱要离开账户。路径色=流程正向推进。灰色=条件不满足（必须附带原因）。</strong></div>
-
-<table class="tb">
-<tr><th>操作</th><th>可撤销？</th><th>按钮色</th></tr>
-<tr><td>发布扣费 / 提现 / 删除</td><td style="color:var(--red)">❌</td><td style="color:var(--red)">警示红 #E85D5D</td></tr>
-<tr><td>接取任务 / 提交成果</td><td style="color:var(--green)">✅</td><td style="color:var(--blue)">主蓝 #4A90D9</td></tr>
-<tr><td>审核通过</td><td style="color:var(--green)">✅</td><td style="color:var(--green)">成功绿 #4CAF7D</td></tr>
-<tr><td>充值</td><td style="color:var(--green)">✅</td><td style="color:var(--amber)">琥珀 #D4A04A</td></tr>
-<tr><td>条件不满足</td><td>—</td><td style="color:var(--text3)">禁用灰 #555（附原因文案）</td></tr>
-</table>
+<div style="display:flex;flex-wrap:wrap;gap:8px;margin:12px 0">
+  <button class="m-btn m-btn-red" style="width:auto;padding:10px 20px;font-size:12px">确认支付 ¥150（不可撤销）</button>
+  <button class="m-btn m-btn-blue" style="width:auto;padding:10px 20px;font-size:12px">接取任务（可撤销）</button>
+  <button class="m-btn m-btn-green" style="width:auto;padding:10px 20px;font-size:12px">审核通过</button>
+  <button class="m-btn m-btn-amber" style="width:auto;padding:10px 20px;font-size:12px">确认充值</button>
+  <button class="m-btn m-btn-disabled" style="width:auto;padding:10px 20px;font-size:12px">余额不足</button>
+</div>
 
 <div class="fb" data-id="6.4">
   <div class="fb-t">CEO 反馈</div>
@@ -319,35 +364,51 @@ body { background:var(--bg); color:var(--text); font-family:'Noto Sans SC',sans-
 </div>
 </section>
 
-<!-- ════════════════════════════════════════ -->
+<!-- ══════════════════════════════ -->
 <!-- 维度7：留存激励 -->
-<!-- ════════════════════════════════════════ -->
+<!-- ══════════════════════════════ -->
 <section class="sec" id="d7">
-<div class="sec-label amber">DIMENSION 7</div>
+<div class="sec-label" style="color:var(--amber)">DIMENSION 7</div>
 <div class="sec-title">留存与激励机制</div>
-<div class="sec-desc">用 Octalysis 8核心驱动力框架设计——当前产品只触发了"拥有余额"1个驱动力，目标覆盖6个以上。白帽驱动力（成就/意义/社交）为主、黑帽（稀缺/损失厌恶）为辅。</div>
+<div class="sec-desc">用 Octalysis 8核心驱动力框架设计——当前产品只触发了"拥有余额"1个驱动力，目标覆盖6+个。</div>
 
-<!-- 7.1 等级体系 -->
+<!-- 7.1 -->
 <div class="card">
 <div class="card-head" onclick="tog(this)">
   <span class="card-num amber">7.1</span>
-  <span class="card-name">接单者等级体系（外在权益+内在身份）</span>
+  <span class="card-name">接单者等级体系（4级 + 环境变化）</span>
   <span class="card-arrow">▼</span>
 </div>
 <div class="card-body"><div class="card-inner">
 
-<table class="tb">
-<tr><th>等级</th><th>条件</th><th>功能权益</th><th>身份权益 <span class="tg new">NEW</span></th></tr>
-<tr><td>🌱 Lv.1 新手</td><td>注册即得</td><td>基础任务</td><td>—</td></tr>
-<tr><td>⚡ Lv.2 能手</td><td>10单+80%好评</td><td>中级任务 · 上限+5</td><td>蓝色头像框 · 名字带⚡标识</td></tr>
-<tr><td>🔥 Lv.3 达人</td><td>50单+90%好评</td><td>高价任务 · 优先推荐</td><td>自定义头像框色 · 称号「已助力N个品牌」</td></tr>
-<tr><td>👑 Lv.4 金牌</td><td>200单+95%好评+30天连续</td><td>全任务 · 费率优惠 · 专属客服</td><td>金色全局高亮 · 达人榜 · 可建团队</td></tr>
-</table>
+<div class="phone">
+  <div class="phone-bar">MSC.AI</div>
+  <div class="phone-scr">
+    <div class="phone-nav"><span class="back">‹</span> 我的等级</div>
+    <div class="phone-body">
+      <div class="m-center" style="padding:10px 0">
+        <div style="font-size:36px">⚡</div>
+        <div style="font-size:18px;font-weight:900;margin:4px 0">Lv.2 能手</div>
+        <div class="m-dim">距离 🔥 Lv.3 达人还差 <strong style="color:var(--amber)">38单</strong></div>
+      </div>
+      <div class="prog" style="height:8px;margin:8px 0"><div class="prog-fill" style="width:24%;background:linear-gradient(90deg,var(--blue),var(--purple))"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--t3)"><span>12/50单完成</span><span>好评率 92%</span></div>
 
-<div class="p"><span class="th-tag">成就驱动</span> 等级进度条+升级庆祝动效。<span class="th-tag">社交影响</span> 金色高亮和达人榜让同行看到你的地位——比"接更贵的单"更有持续激励力。<span class="th-tag">使命感</span> "已助力50个品牌"让赚钱有了意义，不只是打工。</div>
+      <hr class="m-sep" style="margin:14px 0">
+      <div style="font-size:12px;font-weight:600;margin-bottom:8px">当前权益</div>
+      <div class="lvl"><div class="lvl-icon" style="font-size:18px">📋</div><div class="lvl-info"><div class="lvl-name" style="font-size:12px">中级任务已解锁</div><div class="lvl-meta">可接单数上限 +5</div></div></div>
+      <div class="lvl"><div class="lvl-icon" style="font-size:18px">💎</div><div class="lvl-info"><div class="lvl-name" style="font-size:12px">蓝色头像框</div><div class="lvl-meta">⚡ 名字标识</div></div></div>
 
-<div class="st"><span class="d amber"></span>升级后的环境变化</div>
-<div class="p">升级Lv.3后，任务广场顶部出现一条之前看不到的<strong>"高级任务区"</strong>，配文字"🔓 Lv.3 已解锁高价任务"。这比一次性庆祝弹窗更有持续满足感——用户每次进入都看到"我能看到别人看不到的内容"。</div>
+      <hr class="m-sep" style="margin:14px 0">
+      <div style="font-size:12px;font-weight:600;margin-bottom:8px">下一级解锁</div>
+      <div class="lvl" style="opacity:.6"><div class="lvl-icon" style="font-size:18px">🔥</div><div class="lvl-info"><div class="lvl-name" style="font-size:12px">Lv.3 达人</div><div class="lvl-meta">高价任务 · 优先推荐 · 自定义头像框色</div></div><div style="font-size:10px;color:var(--amber)">🔒</div></div>
+    </div>
+  </div>
+</div>
+<div class="phone-label">等级详情页</div>
+<div class="phone-label-sub">进度条 + 当前权益 + 下级预览</div>
+
+<div class="p"><span class="th-tag">成就驱动</span> 进度条+剩余单数。<span class="th-tag">社交影响</span> 头像框和标识让同行看到地位。升级后任务广场出现"🔓 Lv.3已解锁高价任务区"——持续满足感。</div>
 
 <div class="fb" data-id="7.1">
   <div class="fb-t">CEO 反馈</div>
@@ -361,28 +422,39 @@ body { background:var(--bg); color:var(--text); font-family:'Noto Sans SC',sans-
 </div></div>
 </div>
 
-<!-- 7.2 奖励系统 -->
+<!-- 7.2 -->
 <div class="card">
 <div class="card-head" onclick="tog(this)">
   <span class="card-num amber">7.2</span>
-  <span class="card-name">多变奖赏系统（红包+抽奖+冻结卡）</span>
+  <span class="card-name">多变奖赏系统（红包 + 抽奖）</span>
   <span class="card-arrow">▼</span>
 </div>
 <div class="card-body"><div class="card-inner">
+<div class="p"><span class="th-tag">Hook模型</span> 奖励核心是不确定性——随机¥1~5（含0.5%概率¥50）每天都有期待。点击红包试试：</div>
 
-<div class="p"><span class="th-tag">Hook模型</span> 奖励的核心是<strong>不确定性</strong>——固定¥2没人兴奋，随机¥1~5（含0.5%概率¥50大包）每天都期待惊喜。这就是微信红包和老虎机的底层机制。</div>
+<div class="phone">
+  <div class="phone-bar">MSC.AI</div>
+  <div class="phone-scr">
+    <div class="phone-body m-center">
+      <div style="margin:16px 0 8px;font-size:14px;font-weight:600">🎉 每日首单完成！</div>
+      <div id="redpkt" style="width:120px;height:140px;margin:10px auto;background:linear-gradient(180deg,#e85d5d,#c0392b);border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative" onclick="openRedPkt()">
+        <div style="font-size:32px;margin-bottom:4px" id="rp-emoji">🧧</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.8)" id="rp-text">点击开红包</div>
+        <div id="rp-amount" style="display:none;font-size:28px;font-weight:900;color:#fff"></div>
+      </div>
+      <div class="m-dim" style="margin:10px 0">随机 ¥1~5 · 0.5%概率 ¥50 大红包</div>
 
-<table class="tb">
-<tr><th>触发点</th><th>奖励</th><th>多变性设计</th></tr>
-<tr><td>每日首单</td><td>🧧 开红包</td><td>¥1~5随机 · 0.5%概率¥50大红包</td></tr>
-<tr><td>连续3天</td><td>🎰 抽奖1次</td><td>转盘：¥3/¥5/¥10/¥20/冻结卡/经验加倍</td></tr>
-<tr><td>连续7天</td><td>🎁 惊喜宝箱</td><td>保底¥10 + 随机¥0~30 + 随机徽章</td></tr>
-<tr><td>连续30天</td><td>🏆 金牌礼包</td><td>¥50 + 专属称号 + 永久头像框</td></tr>
-<tr><td>周末</td><td>⚡ 收入加成</td><td>周六1.2x / 周日随机1.2~1.5x</td></tr>
-</table>
-
-<div class="st"><span class="d red"></span>连签保护：冻结卡</div>
-<div class="p">每30天自动获得1张冻结卡。当天22:00前未完成任务时通知：「⚠️ 5天连续活跃即将中断 · 使用冻结卡保护？剩余1张」。<span class="th-tag">损失厌恶</span> 不想失去累计天数 + <span class="th-tag">稀缺性</span> 冻结卡有限——但提供了安全网，用户感到"平台在帮我"而非"在逼我"。</div>
+      <hr class="m-sep">
+      <div style="font-size:12px;font-weight:600;margin:10px 0 8px;text-align:left">连续活跃奖励</div>
+      <div class="lvl"><div class="lvl-icon" style="font-size:16px;background:rgba(232,93,93,.12)">🧧</div><div class="lvl-info"><div class="lvl-name" style="font-size:12px">每日首单</div><div class="lvl-meta">随机红包 ¥1~5</div></div><div style="color:var(--green);font-size:11px">✅ 今日已领</div></div>
+      <div class="lvl"><div class="lvl-icon" style="font-size:16px;background:rgba(212,160,74,.12)">🎰</div><div class="lvl-info"><div class="lvl-name" style="font-size:12px">连续3天</div><div class="lvl-meta">抽奖1次</div></div><div style="color:var(--amber);font-size:11px">2/3天</div></div>
+      <div class="lvl"><div class="lvl-icon" style="font-size:16px;background:rgba(155,109,255,.12)">🎁</div><div class="lvl-info"><div class="lvl-name" style="font-size:12px">连续7天</div><div class="lvl-meta">保底¥10惊喜宝箱</div></div><div style="color:var(--t3);font-size:11px">2/7天</div></div>
+      <div class="lvl"><div class="lvl-icon" style="font-size:16px;background:rgba(74,144,217,.12)">🏆</div><div class="lvl-info"><div class="lvl-name" style="font-size:12px">连续30天</div><div class="lvl-meta">¥50 + 永久头像框</div></div><div style="color:var(--t3);font-size:11px">2/30天</div></div>
+    </div>
+  </div>
+</div>
+<div class="phone-label">奖赏系统 · 红包demo</div>
+<div class="phone-label-sub">点击红包体验开奖 · 连签阶梯奖励</div>
 
 <div class="fb" data-id="7.2">
   <div class="fb-t">CEO 反馈</div>
@@ -396,26 +468,54 @@ body { background:var(--bg); color:var(--text); font-family:'Noto Sans SC',sans-
 </div></div>
 </div>
 
-<!-- 7.3 成就系统 -->
+<!-- 7.3 -->
 <div class="card">
 <div class="card-head" onclick="tog(this)">
   <span class="card-num amber">7.3</span>
-  <span class="card-name">社交货币型成就系统</span>
+  <span class="card-name">收入可视化 + AI自动赚钱面板</span>
   <span class="card-arrow">▼</span>
 </div>
 <div class="card-body"><div class="card-inner">
 
-<div class="p">成就分三类：<strong>展示型</strong>（平台内可见：头像框/标识）、<strong>传播型</strong>（可分享站外：精美海报+小程序码）、<strong>功能型</strong>（解锁能力：高价任务区/团队）。</div>
+<div class="phone">
+  <div class="phone-bar">MSC.AI</div>
+  <div class="phone-scr">
+    <div class="phone-nav"><span class="back">‹</span> 我的</div>
+    <div class="phone-body">
+      <div class="m-card" style="background:linear-gradient(135deg,rgba(74,144,217,.12),rgba(155,109,255,.12));border-color:rgba(74,144,217,.2)">
+        <div class="m-dim">累计收入</div>
+        <div style="font-size:32px;font-weight:900;color:var(--green)">¥2,180.00</div>
+        <div style="display:flex;gap:10px;margin-top:10px">
+          <div style="flex:1;background:var(--bg);border-radius:8px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:700;color:var(--green)">¥85</div><div class="m-dim">今日</div></div>
+          <div style="flex:1;background:var(--bg);border-radius:8px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:700">¥420</div><div class="m-dim">本周</div></div>
+          <div style="flex:1;background:var(--bg);border-radius:8px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:700">¥1,680</div><div class="m-dim">本月</div></div>
+        </div>
+      </div>
 
-<table class="tb">
-<tr><th>成就</th><th>类型</th><th>条件</th><th>社交价值</th></tr>
-<tr><td>💰 月入过千</td><td>传播</td><td>月收入>¥1000</td><td>海报「收入突破四位数」→ 一键分享</td></tr>
-<tr><td>🤖 AI先锋</td><td>传播</td><td>AI完成10单</td><td>海报「我的AI已完成X单」→ 品牌裂变</td></tr>
-<tr><td>🤝 助力50家</td><td>展示+传播</td><td>帮助50个发布者</td><td>称号「品牌助力官」</td></tr>
-<tr><td>👑 万元户</td><td>全类型</td><td>累计收入>¥10,000</td><td>金色标识 + 达人榜 + 里程碑海报</td></tr>
-</table>
+      <div class="m-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div style="font-size:12px;font-weight:600">🤖 AI自动赚钱</div>
+          <div style="font-size:14px;font-weight:700;color:var(--green)">¥620</div>
+        </div>
+        <div class="m-dim">占总收入 28% · 本月AI完成 47 单</div>
+        <div class="prog" style="margin-top:8px"><div class="prog-fill" style="width:28%;background:var(--green)"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--t3);margin-top:4px"><span>🔵 手动 72%</span><span>🟢 AI 28%</span></div>
+      </div>
 
-<div class="p"><strong>裂变设计</strong>：传播型成就的分享海报底部带<strong>MSC.AI小程序码</strong>。文案设计为"社交安全型"——不是"我赚了多少钱"（引反感），而是「用AI为品牌赋能，本月已助力12个品牌」。分享者展示科技感而非炫富，每次分享=免费品牌曝光。</div>
+      <div class="m-dim" style="margin:8px 0 4px">📈 收入趋势（本周 vs 上周）</div>
+      <div style="display:flex;align-items:flex-end;gap:4px;height:60px;padding:4px 0">
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="background:var(--blue);width:100%;height:20px;border-radius:3px 3px 0 0;opacity:.4"></div><div style="background:var(--blue);width:100%;height:28px;border-radius:3px 3px 0 0"></div><div class="m-dim" style="font-size:9px">一</div></div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="background:var(--blue);width:100%;height:24px;border-radius:3px 3px 0 0;opacity:.4"></div><div style="background:var(--blue);width:100%;height:35px;border-radius:3px 3px 0 0"></div><div class="m-dim" style="font-size:9px">二</div></div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="background:var(--blue);width:100%;height:18px;border-radius:3px 3px 0 0;opacity:.4"></div><div style="background:var(--blue);width:100%;height:40px;border-radius:3px 3px 0 0"></div><div class="m-dim" style="font-size:9px">三</div></div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="background:var(--blue);width:100%;height:30px;border-radius:3px 3px 0 0;opacity:.4"></div><div style="background:var(--green);width:100%;height:50px;border-radius:3px 3px 0 0"></div><div class="m-dim" style="font-size:9px">四</div></div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="background:var(--blue);width:100%;height:26px;border-radius:3px 3px 0 0;opacity:.4"></div><div style="background:var(--green);width:100%;height:45px;border-radius:3px 3px 0 0"></div><div class="m-dim" style="font-size:9px">五</div></div>
+      </div>
+      <div class="m-dim m-center" style="margin-top:4px">本周 <span style="color:var(--green)">↑ 18%</span> vs 上周（浅色）</div>
+    </div>
+  </div>
+</div>
+<div class="phone-label">收入仪表盘</div>
+<div class="phone-label-sub">累计收入 + AI占比 + 趋势对比</div>
 
 <div class="fb" data-id="7.3">
   <div class="fb-t">CEO 反馈</div>
@@ -428,56 +528,17 @@ body { background:var(--bg); color:var(--text); font-family:'Noto Sans SC',sans-
 </div>
 </div></div>
 </div>
-
-<!-- 7.4 收入可视化 -->
-<div class="card">
-<div class="card-head" onclick="tog(this)">
-  <span class="card-num amber">7.4</span>
-  <span class="card-name">收入数据可视化 + AI自动赚钱面板</span>
-  <span class="card-arrow">▼</span>
-</div>
-<div class="card-body"><div class="card-inner">
-
-<div class="wf">「我的」Tab 顶部收入卡片：
-
-┌──────────────────────────────┐
-│ 我的收入                      │
-│ ¥ 2,180.00                    │ ← 32px 成功绿
-│ 累计收入                      │
-│ ┌─────┐ ┌─────┐ ┌─────┐     │
-│ │¥85  │ │¥420 │ │¥1680│     │
-│ │ 今日 │ │ 本周 │ │ 本月 │     │
-│ └─────┘ └─────┘ └─────┘     │
-│ 🤖 AI自动赚钱：¥620 (28%)    │
-└──────────────────────────────┘
-
-点击展开 → 7/30天折线图（蓝=手动 绿=AI）
-             + AI最近完成任务列表</div>
-
-<div class="p"><span class="th-tag">禀赋效应</span> 累计收入数字越大，用户越不会离开——"我在这个平台已经赚了两千多"变成沉没成本。AI收益独立展示是为了推广AI自动赚钱功能。</div>
-
-<div class="fb" data-id="7.4">
-  <div class="fb-t">CEO 反馈</div>
-  <div class="fb-btns">
-    <button class="fb-b" onclick="sf(this,'a','7.4')">✅ 同意</button>
-    <button class="fb-b" onclick="sf(this,'d','7.4')">💬 需讨论</button>
-    <button class="fb-b" onclick="sf(this,'x','7.4')">❌ 不同意</button>
-  </div>
-  <textarea class="fb-n" placeholder="备注…" onchange="sn(this,'7.4')"></textarea>
-</div>
-</div></div>
-</div>
 </section>
 
-<!-- ════════════════════════════════════════ -->
+<!-- ══════════════════════════════ -->
 <!-- 维度8：异常处理 -->
-<!-- ════════════════════════════════════════ -->
+<!-- ══════════════════════════════ -->
 <section class="sec" id="d8">
-<div class="sec-label blue">DIMENSION 8</div>
+<div class="sec-label" style="color:var(--blue)">DIMENSION 8</div>
 <div class="sec-title">异常状态与错误处理</div>
-<div class="sec-desc">每个异常时刻都是用户情绪最脆弱的瞬间。<span class="th-tag">峰终定律</span> 用户对产品的记忆主要取决于"最强烈的时刻"和"结束时的感受"——异常处理做好了，信任度反而超过从未出错。</div>
+<div class="sec-desc">每个异常时刻都是用户情绪最脆弱的瞬间。<span class="th-tag">服务恢复悖论</span> 出色的故障恢复让满意度超过从未出错。</div>
 
-<!-- 8.1 余额不足 -->
+<!-- 8.1 -->
 <div class="card">
 <div class="card-head" onclick="tog(this)">
   <span class="card-num blue">8.1</span>
@@ -486,14 +547,32 @@ body { background:var(--bg); color:var(--text); font-family:'Noto Sans SC',sans-
 </div>
 <div class="card-body"><div class="card-inner">
 
-<div class="vs">
-  <div class="vs-card"><div class="vs-l old">❌ 原方案</div><div class="p" style="margin:0">"余额不足，去充值"<br>按钮灰色禁用</div></div>
-  <div class="vs-mid">→</div>
-  <div class="vs-card"><div class="vs-l new">✅ 优化</div><div class="p" style="margin:0">"距发布还差 ¥70 · 充值后立即发布"<br>按钮变琥珀色「补充 ¥70」</div></div>
+<div class="phones">
+  <div>
+    <div class="phone">
+      <div class="phone-bar">MSC.AI</div>
+      <div class="phone-scr">
+        <div class="phone-nav"><span class="back">‹</span> 发布任务</div>
+        <div class="phone-body">
+          <div class="m-dim">任务类型</div>
+          <div style="font-size:14px;font-weight:600;margin:2px 0 10px">抖音涨粉 · 500个 · ¥0.30/个</div>
+          <div class="m-card" style="border-color:rgba(232,93,93,.3);background:rgba(232,93,93,.04)">
+            <div style="font-size:12px;color:var(--red);font-weight:600">⚠️ 余额不足</div>
+            <div class="m-row"><span class="k">需要</span><span class="v">¥150.75</span></div>
+            <div class="m-row"><span class="k">当前余额</span><span class="v">¥80.25</span></div>
+            <div class="m-row"><span class="k" style="color:var(--red)">还差</span><span class="v" style="color:var(--red)">¥70.50</span></div>
+          </div>
+          <button class="m-btn m-btn-amber" style="margin-top:8px">补充 ¥80 → 继续发布</button>
+          <div class="m-dim m-center" style="margin-top:6px">充值后自动返回发布流程</div>
+        </div>
+      </div>
+    </div>
+    <div class="phone-label">余额不足引导</div>
+    <div class="phone-label-sub">精确差额 + 一键补充</div>
+  </div>
 </div>
 
-<div class="st"><span class="d amber"></span>充值套餐锚定设计</div>
-<div class="p">套餐<strong>从高到低排列</strong>：¥500（锚点）→ ¥200（热门🔥）→ ¥100（推荐⭐ 默认选中）→ ¥50 → 自定义。<span class="th-tag">锚定效应</span> ¥500放最上方不是为了让用户选它，而是让¥100看起来像"理性选择"。充值成功后自动返回发布流程，按钮恢复可用。</div>
+<div class="p"><span class="th-tag">锚定效应</span> 补充金额向上取整到¥80（而非¥70.50），减少决策成本。充值成功自动返回发布流程，不让用户迷路。</div>
 
 <div class="fb" data-id="8.1">
   <div class="fb-t">CEO 反馈</div>
@@ -507,7 +586,7 @@ body { background:var(--bg); color:var(--text); font-family:'Noto Sans SC',sans-
 </div></div>
 </div>
 
-<!-- 8.2 审核驳回 -->
+<!-- 8.2 -->
 <div class="card">
 <div class="card-head" onclick="tog(this)">
   <span class="card-num blue">8.2</span>
@@ -515,20 +594,33 @@ body { background:var(--bg); color:var(--text); font-family:'Noto Sans SC',sans-
   <span class="card-arrow">▼</span>
 </div>
 <div class="card-body"><div class="card-inner">
+<div class="p"><span class="th-tag">框架效应</span> 全链路文案重构——"审核未通过" → "任务需要小幅调整"：</div>
 
-<div class="p"><span class="th-tag">框架效应</span> 同一事实的不同措辞决定用户感受。全链路文案重构：</div>
-
-<table class="tb">
-<tr><th>触点</th><th>❌ 原文案</th><th>✅ 优化文案</th></tr>
-<tr><td>微信通知</td><td>审核未通过</td><td>任务需要小幅调整</td></tr>
-<tr><td>页面条幅</td><td>⚠️ 审核未通过</td><td>📝 改进后即可通过</td></tr>
-<tr><td>原因标题</td><td>驳回原因</td><td>改进建议</td></tr>
-<tr><td>修改次数</td><td>剩余修改次数：2/3</td><td>还可修改2次 · 修改后通过率95%</td></tr>
-<tr><td>按钮</td><td>修改并重新提交</td><td>立即改进 → 快速通过</td></tr>
-</table>
-
-<div class="st"><span class="d blue"></span>申诉入口</div>
-<div class="p">详情页底部增加「申诉」幽灵按钮 → 弹出申诉表单（200字说明+最多3张补充截图）→ 24小时内平台处理 → 结果推送微信通知。申诉期间任务状态显示"🔍 申诉处理中"。</div>
+<div class="phones">
+  <div>
+    <div class="phone">
+      <div class="phone-bar">MSC.AI</div>
+      <div class="phone-scr">
+        <div class="phone-nav"><span class="back">‹</span> 任务详情</div>
+        <div class="phone-body">
+          <div class="m-card" style="border-color:rgba(212,160,74,.3);background:rgba(212,160,74,.04)">
+            <div style="font-size:13px;font-weight:600;color:var(--amber)">📝 改进后即可通过</div>
+            <div class="m-dim" style="margin-top:4px">任务"抖音涨粉" · 提交于 03-28 14:30</div>
+          </div>
+          <div style="font-size:12px;font-weight:600;margin:12px 0 6px">💡 改进建议</div>
+          <div class="m-card">
+            <div style="font-size:12px;color:var(--t2);line-height:1.8">截图中未显示关注成功状态，请重新截图确保显示"已关注"字样。</div>
+          </div>
+          <div class="m-dim" style="margin:6px 0">还可修改 <strong style="color:var(--text)">2次</strong> · 修改后通过率 <strong style="color:var(--green)">95%</strong></div>
+          <button class="m-btn m-btn-blue">立即改进 → 快速通过</button>
+          <button class="m-btn m-btn-ghost" style="font-size:12px;color:var(--t3)">对结果有异议？申诉</button>
+        </div>
+      </div>
+    </div>
+    <div class="phone-label">审核改进页</div>
+    <div class="phone-label-sub">正向文案 + 通过率激励 + 申诉入口</div>
+  </div>
+</div>
 
 <div class="fb" data-id="8.2">
   <div class="fb-t">CEO 反馈</div>
@@ -542,7 +634,7 @@ body { background:var(--bg); color:var(--text); font-family:'Noto Sans SC',sans-
 </div></div>
 </div>
 
-<!-- 8.3 AI降级 -->
+<!-- 8.3 -->
 <div class="card">
 <div class="card-head" onclick="tog(this)">
   <span class="card-num blue">8.3</span>
@@ -550,26 +642,40 @@ body { background:var(--bg); color:var(--text); font-family:'Noto Sans SC',sans-
   <span class="card-arrow">▼</span>
 </div>
 <div class="card-body"><div class="card-inner">
+<div class="p"><span class="th-tag">服务恢复悖论</span> 出色的恢复让满意度超过从未出错。三要素：速度+诚意+补偿。</div>
 
-<div class="p"><span class="th-tag">服务恢复悖论</span> 营销学研究发现：服务失败后的出色恢复，能让满意度<strong>超过从未出错</strong>。关键三要素：速度（立即通知）+ 诚意（承认问题）+ 补偿（额外价值）。</div>
-
-<div class="wf">AI失败通知弹窗：
-
-┌──────────────────────────────┐
-│      🤖 AI需要帮手            │ ← 拟人化，不说"失败"
-│──────────────────────────────│
-│ 任务"抖音涨粉"AI执行遇到障碍  │
-│ AI已完成：230/500（46%）      │ ← 展示已完成部分
-│ 📋 剩余270需手动完成          │
-│ ⏱️ 截止时间已延长 48 小时     │ ← 好消息前置
-│                               │
-│ 🎁 补偿奖励                  │ ← 超预期
-│ 本单完成后额外 +¥3.00        │
-│                               │
-│ [开始手动完成]  [放弃此单]    │
-└──────────────────────────────┘
-
-放弃 → 任务释放回池 → 无惩罚</div>
+<div class="phone">
+  <div class="phone-bar">MSC.AI</div>
+  <div class="phone-scr" style="position:relative;min-height:400px">
+    <div class="phone-nav" style="opacity:.3"><span class="back">‹</span> 我的任务</div>
+    <div style="padding:14px;opacity:.1">任务列表…</div>
+    <div style="position:absolute;inset:0;background:rgba(0,0,0,.6);border-radius:16px;display:flex;align-items:center;justify-content:center;padding:14px">
+      <div style="background:var(--bg2);border-radius:14px;padding:20px 16px;width:100%;border:1px solid var(--brd)">
+        <div class="m-center">
+          <div style="font-size:28px;margin-bottom:6px">🤖</div>
+          <div style="font-size:16px;font-weight:700">AI需要帮手</div>
+        </div>
+        <div class="m-card" style="margin-top:12px">
+          <div class="m-dim">任务"抖音涨粉"执行遇到障碍</div>
+          <div class="m-row"><span class="k">AI已完成</span><span class="v" style="color:var(--green)">230/500（46%）</span></div>
+          <div class="m-row"><span class="k">剩余需手动</span><span class="v">270个</span></div>
+          <div class="m-row"><span class="k">截止时间</span><span class="v" style="color:var(--green)">⏱️ 已延长48小时</span></div>
+        </div>
+        <div class="m-card" style="border-color:rgba(76,175,125,.3);background:rgba(76,175,125,.04)">
+          <div style="font-size:12px;color:var(--green);font-weight:600">🎁 补偿奖励</div>
+          <div style="font-size:13px;margin-top:4px">本单完成后额外 <strong style="color:var(--green)">+¥3.00</strong></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button class="m-btn m-btn-ghost" style="flex:1;font-size:12px">放弃此单</button>
+          <button class="m-btn m-btn-blue" style="flex:2;font-size:12px">开始手动完成</button>
+        </div>
+        <div class="m-dim m-center" style="margin-top:6px">放弃无惩罚 · 任务释放回池</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="phone-label">AI失败通知弹窗</div>
+<div class="phone-label-sub">拟人化 + 已完成进度 + 补偿奖励</div>
 
 <div class="fb" data-id="8.3">
   <div class="fb-t">CEO 反馈</div>
@@ -583,7 +689,7 @@ body { background:var(--bg); color:var(--text); font-family:'Noto Sans SC',sans-
 </div></div>
 </div>
 
-<!-- 8.4 网络异常 -->
+<!-- 8.4 -->
 <div class="card">
 <div class="card-head" onclick="tog(this)">
   <span class="card-num blue">8.4</span>
@@ -592,16 +698,32 @@ body { background:var(--bg); color:var(--text); font-family:'Noto Sans SC',sans-
 </div>
 <div class="card-body"><div class="card-inner">
 
-<div class="p">用户最怕的不是"功能不可用"，而是<strong>"我填的东西会不会丢"</strong>。断网提示首先安抚数据安全：</div>
-
-<div class="vs">
-  <div class="vs-card"><div class="vs-l old">❌ 原文案</div><div class="p" style="margin:0">⚠️ 网络连接已断开，部分功能暂不可用</div></div>
-  <div class="vs-mid">→</div>
-  <div class="vs-card"><div class="vs-l new">✅ 优化</div><div class="p" style="margin:0">📡 网络中断 · 你的数据已安全保存 · 恢复后自动同步</div></div>
+<div class="phone">
+  <div class="phone-bar" style="color:var(--red)">📡 无网络连接</div>
+  <div class="phone-scr">
+    <div class="phone-nav"><span class="back">‹</span> 发布任务</div>
+    <div class="phone-body">
+      <div class="m-card" style="border-color:rgba(74,144,217,.3);background:rgba(74,144,217,.04);text-align:center;padding:20px">
+        <div style="font-size:28px;margin-bottom:8px">📡</div>
+        <div style="font-size:14px;font-weight:600">网络中断</div>
+        <div style="font-size:13px;color:var(--green);font-weight:500;margin:8px 0">✅ 你的数据已安全保存</div>
+        <div class="m-dim">恢复连接后自动同步</div>
+      </div>
+      <div class="m-dim" style="margin:12px 0 4px">已缓存的内容</div>
+      <div class="m-card">
+        <div class="m-row"><span class="k">任务标题</span><span class="v" style="color:var(--green)">✅ 已保存</span></div>
+        <div class="m-row"><span class="k">任务类型</span><span class="v" style="color:var(--green)">✅ 已保存</span></div>
+        <div class="m-row"><span class="k">定价配置</span><span class="v" style="color:var(--green)">✅ 已保存</span></div>
+        <div class="m-row"><span class="k">有效期</span><span class="v">7天内恢复有效</span></div>
+      </div>
+      <button class="m-btn m-btn-ghost" style="font-size:12px">继续编辑（离线）</button>
+    </div>
+  </div>
 </div>
+<div class="phone-label">网络中断提示</div>
+<div class="phone-label-sub">数据安全优先 + 缓存状态清单</div>
 
-<div class="st"><span class="d blue"></span>缓存策略</div>
-<div class="p">发布草稿：字段变更自动保存 → wx.setStorageSync → 7天有效。提交草稿：截图+文字自动保存 → 3天有效。重连后弹出「欢迎回来！上次编辑已保存」→ 默认选中"继续编辑"（<span class="th-tag">默认偏好</span> 大多数人直接点默认选项）。</div>
+<div class="p">用户最怕的不是"功能不可用"，而是<strong>"我填的东西会丢"</strong>。断网提示首先安抚数据安全，展示已缓存的字段清单，恢复后弹出「欢迎回来！上次编辑已保存」。</div>
 
 <div class="fb" data-id="8.4">
   <div class="fb-t">CEO 反馈</div>
@@ -616,44 +738,12 @@ body { background:var(--bg); color:var(--text); font-family:'Noto Sans SC',sans-
 </div>
 </section>
 
-<!-- ════════════════════════════════════════ -->
-<!-- Octalysis 覆盖矩阵 -->
-<!-- ════════════════════════════════════════ -->
-<section class="sec" id="oct">
-<div class="sec-label green">OCTALYSIS COVERAGE</div>
-<div class="sec-title">8核心驱动力覆盖对照</div>
-<div class="sec-desc">优化前产品只激活了1个驱动力，目标覆盖6+个。CD6/CD8标记"适度"是刻意设计——这两个是"黑帽"驱动力，过度使用会让用户感到被操控。</div>
-
-<table class="tb">
-<tr><th>驱动力</th><th>优化前</th><th>优化后</th><th>实现方案</th></tr>
-<tr><td>CD1 史诗意义</td><td style="color:var(--red)">❌</td><td style="color:var(--green)">✅</td><td>「助力N个品牌」称号 · 使命感海报</td></tr>
-<tr><td>CD2 发展成就</td><td style="color:var(--red)">❌</td><td style="color:var(--green)">✅ 强</td><td>4级等级 · 进度条 · 升级动效 · 徽章</td></tr>
-<tr><td>CD3 创意赋权</td><td style="color:var(--red)">❌</td><td style="color:var(--amber)">⚠️ 中</td><td>Lv.4建团队 · 自定义头像框 · AI策略</td></tr>
-<tr><td>CD4 所有权</td><td style="color:var(--amber)">⚠️ 弱</td><td style="color:var(--green)">✅ 强</td><td>累计收入可视化 · 等级=身份资产</td></tr>
-<tr><td>CD5 社交影响</td><td style="color:var(--red)">❌</td><td style="color:var(--green)">✅ 强</td><td>信用分 · 达人榜 · 分享海报 · 社会证明</td></tr>
-<tr><td>CD6 稀缺焦虑</td><td style="color:var(--red)">❌</td><td style="color:var(--amber)">⚠️ 适度</td><td>任务名额 · 冻结卡有限 · 免费提现次数</td></tr>
-<tr><td>CD7 不可预测</td><td style="color:var(--red)">❌</td><td style="color:var(--green)">✅</td><td>随机红包 · 抽奖 · 周日随机加成</td></tr>
-<tr><td>CD8 损失厌恶</td><td style="color:var(--red)">❌</td><td style="color:var(--amber)">⚠️ 适度</td><td>连签提醒 · 提现时AI收益展示</td></tr>
-</table>
-
-<div class="fb" data-id="oct">
-  <div class="fb-t">CEO 对整体驱动力覆盖策略的反馈</div>
-  <div class="fb-btns">
-    <button class="fb-b" onclick="sf(this,'a','oct')">✅ 同意</button>
-    <button class="fb-b" onclick="sf(this,'d','oct')">💬 需讨论</button>
-    <button class="fb-b" onclick="sf(this,'x','oct')">❌ 不同意</button>
-  </div>
-  <textarea class="fb-n" placeholder="备注…" onchange="sn(this,'oct')"></textarea>
-</div>
-</section>
-
 </div>
 
 <div class="sbar">
   <span class="si"><span class="sd" style="background:var(--green)"></span>同意 <strong id="ca">0</strong></span>
   <span class="si"><span class="sd" style="background:var(--amber)"></span>需讨论 <strong id="cd">0</strong></span>
   <span class="si"><span class="sd" style="background:var(--red)"></span>不同意 <strong id="cx">0</strong></span>
-  <span style="color:var(--text3)">/10项</span>
 </div>
 
 <script src="/sync.js"></script>
@@ -663,11 +753,100 @@ SYNC.init('chatD',K);
 function ld(){try{return JSON.parse(localStorage.getItem(K))||{}}catch{return{}}}
 function sv(d){localStorage.setItem(K,JSON.stringify(d));up()}
 function tog(h){h.closest('.card').classList.toggle('open')}
-function sf(b,t,id){const d=ld();d[id]={...d[id],c:t};sv(d);const bs=b.parentElement.querySelectorAll('.fb-b');bs.forEach(x=>x.className='fb-b');b.classList.add(t==='a'?'s-a':t==='d'?'s-d':'s-x');SYNC.push(id,t)}
+function sf(b,t,id){const cls=t==='a'?'s-a':t==='d'?'s-d':'s-x';const was=b.classList.contains(cls);const bs=b.parentElement.querySelectorAll('.fb-b');bs.forEach(x=>x.className='fb-b');const d=ld();if(was){d[id]={...d[id],c:undefined};sv(d);SYNC.push(id,'')}else{b.classList.add(cls);d[id]={...d[id],c:t};sv(d);SYNC.push(id,t)}}
 function sn(ta,id){const d=ld();d[id]={...d[id],n:ta.value};sv(d);SYNC.push(id,undefined,ta.value)}
 function up(){const d=ld();let a=0,dd=0,x=0;Object.values(d).forEach(v=>{if(v.c==='a')a++;if(v.c==='d')dd++;if(v.c==='x')x++});document.getElementById('ca').textContent=a;document.getElementById('cd').textContent=dd;document.getElementById('cx').textContent=x}
-function render(d){Object.entries(d).forEach(([id,v])=>{const w=document.querySelector(`.fb[data-id="${id}"]`);if(!w)return;if(v.c){const bs=w.querySelectorAll('.fb-b');bs.forEach(x=>x.className='fb-b');const idx=v.c==='a'?0:v.c==='d'?1:2;if(bs[idx])bs[idx].classList.add(v.c==='a'?'s-a':v.c==='d'?'s-d':'s-x')}if(v.n){const ta=w.querySelector('.fb-n');if(ta)ta.value=v.n}});up()}
-document.addEventListener('DOMContentLoaded',async()=>{await SYNC.pull();render(ld())})
+
+// Slide to confirm
+function startSlide(e,id){
+  const track=document.getElementById(id);
+  const thumb=document.getElementById(id+'-thumb');
+  if(track.classList.contains('done'))return;
+  const rect=track.getBoundingClientRect();
+  const maxX=rect.width-48;
+  function onMove(ev){
+    const clientX=(ev.touches?ev.touches[0]:ev).clientX;
+    let x=Math.max(4,Math.min(clientX-rect.left-20,maxX));
+    thumb.style.left=x+'px';
+    if(x>=maxX-4){
+      track.classList.add('done');
+      document.getElementById(id+'-label').textContent='✅ 已接取 · 请在24h内完成';
+      thumb.textContent='✅';
+      const before=document.getElementById(id+'-before');
+      const after=document.getElementById(id+'-after');
+      if(before)before.style.display='none';
+      if(after)after.style.display='block';
+      cleanup();
+    }
+  }
+  function onEnd(){
+    if(!track.classList.contains('done'))thumb.style.left='4px';
+    cleanup();
+  }
+  function cleanup(){
+    document.removeEventListener('mousemove',onMove);
+    document.removeEventListener('mouseup',onEnd);
+    document.removeEventListener('touchmove',onMove);
+    document.removeEventListener('touchend',onEnd);
+  }
+  document.addEventListener('mousemove',onMove);
+  document.addEventListener('mouseup',onEnd);
+  document.addEventListener('touchmove',onMove,{passive:false});
+  document.addEventListener('touchend',onEnd);
+  e.preventDefault();
+}
+function resetSlide(id){
+  const track=document.getElementById(id);
+  const thumb=document.getElementById(id+'-thumb');
+  track.classList.remove('done');
+  thumb.style.left='4px';
+  thumb.textContent='➜';
+  document.getElementById(id+'-label').textContent='➜ 滑动确认接取';
+  const before=document.getElementById(id+'-before');
+  const after=document.getElementById(id+'-after');
+  if(before)before.style.display='';
+  if(after)after.style.display='none';
+}
+
+// Countdown button
+function startCountdown(){
+  const btn=document.getElementById('withdraw-btn');
+  if(btn.dataset.ready==='1'){btn.textContent='✅ 提现成功！';btn.className='m-btn m-btn-green';btn.style.flex='2';document.getElementById('withdraw-hint').textContent='已提交提现申请';return}
+  let s=3;
+  btn.textContent='确认提现（'+s+'s）';
+  const iv=setInterval(()=>{s--;if(s>0){btn.textContent='确认提现（'+s+'s）'}else{clearInterval(iv);btn.textContent='确认提现';btn.className='m-btn m-btn-red';btn.style.flex='2';btn.dataset.ready='1';document.getElementById('withdraw-hint').textContent='现在可以点击确认'}},1000);
+}
+
+// Red packet
+function openRedPkt(){
+  const el=document.getElementById('redpkt');
+  if(el.dataset.opened)return;
+  el.dataset.opened='1';
+  const amounts=[1,1.5,2,2.5,3,3.5,4,5];
+  const amt=amounts[Math.floor(Math.random()*amounts.length)].toFixed(2);
+  document.getElementById('rp-emoji').style.display='none';
+  document.getElementById('rp-text').style.display='none';
+  const amtEl=document.getElementById('rp-amount');
+  amtEl.style.display='block';
+  amtEl.textContent='¥'+amt;
+  amtEl.classList.add('pop');
+  el.classList.add('shake');
+}
+
+// Init
+function render(d){
+  Object.entries(d).forEach(([id,v])=>{
+    const w=document.querySelector(`.fb[data-id="${id}"]`);
+    if(!w)return;
+    if(v.c){const bs=w.querySelectorAll('.fb-b');bs.forEach(x=>x.className='fb-b');const idx=v.c==='a'?0:v.c==='d'?1:2;if(bs[idx])bs[idx].classList.add(v.c==='a'?'s-a':v.c==='d'?'s-d':'s-x')}
+    if(v.n){const ta=w.querySelector('.fb-n');if(ta)ta.value=v.n}
+  });
+  up();
+}
+document.addEventListener('DOMContentLoaded',async()=>{
+  await SYNC.pull();
+  render(ld());
+});
 </script>
 </body>
 </html>

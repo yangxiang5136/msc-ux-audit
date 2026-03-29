@@ -49,7 +49,10 @@ app.post('/api/feedback', (req, res) => {
   if (!all[page]) all[page] = {};
   
   const existing = all[page][id] || {};
-  if (choice !== undefined) existing.c = choice;
+  if (choice !== undefined) {
+    if (choice === '' || choice === null) { delete existing.c; }
+    else { existing.c = choice; }
+  }
   if (note !== undefined) existing.n = note;
   existing.t = new Date().toISOString();
   all[page][id] = existing;
