@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MSC-B · 空状态与反馈闭环</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a12;
+  --bg-card: #13131f;
+  --bg-hover: #1a1a2a;
+  --bg-el: #1e1e30;
+  --border: #2a2a3e;
+  --text: #e8e8f0;
+  --text2: #8888a0;
+  --text3: #555570;
+  --blue: #4a90d9;
+  --amber: #d4a04a;
+  --red: #e85d5d;
+  --green: #4caf7d;
+  --orange: #e8923d;
+  --purple: #9b6dff;
+  --teal: #3db89a;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',system-ui,sans-serif;font-size:15px;line-height:1.75;-webkit-font-smoothing:antialiased}
+
+/* ─ header ─ */
+.header{position:sticky;top:36px;z-index:100;background:rgba(10,10,18,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+.header h1{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}
+.header .badge{font-size:11px;padding:3px 10px;background:rgba(74,144,217,.12);color:var(--blue);border:1px solid rgba(74,144,217,.25);border-radius:20px}
+.header .stats{display:flex;gap:12px;font-size:11px;color:var(--text2)}
+.header .stats span{display:flex;align-items:center;gap:3px}
+.header .stats .s-a{color:var(--green)}.header .stats .s-d{color:var(--amber)}.header .stats .s-x{color:var(--red)}
+
+/* ─ nav ─ */
+.nav{position:sticky;top:88px;z-index:90;background:rgba(10,10,18,.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:8px 20px;overflow-x:auto;display:flex;gap:6px;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav a{display:inline-block;padding:5px 14px;font-size:12px;font-weight:500;color:var(--text2);text-decoration:none;border-radius:6px;border:1px solid transparent;transition:all .2s;white-space:nowrap}
+.nav a:hover{color:var(--text);background:var(--bg-el)}
+.nav a.active{color:var(--blue);border-color:rgba(74,144,217,.3);background:rgba(74,144,217,.08)}
+
+/* ─ layout ─ */
+.wrap{max-width:800px;margin:0 auto;padding:28px 20px 100px}
+.sec{margin-bottom:56px}
+.sec-tag{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--blue);margin-bottom:6px}
+.sec-title{font-size:22px;font-weight:900;margin-bottom:4px}
+.sec-sub{font-size:13px;color:var(--text2);margin-bottom:24px}
+
+/* ─ cards ─ */
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;margin-bottom:16px;overflow:hidden;transition:border-color .2s}
+.card:hover{border-color:rgba(136,136,160,.25)}
+.card-head{padding:16px 20px;cursor:pointer;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;user-select:none}
+.card-head:active{background:var(--bg-hover)}
+.card-num{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.n-blue{background:rgba(74,144,217,.12);color:var(--blue)}
+.n-green{background:rgba(76,175,125,.12);color:var(--green)}
+.n-amber{background:rgba(212,160,74,.12);color:var(--amber)}
+.n-teal{background:rgba(61,184,154,.12);color:var(--teal)}
+.card-info{flex:1}
+.card-name{font-size:15px;font-weight:700;margin-bottom:2px}
+.card-desc{font-size:13px;color:var(--text2);line-height:1.5}
+.card-arrow{color:var(--text3);font-size:12px;transition:transform .3s;padding-top:4px;flex-shrink:0}
+.card.open .card-arrow{transform:rotate(180deg)}
+.card-body{display:none;padding:0 20px 20px;border-top:1px solid var(--border)}
+.card.open .card-body{display:block}
+
+/* ─ theory tags ─ */
+.th-tag{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;margin:0 2px;vertical-align:middle}
+.th-loss{background:rgba(232,93,93,.12);color:var(--red)}
+.th-social{background:rgba(76,175,125,.12);color:var(--green)}
+.th-anchor{background:rgba(155,109,255,.12);color:var(--purple)}
+.th-endow{background:rgba(61,184,154,.12);color:var(--teal)}
+.th-goal{background:rgba(212,160,74,.12);color:var(--amber)}
+.th-default{background:rgba(74,144,217,.12);color:var(--blue)}
+.th-peak{background:rgba(232,146,61,.12);color:var(--orange)}
+.th-frame{background:rgba(155,109,255,.12);color:var(--purple)}
+
+/* ─ sub sections inside card ─ */
+.sub{margin-top:16px}
+.sub-label{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.sub-point{font-size:13px;color:var(--text2);margin-bottom:6px;padding-left:14px;position:relative}
+.sub-point::before{content:'';position:absolute;left:0;top:8px;width:6px;height:6px;border-radius:50%;background:var(--text3)}
+
+/* ─ mockup phone ─ */
+.phone{width:100%;max-width:340px;margin:16px auto;background:#0d0d18;border:2px solid var(--border);border-radius:28px;padding:8px 12px 12px;position:relative;overflow:hidden}
+.phone-bar{height:24px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--text3);margin-bottom:8px}
+.phone-content{background:var(--bg-card);border-radius:16px;padding:16px;min-height:280px}
+.mc{font-size:13px;line-height:1.6}
+.mc-title{font-size:16px;font-weight:700;margin-bottom:4px}
+.mc-big{font-size:28px;font-weight:900;margin:8px 0}
+.mc-dim{color:var(--text2)}
+.mc-blue{color:var(--blue)}
+.mc-green{color:var(--green)}
+.mc-amber{color:var(--amber)}
+.mc-red{color:var(--red)}
+.mc-teal{color:var(--teal)}
+.mc-card{background:var(--bg-el);border:1px solid var(--border);border-radius:10px;padding:12px;margin:10px 0}
+.mc-card.highlight{border-color:rgba(74,144,217,.4);background:rgba(74,144,217,.06)}
+.mc-card.highlight-green{border-color:rgba(76,175,125,.4);background:rgba(76,175,125,.06)}
+.mc-card.highlight-amber{border-color:rgba(212,160,74,.4);background:rgba(212,160,74,.06)}
+.mc-btn{display:inline-block;padding:8px 20px;border-radius:8px;font-size:13px;font-weight:600;text-align:center;margin-top:8px}
+.mc-btn-blue{background:var(--blue);color:#fff}
+.mc-btn-green{background:var(--green);color:#fff}
+.mc-btn-amber{background:var(--amber);color:#fff}
+.mc-divider{border:none;border-top:1px dashed var(--border);margin:12px 0}
+.mc-icon{font-size:36px;text-align:center;margin:16px 0 8px;opacity:.6}
+.mc-center{text-align:center}
+.mc-sm{font-size:11px;color:var(--text3)}
+.mc-progress{height:6px;background:var(--bg);border-radius:3px;margin:8px 0;overflow:hidden}
+.mc-progress-fill{height:100%;border-radius:3px}
+
+/* ─ before/after comparison ─ */
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}
+.compare-col{background:var(--bg-el);border-radius:10px;padding:14px;font-size:13px}
+.compare-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.compare-bad{color:var(--red)}
+.compare-good{color:var(--green)}
+
+/* ─ status timeline ─ */
+.timeline{padding-left:20px;border-left:2px solid var(--border);margin:12px 0}
+.timeline-item{position:relative;padding:0 0 16px 16px}
+.timeline-item::before{content:'';position:absolute;left:-25px;top:4px;width:10px;height:10px;border-radius:50%;border:2px solid var(--border);background:var(--bg-card)}
+.timeline-item.done::before{background:var(--green);border-color:var(--green)}
+.timeline-item.active::before{background:var(--blue);border-color:var(--blue);box-shadow:0 0 0 4px rgba(74,144,217,.2)}
+.timeline-item.pending::before{background:var(--bg-card)}
+.timeline-name{font-size:13px;font-weight:600}
+.timeline-meta{font-size:11px;color:var(--text3)}
+
+/* ─ notification template ─ */
+.notif{background:var(--bg-el);border:1px solid var(--border);border-radius:10px;padding:14px;margin:10px 0;font-size:13px}
+.notif-title{font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.notif-row{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(42,42,62,.5)}
+.notif-row:last-child{border:none}
+.notif-key{color:var(--text2)}
+.notif-val{font-weight:500}
+
+/* ─ milestone badges ─ */
+.milestone{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg-el);border-radius:8px;margin:6px 0;font-size:13px}
+.ms-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.ms-blue{background:rgba(74,144,217,.15)}
+.ms-green{background:rgba(76,175,125,.15)}
+.ms-amber{background:rgba(212,160,74,.15)}
+
+/* ─ CEO feedback ─ */
+.fb{background:var(--bg-el);border:1px solid var(--border);border-radius:10px;padding:14px;margin-top:16px}
+.fb-label{font-size:11px;font-weight:700;color:var(--text3);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.fb-row{display:flex;gap:8px;margin-bottom:8px}
+.fb-b{flex:1;padding:8px 0;border-radius:8px;border:1px solid var(--border);font-size:12px;font-weight:600;text-align:center;cursor:pointer;transition:all .15s;background:transparent;color:var(--text2);font-family:inherit}
+.fb-b:hover{background:var(--bg-hover);color:var(--text)}
+.fb-b.s-a{background:rgba(76,175,125,.15);border-color:var(--green);color:var(--green)}
+.fb-b.s-d{background:rgba(212,160,74,.15);border-color:var(--amber);color:var(--amber)}
+.fb-b.s-x{background:rgba(232,93,93,.15);border-color:var(--red);color:var(--red)}
+.fb-n{width:100%;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:12px;color:var(--text);resize:vertical;min-height:36px;font-family:inherit;outline:none;transition:border-color .2s}
+.fb-n:focus{border-color:var(--blue)}
+.fb-n::placeholder{color:var(--text3)}
+
+/* ─ summary table ─ */
+.sum-table{width:100%;border-collapse:collapse;font-size:13px;margin:16px 0}
+.sum-table th{text-align:left;padding:8px 10px;background:var(--bg-el);color:var(--text2);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--border)}
+.sum-table td{padding:8px 10px;border-bottom:1px solid rgba(42,42,62,.4)}
+
+@media(max-width:600px){
+  .compare{grid-template-columns:1fr}
+  .header .stats{display:none}
+}
+</style>
+</head>
+<body>
+<!-- MSC.AI SITE NAV --><div style="position:sticky;top:0;z-index:9999;background:rgba(10,12,16,.95);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.08);padding:8px 16px;display:flex;align-items:center;gap:12px;font-family:Noto Sans SC,sans-serif;font-size:12px;overflow-x:auto;scrollbar-width:none"><a href="index.html" style="color:#34d399;text-decoration:none;font-weight:700;white-space:nowrap;display:flex;align-items:center;gap:4px"><span style="display:inline-flex;width:20px;height:20px;background:linear-gradient(135deg,#34d399,#60a5fa);border-radius:5px;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:#000">M</span>首页</a><span style="color:#5a6478">│</span><a href="chatA.html" style="color:#8b95a8;text-decoration:none;white-space:nowrap;padding:3px 8px;border-radius:4px" class="snav">1·信任</a><a href="chatB.html" style="color:#8b95a8;text-decoration:none;white-space:nowrap;padding:3px 8px;border-radius:4px" class="snav";background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.2);color:#60a5fa">2+3·空状态反馈</a><a href="chatC.html" style="color:#8b95a8;text-decoration:none;white-space:nowrap;padding:3px 8px;border-radius:4px" class="snav">4+5·卡片金额</a><a href="chatD.html" style="color:#8b95a8;text-decoration:none;white-space:nowrap;padding:3px 8px;border-radius:4px" class="snav">6+7+8·确认留存</a></div><!-- END NAV -->
+
+<div class="header">
+  <h1>MSC-B <span class="badge">维度 2+3</span></h1>
+  <div class="stats">
+    <span class="s-a">✓ <b id="ca">0</b></span>
+    <span class="s-d">💬 <b id="cd">0</b></span>
+    <span class="s-x">✗ <b id="cx">0</b></span>
+  </div>
+</div>
+
+<div class="nav">
+  <a href="#empty" class="active">空状态总览</a>
+  <a href="#e1">2.1 余额¥0</a>
+  <a href="#e2">2.2 任务广场空</a>
+  <a href="#e3">2.3 我的任务空</a>
+  <a href="#e4">2.4 订单历史空</a>
+  <a href="#e5">2.5 Tab引导</a>
+  <a href="#feedback">反馈闭环总览</a>
+  <a href="#f1">3.1 接取确认</a>
+  <a href="#f2">3.2 提交进度</a>
+  <a href="#f3">3.3 发布者看板</a>
+  <a href="#f4">3.4 微信通知</a>
+  <a href="#f5">3.5 到账通知</a>
+</div>
+
+<div class="wrap">
+
+  <!-- ═══════ SECTION: 空状态 ═══════ -->
+  <div class="sec" id="empty">
+    <div class="sec-tag">维度 2 · 空状态与冷启动</div>
+    <div class="sec-title">每个"空白"都是一次转化机会</div>
+    <div class="sec-sub">核心问题：新用户看到一堆"0"和空白直接流失。每个空状态需要回答三个问题：这里本该有什么？我现在该做什么？别人在做什么？</div>
+
+    <div class="compare">
+      <div class="compare-col">
+        <div class="compare-label compare-bad">❌ 原产品</div>
+        <p style="font-size:13px;color:var(--text2)">余额显示 ¥0.00 + 空白页面，无引导、无社会证明、无行动指令。用户不知道该充值还是接单。</p>
+      </div>
+      <div class="compare-col">
+        <div class="compare-label compare-good">✅ 优化后</div>
+        <p style="font-size:13px;color:var(--text2)">每个空状态预填充数据 + 平台实时社会证明 + 单一明确CTA + 行为经济学驱动的文案。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 2.1 余额¥0 ─── -->
+  <div class="sec" id="e1">
+    <div class="card open">
+      <div class="card-head" onclick="toggle(this)">
+        <div class="card-num n-blue">2.1</div>
+        <div class="card-info">
+          <div class="card-name">余额 ¥0 引导方案</div>
+          <div class="card-desc">
+            <span class="th-tag th-loss">损失厌恶</span>
+            <span class="th-tag th-anchor">锚定效应</span>
+            <span class="th-tag th-social">社会证明</span>
+            从"充值可以做X"翻转为"平台上正在发生X，而你还没参与"
+          </div>
+        </div>
+        <div class="card-arrow">▼</div>
+      </div>
+      <div class="card-body">
+
+        <div class="sub">
+          <div class="sub-label">发布者视角</div>
+          <div class="phone">
+            <div class="phone-bar">MSC.AI · 我的</div>
+            <div class="phone-content mc">
+              <div class="mc-dim" style="font-size:12px">账户余额</div>
+              <div class="mc-big">¥ 0.00</div>
+              <div class="mc-card highlight">
+                <div style="font-size:12px;margin-bottom:8px">📊 <b>今日平台数据</b></div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+                  <span class="mc-dim">执行中的任务</span>
+                  <span style="font-weight:700">1,247 个</span>
+                </div>
+                <div style="display:flex;justify-content:space-between">
+                  <span class="mc-dim">今日发放报酬</span>
+                  <span style="font-weight:700;color:var(--green)">¥18,320</span>
+                </div>
+                <hr class="mc-divider">
+                <div class="mc-dim" style="font-size:12px;margin-bottom:4px">平台用户平均首次充值 <b class="mc-blue">¥50</b></div>
+                <div class="mc-dim" style="font-size:12px;margin-bottom:10px">最低 <b>¥10</b> 起充</div>
+                <div class="mc-btn mc-btn-blue" style="display:block;text-align:center">立即充值，发布第一个任务</div>
+              </div>
+              <div class="mc-sm" style="text-align:center;margin-top:10px">已有 326 位发布者通过平台完成推广 ›</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sub">
+          <div class="sub-label">接单者视角</div>
+          <div class="phone">
+            <div class="phone-bar">MSC.AI · 我的</div>
+            <div class="phone-content mc">
+              <div class="mc-dim" style="font-size:12px">账户余额</div>
+              <div class="mc-big">¥ 0.00</div>
+              <div class="mc-card highlight-green">
+                <div style="font-size:12px;margin-bottom:8px">🤖 <b>你的 AI CEO 已就绪</b></div>
+                <div style="margin-bottom:4px">已为你发现 <b class="mc-teal">3 个</b>匹配任务</div>
+                <div class="mc-dim" style="font-size:12px;margin-bottom:10px">预估收入：¥8 – ¥15</div>
+                <div class="mc-btn mc-btn-green" style="display:block;text-align:center">查看推荐任务</div>
+                <div class="mc-sm" style="margin-top:8px">💡 完成首单平均只需 5 分钟</div>
+              </div>
+              <div class="mc-sm" style="text-align:center;margin-top:10px">今日已有 142 人完成首单 ›</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sub">
+          <div class="sub-label">设计原理</div>
+          <div class="sub-point"><span class="th-tag th-loss">损失厌恶</span> "今日发放 ¥18,320" — 别人都在赚钱/花钱，而你还没参与</div>
+          <div class="sub-point"><span class="th-tag th-anchor">锚定</span> 先看到"平均首充 ¥50"，再看"¥10起充"显得门槛极低</div>
+          <div class="sub-point"><span class="th-tag th-endow">禀赋</span> "AI 已为你找到3个任务" — 推荐结果已经是"你的"，不看就浪费</div>
+          <div class="sub-point"><span class="th-tag th-social">社会证明</span> "326位发布者"、"142人完成首单" — 他人行为验证</div>
+        </div>
+
+        <div class="fb" data-id="b-e1">
+          <div class="fb-label">👤 CEO反馈</div>
+          <div class="fb-row">
+            <button class="fb-b" onclick="sel(this,'b-e1','a')">✓ 同意</button>
+            <button class="fb-b" onclick="sel(this,'b-e1','d')">💬 需讨论</button>
+            <button class="fb-b" onclick="sel(this,'b-e1','x')">✗ 不同意</button>
+          </div>
+          <textarea class="fb-n" placeholder="补充说明…" onchange="sn(this,'b-e1')"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 2.2 任务广场空 ─── -->
+  <div class="sec" id="e2">
+    <div class="card">
+      <div class="card-head" onclick="toggle(this)">
+        <div class="card-num n-blue">2.2</div>
+        <div class="card-info">
+          <div class="card-name">任务广场无任务</div>
+          <div class="card-desc">
+            <span class="th-tag th-endow">禀赋效应</span>
+            <span class="th-tag th-social">社会证明</span>
+            消灭"真正的空"——用"即将开放"预告卡替代空白
+          </div>
+        </div>
+        <div class="card-arrow">▼</div>
+      </div>
+      <div class="card-body">
+        <div class="phone">
+          <div class="phone-bar">MSC.AI · 任务广场</div>
+          <div class="phone-content mc">
+            <div class="mc-card" style="opacity:.7">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+                <span style="font-size:12px">🕐</span>
+                <b style="font-size:13px">抖音涨粉 · ¥5/次</b>
+              </div>
+              <div class="mc-dim" style="font-size:12px">预计 30 分钟内开放</div>
+              <div class="mc-sm mc-blue" style="margin-top:6px;cursor:pointer">设置到达提醒 ›</div>
+            </div>
+            <div class="mc-card" style="opacity:.7">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+                <span style="font-size:12px">🕐</span>
+                <b style="font-size:13px">短视频制作 · ¥15/次</b>
+              </div>
+              <div class="mc-dim" style="font-size:12px">预计今日下午开放</div>
+              <div class="mc-sm mc-blue" style="margin-top:6px;cursor:pointer">设置到达提醒 ›</div>
+            </div>
+            <hr class="mc-divider">
+            <div class="mc-card highlight-green">
+              <div style="font-size:13px;margin-bottom:4px">🤖 <b>开启 AI 自动接单</b></div>
+              <div class="mc-dim" style="font-size:12px;margin-bottom:4px">新任务出现的前 3 秒内自动抢单</div>
+              <div style="font-size:12px;color:var(--green);font-weight:600;margin-bottom:8px">本周 AI 用户比手动用户多赚 47%</div>
+              <div class="mc-btn mc-btn-green" style="display:block;text-align:center;font-size:12px;padding:6px">立即开启</div>
+            </div>
+            <div class="mc-sm mc-center" style="margin-top:10px">任务通常在 9-11 点 / 14-16 点集中发布</div>
+          </div>
+        </div>
+        <div class="sub">
+          <div class="sub-label">关键设计点</div>
+          <div class="sub-point"><b>永远不要真正为空</b> — 用历史规律生成"即将开放"预告卡，低透明度表示"还不能接"但让用户知道东西是有的</div>
+          <div class="sub-point"><span class="th-tag th-endow">禀赋</span> "设置到达提醒" — 把被动等待变为主动订阅，用户觉得"已经在参与"</div>
+          <div class="sub-point"><span class="th-tag th-social">社会证明</span> "AI用户多赚47%" — 具体量化的差距比功能描述更有说服力</div>
+          <div class="sub-point">"设置提醒"是微信订阅消息授权的绝佳触发时机——用户有明确动机同意</div>
+        </div>
+        <div class="fb" data-id="b-e2">
+          <div class="fb-label">👤 CEO反馈</div>
+          <div class="fb-row">
+            <button class="fb-b" onclick="sel(this,'b-e2','a')">✓ 同意</button>
+            <button class="fb-b" onclick="sel(this,'b-e2','d')">💬 需讨论</button>
+            <button class="fb-b" onclick="sel(this,'b-e2','x')">✗ 不同意</button>
+          </div>
+          <textarea class="fb-n" placeholder="补充说明…" onchange="sn(this,'b-e2')"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 2.3 我的任务空 ─── -->
+  <div class="sec" id="e3">
+    <div class="card">
+      <div class="card-head" onclick="toggle(this)">
+        <div class="card-num n-blue">2.3</div>
+        <div class="card-info">
+          <div class="card-name">"我的任务"列表为空</div>
+          <div class="card-desc">
+            <span class="th-tag th-goal">目标梯度</span>
+            <span class="th-tag th-social">社会证明</span>
+            "完成3单解锁全部功能" — 用进度条替代空白
+          </div>
+        </div>
+        <div class="card-arrow">▼</div>
+      </div>
+      <div class="card-body">
+        <div class="phone">
+          <div class="phone-bar">MSC.AI · 我的任务</div>
+          <div class="phone-content mc">
+            <div style="display:flex;gap:0;margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:8px">
+              <div style="flex:1;text-align:center;font-size:13px;font-weight:700;color:var(--blue);border-bottom:2px solid var(--blue);padding-bottom:6px">我接的</div>
+              <div style="flex:1;text-align:center;font-size:13px;color:var(--text3);padding-bottom:6px">我发的</div>
+            </div>
+            <div class="mc-card highlight-amber">
+              <div style="font-size:14px;font-weight:700;text-align:center;margin-bottom:8px">🎯 新手任务挑战</div>
+              <div class="mc-center mc-dim" style="font-size:12px;margin-bottom:6px">完成 3 单解锁全部功能</div>
+              <div class="mc-progress"><div class="mc-progress-fill" style="width:0%;background:var(--amber)"></div></div>
+              <div class="mc-center mc-dim" style="font-size:11px;margin-bottom:12px">0 / 3</div>
+              <div style="font-size:11px;color:var(--text2);margin-bottom:4px">第 1 单推荐：</div>
+              <div class="mc-card" style="margin:4px 0">
+                <div style="font-size:13px;font-weight:600">会员推广 · ¥2.00</div>
+                <div class="mc-dim" style="font-size:11px">⏱ 约5分钟 · 📱 手机可做</div>
+                <div style="font-size:11px;color:var(--green);margin-top:2px">已有 89 人完成</div>
+                <div class="mc-btn mc-btn-blue" style="font-size:11px;padding:5px 14px;margin-top:6px">立即接取 →</div>
+              </div>
+              <div style="font-size:11px;color:var(--text3);margin-top:10px;line-height:1.6">
+                完成 3 单奖励：<br>
+                ✦ 解锁高收益任务<br>
+                ✦ AI 自动接单功能<br>
+                ✦ 信用评分加速
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="sub">
+          <div class="sub-label">设计原理</div>
+          <div class="sub-point"><span class="th-tag th-goal">目标梯度</span> 0/3 进度条 — "只差3步"比"从零开始"心理负担小得多。咖啡积分卡效应：越接近目标越有动力</div>
+          <div class="sub-point"><b>直接给具体任务</b>而非"去浏览一下" — 消除选择恐惧，降低行动成本</div>
+          <div class="sub-point"><span class="th-tag th-loss">损失厌恶</span> 用户已经"看到"了3单奖励（高收益任务、AI功能），不完成就"失去"了</div>
+          <div class="sub-point"><span class="th-tag th-social">社会证明</span> "89人完成" — 验证这个任务真实可完成</div>
+        </div>
+        <div class="fb" data-id="b-e3">
+          <div class="fb-label">👤 CEO反馈</div>
+          <div class="fb-row">
+            <button class="fb-b" onclick="sel(this,'b-e3','a')">✓ 同意</button>
+            <button class="fb-b" onclick="sel(this,'b-e3','d')">💬 需讨论</button>
+            <button class="fb-b" onclick="sel(this,'b-e3','x')">✗ 不同意</button>
+          </div>
+          <textarea class="fb-n" placeholder="补充说明…" onchange="sn(this,'b-e3')"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 2.4 订单历史空 ─── -->
+  <div class="sec" id="e4">
+    <div class="card">
+      <div class="card-head" onclick="toggle(this)">
+        <div class="card-num n-blue">2.4</div>
+        <div class="card-info">
+          <div class="card-name">订单历史为空</div>
+          <div class="card-desc">
+            <span class="th-tag th-endow">禀赋效应</span>
+            预填充示例数据 + 利用空白传递信任信号
+          </div>
+        </div>
+        <div class="card-arrow">▼</div>
+      </div>
+      <div class="card-body">
+        <div class="phone">
+          <div class="phone-bar">MSC.AI · 交易记录</div>
+          <div class="phone-content mc">
+            <div class="mc-card" style="opacity:.3">
+              <div style="display:flex;justify-content:space-between;font-size:12px">
+                <span>💰 +¥3.00 抖音涨粉</span>
+                <span class="mc-dim">03-28</span>
+              </div>
+            </div>
+            <div class="mc-card" style="opacity:.3">
+              <div style="display:flex;justify-content:space-between;font-size:12px">
+                <span>💰 +¥5.00 视频制作</span>
+                <span class="mc-dim">03-28</span>
+              </div>
+            </div>
+            <div class="mc-center mc-dim" style="font-size:12px;margin:12px 0">这里会记录你的每一笔<br>收入、支出和提现明细</div>
+            <div class="mc-btn mc-btn-blue" style="display:block;text-align:center;font-size:12px">去赚第一笔收入</div>
+            <div class="mc-card" style="margin-top:14px;border-left:3px solid var(--green)">
+              <div style="font-size:12px;font-weight:600;color:var(--green);margin-bottom:4px">🔒 资金安全保障</div>
+              <div class="mc-dim" style="font-size:11px;line-height:1.6">
+                平台托管 · 完成即结算<br>
+                提现实时到账微信零钱<br>
+                资金问题 7×24 客服响应
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="sub">
+          <div class="sub-label">设计原理</div>
+          <div class="sub-point"><span class="th-tag th-endow">禀赋</span> 低透明度示例数据 — 让用户"看到"未来的自己有收入记录，比空白更有驱动力</div>
+          <div class="sub-point">利用空状态传递<b>信任信号</b>（呼应维度1）— 在用户还没花钱之前建立资金安全认知</div>
+        </div>
+        <div class="fb" data-id="b-e4">
+          <div class="fb-label">👤 CEO反馈</div>
+          <div class="fb-row">
+            <button class="fb-b" onclick="sel(this,'b-e4','a')">✓ 同意</button>
+            <button class="fb-b" onclick="sel(this,'b-e4','d')">💬 需讨论</button>
+            <button class="fb-b" onclick="sel(this,'b-e4','x')">✗ 不同意</button>
+          </div>
+          <textarea class="fb-n" placeholder="补充说明…" onchange="sn(this,'b-e4')"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 2.5 Tab引导 ─── -->
+  <div class="sec" id="e5">
+    <div class="card">
+      <div class="card-head" onclick="toggle(this)">
+        <div class="card-num n-blue">2.5</div>
+        <div class="card-info">
+          <div class="card-name">首次进入 Tab 的任务驱动式引导</div>
+          <div class="card-desc">
+            <span class="th-tag th-goal">目标梯度</span>
+            <span class="th-tag th-default">默认值</span>
+            从"这是XX功能"升级为"完成这个动作，你就开始赚钱了"
+          </div>
+        </div>
+        <div class="card-arrow">▼</div>
+      </div>
+      <div class="card-body">
+        <div class="compare">
+          <div class="compare-col">
+            <div class="compare-label compare-bad">❌ 功能说明式</div>
+            <p style="font-size:13px;color:var(--text2)">"这是任务广场，你可以在这里浏览并接取任务。"</p>
+            <p style="font-size:11px;color:var(--text3);margin-top:4px">→ 用户知道了但不会行动</p>
+          </div>
+          <div class="compare-col">
+            <div class="compare-label compare-good">✅ 任务驱动式</div>
+            <p style="font-size:13px;color:var(--text2)">"点击这个任务，看看赚钱有多简单" → 引导完成时用户已经接了第一个任务</p>
+            <p style="font-size:11px;color:var(--green);margin-top:4px">→ 引导结束 = Activation 完成</p>
+          </div>
+        </div>
+
+        <div class="sub">
+          <div class="sub-label">任务广场引导流程（3步）</div>
+          <div class="milestone"><div class="ms-icon ms-blue">1</div><div><b>聚光灯→顶部任务</b><br><span class="mc-dim" style="font-size:12px">"📋 这是适合你的任务，点击它看看赚钱有多简单"</span></div></div>
+          <div class="milestone"><div class="ms-icon ms-blue">2</div><div><b>聚光灯→接取按钮</b><br><span class="mc-dim" style="font-size:12px">"👆 点这里接取任务，完成即可赚取 ¥3"</span></div></div>
+          <div class="milestone"><div class="ms-icon ms-green">3</div><div><b>接取成功触发</b><br><span class="mc-dim" style="font-size:12px">"🎉 太好了！新手挑战进度 1/3。开始执行 →"</span></div></div>
+        </div>
+
+        <div class="sub">
+          <div class="sub-label">技术实现</div>
+          <div class="sub-point">遮罩 rgba(0,0,0,0.7) + <code>box-shadow: 0 0 0 9999px</code> 聚光灯</div>
+          <div class="sub-point">每个Tab独立标记：<code>wx.setStorageSync('tab_X_guided', true)</code></div>
+          <div class="sub-point">「我的」→「设置」中提供"重置引导"入口</div>
+          <div class="sub-point">引导与"新手挑战 0/3"进度打通——引导完成 = 进度 +1</div>
+        </div>
+        <div class="fb" data-id="b-e5">
+          <div class="fb-label">👤 CEO反馈</div>
+          <div class="fb-row">
+            <button class="fb-b" onclick="sel(this,'b-e5','a')">✓ 同意</button>
+            <button class="fb-b" onclick="sel(this,'b-e5','d')">💬 需讨论</button>
+            <button class="fb-b" onclick="sel(this,'b-e5','x')">✗ 不同意</button>
+          </div>
+          <textarea class="fb-n" placeholder="补充说明…" onchange="sn(this,'b-e5')"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ SECTION: 反馈闭环 ═══════ -->
+  <div class="sec" id="feedback">
+    <div class="sec-tag">维度 3 · 反馈闭环</div>
+    <div class="sec-title">操作后不能让用户掉进黑洞</div>
+    <div class="sec-sub">核心问题：接了任务→然后呢？提交了→审核多久？发布了→有人接吗？到账了→能看到吗？每个操作后 300ms 内给视觉反馈，等待期间状态持续可查，每个流程有清晰的"完成"信号。</div>
+  </div>
+
+  <!-- ─── 3.1 接取确认 ─── -->
+  <div class="sec" id="f1">
+    <div class="card">
+      <div class="card-head" onclick="toggle(this)">
+        <div class="card-num n-green">3.1</div>
+        <div class="card-info">
+          <div class="card-name">接取任务后的确认反馈 + 状态追踪</div>
+          <div class="card-desc">
+            <span class="th-tag th-anchor">锚定效应</span>
+            <span class="th-tag th-social">社会证明</span>
+            <span class="th-tag th-default">默认值</span>
+            全屏结果页 + 社会数据 + 自动订阅通知
+          </div>
+        </div>
+        <div class="card-arrow">▼</div>
+      </div>
+      <div class="card-body">
+        <div class="phone">
+          <div class="phone-bar">MSC.AI · 接取成功</div>
+          <div class="phone-content mc">
+            <div class="mc-center" style="margin:10px 0">
+              <div style="font-size:36px">✅</div>
+              <div style="font-size:18px;font-weight:900;margin-top:6px">任务接取成功！</div>
+            </div>
+            <div class="mc-card">
+              <div style="font-size:14px;font-weight:700;margin-bottom:6px">抖音涨粉 · ¥3.00/次</div>
+              <div class="mc-dim" style="font-size:11px;line-height:1.8">
+                ⏰ 建议 2 小时内完成<br>
+                📊 本任务平均完成时间：<b>8 分钟</b><br>
+                ✅ 通过率：<b class="mc-green">94%</b>
+              </div>
+            </div>
+            <div class="mc-btn mc-btn-blue" style="display:block;text-align:center">立即执行 — 越早提交排队越前</div>
+            <div class="mc-sm mc-center" style="margin-top:8px">稍后再做 ›</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:12px;text-align:center">🔔 审核结果通知已开启</div>
+          </div>
+        </div>
+        <div class="sub">
+          <div class="sub-label">状态追踪（我的任务列表）</div>
+          <table class="sum-table">
+            <thead><tr><th>状态</th><th>颜色</th><th>文案</th><th>操作</th></tr></thead>
+            <tbody>
+              <tr><td>待执行</td><td style="color:var(--blue)">● 蓝</td><td>"待执行"</td><td>"去执行"</td></tr>
+              <tr><td>已提交</td><td style="color:var(--amber)">● 黄</td><td>"审核中 · 预计24h"</td><td>无</td></tr>
+              <tr><td>已通过</td><td style="color:var(--green)">● 绿</td><td>"审核通过 · 结算中"</td><td>无</td></tr>
+              <tr><td>已结算</td><td style="color:var(--green)">● 绿</td><td>"已到账 ¥3.00"</td><td>"查看流水"</td></tr>
+              <tr><td>被驳回</td><td style="color:var(--red)">● 红</td><td>"需要小幅调整"</td><td>"修改重提"</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="sub">
+          <div class="sub-label">设计原理</div>
+          <div class="sub-point"><span class="th-tag th-anchor">锚定</span> "平均完成8分钟""通过率94%" — 消除不确定性，心理上觉得"很快且几乎不会失败"</div>
+          <div class="sub-point"><span class="th-tag th-loss">损失厌恶</span> "越早提交排队越前" — 微损失框架推动即时行动</div>
+          <div class="sub-point"><span class="th-tag th-default">默认值</span> 通知默认开启 — 利用现状偏好，大部分用户不会主动关闭</div>
+        </div>
+        <div class="fb" data-id="b-f1">
+          <div class="fb-label">👤 CEO反馈</div>
+          <div class="fb-row">
+            <button class="fb-b" onclick="sel(this,'b-f1','a')">✓ 同意</button>
+            <button class="fb-b" onclick="sel(this,'b-f1','d')">💬 需讨论</button>
+            <button class="fb-b" onclick="sel(this,'b-f1','x')">✗ 不同意</button>
+          </div>
+          <textarea class="fb-n" placeholder="补充说明…" onchange="sn(this,'b-f1')"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 3.2 提交进度 ─── -->
+  <div class="sec" id="f2">
+    <div class="card">
+      <div class="card-head" onclick="toggle(this)">
+        <div class="card-num n-green">3.2</div>
+        <div class="card-info">
+          <div class="card-name">提交成果后的进度追踪</div>
+          <div class="card-desc">
+            <span class="th-tag th-endow">禀赋效应</span>
+            <span class="th-tag th-anchor">锚定效应</span>
+            排队位置 + 审核预估 + 等待期价值化
+          </div>
+        </div>
+        <div class="card-arrow">▼</div>
+      </div>
+      <div class="card-body">
+        <div class="phone">
+          <div class="phone-bar">MSC.AI · 成果已提交</div>
+          <div class="phone-content mc">
+            <div class="mc-center" style="margin:8px 0">
+              <div style="font-size:28px">📤</div>
+              <div style="font-size:16px;font-weight:900;margin-top:4px">成果已提交！</div>
+            </div>
+            <div class="mc-card">
+              <div style="font-size:12px;font-weight:600;margin-bottom:6px">审核预估</div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px">
+                <span class="mc-dim">同类任务平均审核</span>
+                <span style="font-weight:700">4 小时 23 分</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:12px">
+                <span class="mc-dim">你的排队位置</span>
+                <span style="font-weight:700;color:var(--blue)">第 2 位</span>
+              </div>
+            </div>
+            <div class="timeline" style="margin-top:14px">
+              <div class="timeline-item done"><div class="timeline-name">已提交</div><div class="timeline-meta">03-28 14:32</div></div>
+              <div class="timeline-item active"><div class="timeline-name">审核中</div><div class="timeline-meta">预计 03-29 02:00 前完成</div></div>
+              <div class="timeline-item pending"><div class="timeline-name">审核结果</div></div>
+              <div class="timeline-item pending"><div class="timeline-name">结算到账</div></div>
+            </div>
+            <div class="mc-card" style="margin-top:10px">
+              <div style="font-size:11px;color:var(--text2);margin-bottom:6px">等待期间你还可以</div>
+              <div style="font-size:12px;line-height:1.8">
+                📋 浏览更多任务（可同时接取）<br>
+                🤖 开启 AI 自动接单<br>
+                📊 查看本周收入趋势
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="sub">
+          <div class="sub-label">设计原理</div>
+          <div class="sub-point"><span class="th-tag th-endow">禀赋</span> "排队位置：第2位" — 你已经"在队列中了"，感觉离开就失去位置</div>
+          <div class="sub-point"><span class="th-tag th-anchor">锚定</span> "平均审核4小时23分" — 消除最大焦虑源：不知道要等多久</div>
+          <div class="sub-point"><b>等待价值化</b> — 提供可做的事，把等待变成行动，防止用户在等待中流失</div>
+        </div>
+        <div class="fb" data-id="b-f2">
+          <div class="fb-label">👤 CEO反馈</div>
+          <div class="fb-row">
+            <button class="fb-b" onclick="sel(this,'b-f2','a')">✓ 同意</button>
+            <button class="fb-b" onclick="sel(this,'b-f2','d')">💬 需讨论</button>
+            <button class="fb-b" onclick="sel(this,'b-f2','x')">✗ 不同意</button>
+          </div>
+          <textarea class="fb-n" placeholder="补充说明…" onchange="sn(this,'b-f2')"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 3.3 发布者看板 ─── -->
+  <div class="sec" id="f3">
+    <div class="card">
+      <div class="card-head" onclick="toggle(this)">
+        <div class="card-num n-amber">3.3</div>
+        <div class="card-info">
+          <div class="card-name">发布者侧实时进度看板</div>
+          <div class="card-desc">
+            <span class="th-tag th-frame">框架效应</span>
+            <span class="th-tag th-social">社会证明</span>
+            ROI 实时追踪 + 里程碑庆祝机制
+          </div>
+        </div>
+        <div class="card-arrow">▼</div>
+      </div>
+      <div class="card-body">
+        <div class="phone">
+          <div class="phone-bar">MSC.AI · 任务监控</div>
+          <div class="phone-content mc">
+            <div style="font-size:14px;font-weight:700;margin-bottom:10px">抖音涨粉</div>
+            <div style="display:flex;gap:8px;margin-bottom:12px;text-align:center">
+              <div style="flex:1;background:var(--bg);border-radius:8px;padding:8px 4px">
+                <div style="font-size:18px;font-weight:900">¥500</div>
+                <div class="mc-dim" style="font-size:10px">总预算</div>
+              </div>
+              <div style="flex:1;background:var(--bg);border-radius:8px;padding:8px 4px">
+                <div style="font-size:18px;font-weight:900">5<span class="mc-dim" style="font-size:12px">/10</span></div>
+                <div class="mc-dim" style="font-size:10px">已接取</div>
+              </div>
+              <div style="flex:1;background:var(--bg);border-radius:8px;padding:8px 4px">
+                <div style="font-size:18px;font-weight:900;color:var(--green)">¥50</div>
+                <div class="mc-dim" style="font-size:10px">单次成本</div>
+              </div>
+            </div>
+            <div class="mc-card" style="border-left:3px solid var(--green)">
+              <div style="font-size:11px;font-weight:600;color:var(--green);margin-bottom:4px">💰 ROI 追踪</div>
+              <div class="mc-dim" style="font-size:11px;line-height:1.7">
+                行业参考：抖音涨粉平均 ¥65/次<br>
+                你的成本：¥50/次<br>
+                <b style="color:var(--green)">节省 ¥30（约 23%）</b>
+              </div>
+            </div>
+            <div style="margin-top:10px;font-size:12px">
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span class="mc-dim">接取进度</span><span>5/10</span></div>
+              <div class="mc-progress"><div class="mc-progress-fill" style="width:50%;background:var(--blue)"></div></div>
+              <div style="display:flex;justify-content:space-between;margin-top:6px;margin-bottom:4px"><span class="mc-dim">完成进度</span><span>2/10</span></div>
+              <div class="mc-progress"><div class="mc-progress-fill" style="width:20%;background:var(--green)"></div></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;margin-top:10px;color:var(--text2)">
+              <span>待审核 <b style="color:var(--amber)">3</b></span>
+              <span>已通过 <b style="color:var(--green)">2</b></span>
+              <span>已驳回 <b style="color:var(--text3)">0</b></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sub">
+          <div class="sub-label">里程碑触发机制</div>
+          <div class="milestone"><div class="ms-icon ms-blue">🎉</div><div><b>首个接取</b><br><span class="mc-dim" style="font-size:12px">"有人接了！通常首接后2小时内会有更多人跟进"</span></div></div>
+          <div class="milestone"><div class="ms-icon ms-amber">📊</div><div><b>过半接取</b><br><span class="mc-dim" style="font-size:12px">"已过半！你的任务吸引力高于平台平均"</span></div></div>
+          <div class="milestone"><div class="ms-icon ms-green">✅</div><div><b>全部接取</b><br><span class="mc-dim" style="font-size:12px">"全部被接！开启通知，第一时间审核"</span></div></div>
+        </div>
+
+        <div class="sub">
+          <div class="sub-label">设计原理</div>
+          <div class="sub-point"><span class="th-tag th-frame">框架效应</span> 把"费用"重新框架为"投资" — 展示ROI和行业对比，让发布者觉得"不用平台才亏"</div>
+          <div class="sub-point">里程碑庆祝 = 即时正反馈 — 每个关键节点都有推送，保持发布者关注度</div>
+        </div>
+        <div class="fb" data-id="b-f3">
+          <div class="fb-label">👤 CEO反馈</div>
+          <div class="fb-row">
+            <button class="fb-b" onclick="sel(this,'b-f3','a')">✓ 同意</button>
+            <button class="fb-b" onclick="sel(this,'b-f3','d')">💬 需讨论</button>
+            <button class="fb-b" onclick="sel(this,'b-f3','x')">✗ 不同意</button>
+          </div>
+          <textarea class="fb-n" placeholder="补充说明…" onchange="sn(this,'b-f3')"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 3.4 微信通知 ─── -->
+  <div class="sec" id="f4">
+    <div class="card">
+      <div class="card-head" onclick="toggle(this)">
+        <div class="card-num n-green">3.4</div>
+        <div class="card-info">
+          <div class="card-name">微信服务通知：触发节点与文案</div>
+          <div class="card-desc">
+            <span class="th-tag th-peak">峰终定律</span>
+            <span class="th-tag th-loss">损失厌恶</span>
+            在情绪峰值时刻请求授权 + 损失框架文案
+          </div>
+        </div>
+        <div class="card-arrow">▼</div>
+      </div>
+      <div class="card-body">
+        <div class="sub">
+          <div class="sub-label">授权时机设计（在情绪峰值请求）</div>
+          <table class="sum-table">
+            <thead><tr><th>时刻</th><th>情绪</th><th>文案</th></tr></thead>
+            <tbody>
+              <tr><td>接取成功后</td><td style="color:var(--blue)">兴奋</td><td>"¥3.00 到账时第一时间提醒你"</td></tr>
+              <tr><td>发布成功后</td><td style="color:var(--amber)">期待</td><td>"有人接单时立即告诉你"</td></tr>
+              <tr><td>首次到账后</td><td style="color:var(--green)">满足</td><td>"每笔收入到账都及时提醒"</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="sub">
+          <div class="sub-label">5个通知模板</div>
+
+          <div class="notif">
+            <div class="notif-title">📋 模板1：任务审核结果（接单者收）</div>
+            <div class="notif-row"><span class="notif-key">任务名称</span><span class="notif-val">抖音涨粉</span></div>
+            <div class="notif-row"><span class="notif-key">审核结果</span><span class="notif-val" style="color:var(--green)">已通过</span></div>
+            <div class="notif-row"><span class="notif-key">结算金额</span><span class="notif-val">¥3.00</span></div>
+            <div class="notif-row"><span class="notif-key">备注</span><span class="notif-val mc-dim">收入已到账，可在"我的"中查看</span></div>
+          </div>
+
+          <div class="notif">
+            <div class="notif-title">📊 模板2：接取进度（发布者收）</div>
+            <div class="notif-row"><span class="notif-key">任务名称</span><span class="notif-val">抖音涨粉</span></div>
+            <div class="notif-row"><span class="notif-key">接取进度</span><span class="notif-val">50%（5/10）</span></div>
+            <div class="notif-row"><span class="notif-key">备注</span><span class="notif-val mc-dim">剩余5个名额，通常24h内接完</span></div>
+            <div style="font-size:11px;color:var(--text3);margin-top:6px">⚙️ 触发：仅在 25% / 50% / 75% / 100% 四个里程碑触发，避免骚扰</div>
+          </div>
+
+          <div class="notif">
+            <div class="notif-title">💰 模板3：收入到账（接单者收）</div>
+            <div class="notif-row"><span class="notif-key">到账金额</span><span class="notif-val" style="color:var(--green)">¥3.00</span></div>
+            <div class="notif-row"><span class="notif-key">来源任务</span><span class="notif-val">抖音涨粉</span></div>
+            <div class="notif-row"><span class="notif-key">账户余额</span><span class="notif-val">¥156.00</span></div>
+            <div class="notif-row"><span class="notif-key">备注</span><span class="notif-val mc-dim">还差 ¥47 可提现到微信零钱</span></div>
+          </div>
+
+          <div class="notif">
+            <div class="notif-title">✅ 模板4：任务完成（发布者收）</div>
+            <div class="notif-row"><span class="notif-key">完成进度</span><span class="notif-val">8/10（80%）</span></div>
+            <div class="notif-row"><span class="notif-key">备注</span><span class="notif-val mc-dim">有 3 条提交待审核</span></div>
+          </div>
+
+          <div class="notif">
+            <div class="notif-title">💳 模板5：提现到账（双方通用）</div>
+            <div class="notif-row"><span class="notif-key">提现金额</span><span class="notif-val">¥100.00</span></div>
+            <div class="notif-row"><span class="notif-key">到账方式</span><span class="notif-val">微信零钱</span></div>
+          </div>
+        </div>
+        <div class="fb" data-id="b-f4">
+          <div class="fb-label">👤 CEO反馈</div>
+          <div class="fb-row">
+            <button class="fb-b" onclick="sel(this,'b-f4','a')">✓ 同意</button>
+            <button class="fb-b" onclick="sel(this,'b-f4','d')">💬 需讨论</button>
+            <button class="fb-b" onclick="sel(this,'b-f4','x')">✗ 不同意</button>
+          </div>
+          <textarea class="fb-n" placeholder="补充说明…" onchange="sn(this,'b-f4')"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 3.5 到账通知 ─── -->
+  <div class="sec" id="f5">
+    <div class="card">
+      <div class="card-head" onclick="toggle(this)">
+        <div class="card-num n-green">3.5</div>
+        <div class="card-info">
+          <div class="card-name">到账通知：首次仪式 + 日常趋势</div>
+          <div class="card-desc">
+            <span class="th-tag th-peak">峰终定律</span>
+            <span class="th-tag th-anchor">锚定效应</span>
+            首次到账全屏庆祝（Referral入口）+ 后续轻量趋势数据
+          </div>
+        </div>
+        <div class="card-arrow">▼</div>
+      </div>
+      <div class="card-body">
+        <div class="sub">
+          <div class="sub-label">首次到账（特殊仪式感）</div>
+          <div class="phone">
+            <div class="phone-bar">MSC.AI · 恭喜！</div>
+            <div class="phone-content mc mc-center">
+              <div style="font-size:36px;margin:10px 0">🎊</div>
+              <div style="font-size:18px;font-weight:900">恭喜赚到第一笔收入！</div>
+              <div style="font-size:32px;font-weight:900;color:var(--green);margin:10px 0">+ ¥3.00</div>
+              <div class="mc-dim" style="font-size:12px">来自任务："抖音涨粉"</div>
+              <div class="mc-card" style="text-align:left;margin-top:14px">
+                <div style="font-size:12px;color:var(--amber);font-weight:600;margin-bottom:4px">💡 你知道吗？</div>
+                <div class="mc-dim" style="font-size:12px;line-height:1.6">平台最快的接单者月收入超过 ¥3,000<br>平均每天只需要 30 分钟</div>
+              </div>
+              <div style="display:flex;gap:8px;margin-top:14px">
+                <div class="mc-btn mc-btn-blue" style="flex:1;text-align:center;font-size:12px">继续赚钱</div>
+                <div class="mc-btn" style="flex:1;text-align:center;font-size:12px;border:1px solid var(--border);background:var(--bg-el)">分享给朋友</div>
+              </div>
+              <div style="margin-top:12px;font-size:11px;color:var(--text3)">新手挑战进度：1/3 ●○○</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sub">
+          <div class="sub-label">后续到账（轻量日常）</div>
+          <div class="phone">
+            <div class="phone-bar">MSC.AI · 首页</div>
+            <div class="phone-content mc">
+              <div style="background:rgba(76,175,125,.12);border-radius:8px;padding:10px 14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">
+                <span style="font-size:13px">💰 +¥3.00 到账 · "抖音涨粉"</span>
+                <span class="mc-blue" style="font-size:11px">详情 ›</span>
+              </div>
+              <div class="mc-dim" style="font-size:12px">账户余额</div>
+              <div style="font-size:24px;font-weight:900">¥ 156.00</div>
+              <div style="font-size:12px;color:var(--green);margin-top:2px">↑ +¥3.00 ("抖音涨粉")</div>
+              <div style="font-size:12px;color:var(--text2);margin-top:8px">📈 本周累计：¥45.00（<span style="color:var(--green)">比上周 +12%</span>）</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sub">
+          <div class="sub-label">设计原理</div>
+          <div class="sub-point"><span class="th-tag th-peak">峰终定律</span> "收到钱"是任务流程的终点 — 必须是体验的高光。首次到账用全屏庆祝，制造记忆峰值</div>
+          <div class="sub-point"><span class="th-tag th-anchor">锚定</span> "月收入超 ¥3,000" — 建立对平台的长期收益预期</div>
+          <div class="sub-point">"分享给朋友" = <b>AARRR Referral 层</b> — 在情绪高点触发分享，转化率最高</div>
+          <div class="sub-point">"比上周 +12%" = <b>进步感知</b> — 即使绝对值不大，增长趋势让人有成就感，驱动留存</div>
+        </div>
+        <div class="fb" data-id="b-f5">
+          <div class="fb-label">👤 CEO反馈</div>
+          <div class="fb-row">
+            <button class="fb-b" onclick="sel(this,'b-f5','a')">✓ 同意</button>
+            <button class="fb-b" onclick="sel(this,'b-f5','d')">💬 需讨论</button>
+            <button class="fb-b" onclick="sel(this,'b-f5','x')">✗ 不同意</button>
+          </div>
+          <textarea class="fb-n" placeholder="补充说明…" onchange="sn(this,'b-f5')"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="/sync.js"></script>
+<script>
+function toggle(el){el.closest('.card').classList.toggle('open')}
+const SK='msc_b_fb';
+SYNC.init('chatB',SK);
+function ld(){try{return JSON.parse(localStorage.getItem(SK)||'{}')}catch(e){return{}}}
+function sv(d){try{localStorage.setItem(SK,JSON.stringify(d))}catch(e){}}
+function sel(btn,id,c){
+  const row=btn.parentElement;
+  row.querySelectorAll('.fb-b').forEach(b=>{b.classList.remove('s-a','s-d','s-x')});
+  btn.classList.add(c==='a'?'s-a':c==='d'?'s-d':'s-x');
+  const d=ld();d[id]={...d[id],c};sv(d);up();
+  SYNC.push(id,c);
+}
+function sn(ta,id){const d=ld();d[id]={...d[id],n:ta.value};sv(d);SYNC.push(id,undefined,ta.value)}
+function up(){
+  const d=ld();let a=0,dd=0,x=0;
+  Object.values(d).forEach(v=>{if(v.c==='a')a++;if(v.c==='d')dd++;if(v.c==='x')x++});
+  document.getElementById('ca').textContent=a;
+  document.getElementById('cd').textContent=dd;
+  document.getElementById('cx').textContent=x;
+}
+function render(d){
+  Object.entries(d).forEach(([id,v])=>{
+    const w=document.querySelector(`.fb[data-id="${id}"]`);
+    if(!w)return;
+    if(v.c){const bs=w.querySelectorAll('.fb-b');bs.forEach(b=>b.classList.remove('s-a','s-d','s-x'));const idx=v.c==='a'?0:v.c==='d'?1:2;if(bs[idx])bs[idx].classList.add(v.c==='a'?'s-a':v.c==='d'?'s-d':'s-x')}
+    if(v.n){const ta=w.querySelector('.fb-n');if(ta)ta.value=v.n}
+  });
+  up();
+}
+document.addEventListener('DOMContentLoaded',async()=>{
+  const remote=await SYNC.pull();
+  render(ld());
+});
+const obs=new IntersectionObserver(es=>{
+  es.forEach(e=>{
+    if(e.isIntersecting){
+      const id=e.target.id;
+      document.querySelectorAll('.nav a').forEach(a=>{
+        a.classList.toggle('active',a.getAttribute('href')==='#'+id)
+      })
+    }
+  })
+},{rootMargin:'-120px 0px -60% 0px'});
+document.querySelectorAll('.sec[id]').forEach(s=>obs.observe(s));
+</script>
+</body>
+</html>

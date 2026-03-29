@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>MSC.AI 维度1：信任与安全感 — UI/UX设计方案</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700;900&display=swap');
+
+  :root {
+    --bg-deep: #0a0c10;
+    --bg-card: #141820;
+    --bg-card-hover: #1a2030;
+    --bg-elevated: #1e2436;
+    --border-subtle: rgba(255,255,255,0.06);
+    --border-active: rgba(255,255,255,0.12);
+    --text-primary: #f0f2f5;
+    --text-secondary: #8b95a8;
+    --text-muted: #5a6478;
+    --accent-green: #34d399;
+    --accent-green-dim: rgba(52,211,153,0.12);
+    --accent-blue: #60a5fa;
+    --accent-blue-dim: rgba(96,165,250,0.12);
+    --accent-amber: #fbbf24;
+    --accent-amber-dim: rgba(251,191,36,0.12);
+    --accent-red: #f87171;
+    --accent-red-dim: rgba(248,113,113,0.12);
+    --accent-gold: #f59e0b;
+    --accent-silver: #94a3b8;
+    --accent-bronze: #d97706;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans SC', -apple-system, sans-serif;
+    background: var(--bg-deep);
+    color: var(--text-primary);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ===== HEADER ===== */
+  .site-header {
+    position: sticky; top: 36px; z-index: 100;
+    background: rgba(10,12,16,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 16px 0;
+  }
+  .header-inner {
+    max-width: 1200px; margin: 0 auto; padding: 0 24px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .header-brand { display: flex; align-items: center; gap: 12px; }
+  .header-logo {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+    border-radius: 8px; display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 14px; color: #000;
+  }
+  .header-title { font-size: 15px; font-weight: 600; }
+  .header-tag {
+    font-size: 11px; color: var(--accent-green);
+    background: var(--accent-green-dim);
+    padding: 2px 10px; border-radius: 20px; font-weight: 500;
+  }
+
+  /* ===== NAV ===== */
+  .nav-bar {
+    position: sticky; top: 93px; z-index: 99;
+    background: rgba(10,12,16,0.9); backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border-subtle);
+    overflow-x: auto; scrollbar-width: none;
+  }
+  .nav-bar::-webkit-scrollbar { display: none; }
+  .nav-inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; display: flex; gap: 4px; }
+  .nav-item {
+    padding: 12px 16px; font-size: 13px; font-weight: 500;
+    color: var(--text-muted); cursor: pointer; white-space: nowrap;
+    border-bottom: 2px solid transparent; transition: all 0.2s; text-decoration: none;
+  }
+  .nav-item:hover, .nav-item.active { color: var(--accent-green); border-bottom-color: var(--accent-green); }
+
+  /* ===== MAIN ===== */
+  .main-content { max-width: 1200px; margin: 0 auto; padding: 40px 24px 120px; }
+
+  .section { margin-bottom: 80px; scroll-margin-top: 160px; }
+  .section-header { margin-bottom: 40px; }
+  .section-number { font-size: 12px; font-weight: 600; color: var(--accent-green); letter-spacing: 2px; margin-bottom: 8px; }
+  .section-title { font-size: 28px; font-weight: 700; margin-bottom: 12px; line-height: 1.3; }
+  .section-desc { font-size: 15px; color: var(--text-secondary); max-width: 700px; line-height: 1.7; }
+
+  .subsection { margin-bottom: 48px; }
+  .sub-title { font-size: 18px; font-weight: 600; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .badge { font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
+  .badge-page { background: var(--accent-blue-dim); color: var(--accent-blue); }
+  .badge-popup { background: var(--accent-amber-dim); color: var(--accent-amber); }
+  .badge-component { background: var(--accent-green-dim); color: var(--accent-green); }
+  .sub-desc { font-size: 14px; color: var(--text-secondary); margin-bottom: 20px; line-height: 1.7; }
+
+  .spec-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .spec-item { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 16px; }
+  .spec-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+  .spec-value { font-size: 14px; font-weight: 500; }
+
+  /* ===== PHONE — auto height ===== */
+  .mockup-container { display: flex; gap: 32px; flex-wrap: wrap; justify-content: center; margin: 24px 0; }
+  .phone-wrapper { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; }
+  .phone-frame {
+    width: 340px;
+    background: #111318; border-radius: 36px; border: 3px solid #2a2e38;
+    padding: 12px; position: relative;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+  .phone-notch { width: 120px; height: 28px; background: #111318; border-radius: 0 0 16px 16px; margin: 0 auto 4px; }
+  .phone-screen { background: var(--bg-deep); border-radius: 24px; overflow: hidden; display: flex; flex-direction: column; }
+  .phone-label { text-align: center; margin-top: 16px; font-size: 13px; font-weight: 600; color: var(--text-secondary); }
+  .phone-label-sub { text-align: center; font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+  .screen-status-bar { display: flex; justify-content: space-between; padding: 8px 20px 4px; font-size: 12px; font-weight: 600; flex-shrink: 0; }
+  .screen-nav-bar { display: flex; align-items: center; padding: 8px 16px; font-size: 16px; font-weight: 600; gap: 12px; flex-shrink: 0; }
+  .screen-nav-back { font-size: 20px; color: var(--text-secondary); }
+  .screen-content { padding: 0 16px 20px; flex: 1; }
+
+  /* Mock UI */
+  .mock-amount-display { text-align: center; padding: 20px 0 12px; }
+  .mock-amount-label { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
+  .mock-amount-value { font-size: 32px; font-weight: 700; }
+  .mock-amount-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+  .mock-trust-line {
+    display: flex; align-items: center; gap: 6px;
+    padding: 10px 14px; background: var(--accent-green-dim);
+    border-radius: var(--radius-sm); margin: 8px 0; font-size: 12px; color: var(--accent-green);
+  }
+  .mock-trust-line .arrow { margin-left: auto; opacity: 0.5; }
+
+  .mock-input-group { margin: 12px 0; }
+  .mock-input-label { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
+  .mock-input {
+    width: 100%; padding: 12px 14px; background: var(--bg-elevated);
+    border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);
+    font-size: 15px; display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .mock-btn { width: 100%; padding: 14px; border-radius: var(--radius-md); font-size: 15px; font-weight: 600; text-align: center; margin: 8px 0; }
+  .mock-btn-primary { background: linear-gradient(135deg, var(--accent-green), #2dd4a0); color: #000; }
+  .mock-btn-ghost { background: transparent; border: 1px solid var(--border-active); color: var(--text-secondary); }
+  .mock-bottom-links { display: flex; justify-content: center; gap: 16px; padding: 12px 0; font-size: 12px; color: var(--accent-blue); }
+  .mock-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 14px; margin: 8px 0; }
+  .mock-user-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .mock-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #6366f1, #8b5cf6); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: white; flex-shrink: 0; }
+  .mock-user-info { flex: 1; min-width: 0; }
+  .mock-user-name { font-size: 14px; font-weight: 600; }
+  .mock-user-meta { font-size: 11px; color: var(--text-muted); }
+  .mock-credit-badge { display: inline-flex; align-items: center; gap: 3px; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 4px; white-space: nowrap; flex-shrink: 0; }
+  .credit-gold { background: rgba(245,158,11,0.15); color: var(--accent-gold); }
+  .credit-silver { background: rgba(148,163,184,0.15); color: var(--accent-silver); }
+  .credit-new { background: var(--accent-blue-dim); color: var(--accent-blue); }
+  .mock-tags { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+  .mock-tag { font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 500; white-space: nowrap; }
+  .tag-green { background: var(--accent-green-dim); color: var(--accent-green); }
+  .tag-blue { background: var(--accent-blue-dim); color: var(--accent-blue); }
+  .tag-amber { background: var(--accent-amber-dim); color: var(--accent-amber); }
+
+  .mock-fee-row { display: flex; justify-content: space-between; padding: 10px 0; font-size: 13px; border-bottom: 1px solid var(--border-subtle); }
+  .mock-fee-row:last-of-type { border-bottom: none; }
+  .mock-fee-label { color: var(--text-secondary); }
+  .mock-fee-value { color: var(--text-primary); font-weight: 600; }
+  .mock-fee-total .mock-fee-value { font-size: 18px; color: var(--accent-green); }
+
+  .mock-progress-bar { display: flex; height: 8px; border-radius: 4px; overflow: hidden; margin: 8px 0; background: var(--bg-elevated); }
+  .mock-progress-seg { height: 100%; }
+  .mock-progress-legend { display: flex; gap: 12px; font-size: 11px; color: var(--text-muted); margin-top: 6px; flex-wrap: wrap; }
+  .mock-progress-legend span { display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+  .mock-history-item { display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border-subtle); }
+  .mock-history-dot { width: 8px; height: 8px; border-radius: 50%; margin-right: 12px; flex-shrink: 0; }
+  .mock-history-info { flex: 1; min-width: 0; }
+  .mock-history-amount { font-size: 14px; font-weight: 600; }
+  .mock-history-time { font-size: 11px; color: var(--text-muted); }
+  .mock-history-status { font-size: 12px; font-weight: 500; white-space: nowrap; flex-shrink: 0; margin-left: 8px; }
+
+  .mock-tabbar { display: flex; background: var(--bg-card); border-top: 1px solid var(--border-subtle); padding: 8px 0 12px; flex-shrink: 0; }
+  .mock-tab { flex: 1; text-align: center; font-size: 10px; color: var(--text-muted); padding-top: 4px; }
+  .mock-tab.active { color: var(--accent-green); }
+  .mock-tab-icon { font-size: 18px; margin-bottom: 2px; }
+
+  /* CEO Feedback */
+  .ceo-section { background: var(--bg-card); border: 1px solid var(--accent-amber-dim); border-left: 3px solid var(--accent-amber); border-radius: var(--radius-md); padding: 20px; margin: 24px 0; }
+  .ceo-section-title { font-size: 13px; font-weight: 600; color: var(--accent-amber); margin-bottom: 12px; }
+  .ceo-options { display: flex; gap: 8px; flex-wrap: wrap; }
+  .ceo-btn { padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 500; cursor: pointer; border: none; transition: all 0.2s; }
+  .ceo-btn-agree { background: var(--accent-green-dim); color: var(--accent-green); border: 1px solid rgba(52,211,153,0.2); }
+  .ceo-btn-discuss { background: var(--accent-amber-dim); color: var(--accent-amber); border: 1px solid rgba(251,191,36,0.2); }
+  .ceo-btn-disagree { background: var(--accent-red-dim); color: var(--accent-red); border: 1px solid rgba(248,113,113,0.2); }
+  .ceo-btn:hover { filter: brightness(1.2); }
+  .ceo-btn.selected { filter: brightness(1.3); box-shadow: 0 0 12px rgba(255,255,255,0.1); }
+
+  .flow-container { display: flex; align-items: center; gap: 8px; padding: 20px; background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border-subtle); overflow-x: auto; margin: 16px 0; }
+  .flow-step { display: flex; flex-direction: column; align-items: center; min-width: 70px; text-align: center; }
+  .flow-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 6px; }
+  .flow-label { font-size: 11px; font-weight: 500; }
+  .flow-sublabel { font-size: 10px; color: var(--text-muted); }
+  .flow-arrow { font-size: 16px; color: var(--text-muted); flex-shrink: 0; }
+
+  .rating-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
+  .rating-table th, .rating-table td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border-subtle); }
+  .rating-table th { color: var(--text-muted); font-weight: 500; font-size: 11px; letter-spacing: 1px; }
+  .rating-table td { color: var(--text-secondary); }
+
+  .collapsible { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); margin: 8px 0; overflow: hidden; }
+  .collapsible-header { padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; font-size: 14px; font-weight: 500; transition: background 0.2s; }
+  .collapsible-header:hover { background: var(--bg-card-hover); }
+  .collapsible-arrow { transition: transform 0.2s; color: var(--text-muted); }
+  .collapsible.open .collapsible-arrow { transform: rotate(180deg); }
+  .collapsible-body { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+  .collapsible.open .collapsible-body { max-height: 800px; }
+  .collapsible-content { padding: 0 16px 16px; font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
+
+  .section-divider { border: none; height: 1px; background: linear-gradient(90deg, transparent, var(--border-subtle), transparent); margin: 60px 0; }
+
+  @media (max-width: 768px) {
+    .mockup-container { flex-direction: column; align-items: center; }
+    .phone-frame { width: 100%; max-width: 340px; }
+    .section-title { font-size: 22px; }
+    .spec-grid { grid-template-columns: 1fr; }
+    .main-content { padding: 24px 16px 80px; }
+    .rating-table { font-size: 12px; }
+    .rating-table th, .rating-table td { padding: 8px 10px; }
+  }
+</style>
+</head>
+<body>
+<!-- MSC.AI SITE NAV --><div style="position:sticky;top:0;z-index:9999;background:rgba(10,12,16,.95);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.08);padding:8px 16px;display:flex;align-items:center;gap:12px;font-family:Noto Sans SC,sans-serif;font-size:12px;overflow-x:auto;scrollbar-width:none"><a href="index.html" style="color:#34d399;text-decoration:none;font-weight:700;white-space:nowrap;display:flex;align-items:center;gap:4px"><span style="display:inline-flex;width:20px;height:20px;background:linear-gradient(135deg,#34d399,#60a5fa);border-radius:5px;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:#000">M</span>首页</a><span style="color:#5a6478">│</span><a href="chatA.html" style="color:#8b95a8;text-decoration:none;white-space:nowrap;padding:3px 8px;border-radius:4px" class="snav";background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);color:#34d399">1·信任</a><a href="chatB.html" style="color:#8b95a8;text-decoration:none;white-space:nowrap;padding:3px 8px;border-radius:4px" class="snav">2+3·空状态反馈</a><a href="chatC.html" style="color:#8b95a8;text-decoration:none;white-space:nowrap;padding:3px 8px;border-radius:4px" class="snav">4+5·卡片金额</a><a href="chatD.html" style="color:#8b95a8;text-decoration:none;white-space:nowrap;padding:3px 8px;border-radius:4px" class="snav">6+7+8·确认留存</a></div><!-- END NAV -->
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="header-brand">
+      <div class="header-logo">M</div>
+      <span class="header-title">MSC.AI UI/UX 重构</span>
+    </div>
+    <span class="header-tag">维度1 · 信任与安全感</span>
+  </div>
+</header>
+
+<nav class="nav-bar">
+  <div class="nav-inner">
+    <a href="#fund" class="nav-item active" onclick="setActive(this)">资金保障</a>
+    <a href="#credit" class="nav-item" onclick="setActive(this)">信用体系</a>
+    <a href="#platform" class="nav-item" onclick="setActive(this)">平台资质</a>
+    <a href="#withdraw" class="nav-item" onclick="setActive(this)">提现安全</a>
+  </div>
+</nav>
+
+<main class="main-content">
+
+  <!-- ===== 资金保障 ===== -->
+  <section class="section" id="fund">
+    <div class="section-header">
+      <div class="section-number">维度 1-A</div>
+      <h2 class="section-title">资金保障展示方案</h2>
+      <p class="section-desc">在用户与"钱"产生关联的每一个触点，持续强化"平台托管"的安全感——充值、发布、支付确认、任务监控，全链路覆盖。安全认证信息（SSL等）收纳于保障面板中，不单独占位。</p>
+    </div>
+
+    <div class="subsection">
+      <h3 class="sub-title">1.1 充值页面 — 信任提示 + 保障面板 <span class="badge badge-page">页面</span></h3>
+      <p class="sub-desc">充值是用户第一次把钱交给平台的关键时刻。支付按钮上方添加常驻信任提示行，点击展开完整保障说明。</p>
+      <div class="spec-grid">
+        <div class="spec-item"><div class="spec-label">展示位置</div><div class="spec-value">金额选择区下方，支付按钮上方</div></div>
+        <div class="spec-item"><div class="spec-label">触发条件</div><div class="spec-value">常驻显示，点击展开底部面板</div></div>
+        <div class="spec-item"><div class="spec-label">文案</div><div class="spec-value">🔒 资金由平台托管，未使用余额可随时提现</div></div>
+        <div class="spec-item"><div class="spec-label">字号/颜色</div><div class="spec-value">12px · #34d399 · 背景 rgba(52,211,153,0.12)</div></div>
+      </div>
+
+      <div class="mockup-container">
+        <div class="phone-wrapper">
+          <div class="phone-frame">
+            <div class="phone-notch"></div>
+            <div class="phone-screen">
+              <div class="screen-status-bar"><span>9:41</span><span>📶 🔋</span></div>
+              <div class="screen-nav-bar"><span class="screen-nav-back">‹</span><span>充值</span></div>
+              <div class="screen-content">
+                <div class="mock-amount-display">
+                  <div class="mock-amount-label">充值金额</div>
+                  <div class="mock-amount-value">¥ 100.00</div>
+                </div>
+                <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:12px 0;">
+                  <div class="mock-card" style="text-align:center;padding:10px;margin:0;font-size:14px;">¥10</div>
+                  <div class="mock-card" style="text-align:center;padding:10px;margin:0;font-size:14px;">¥50</div>
+                  <div class="mock-card" style="text-align:center;padding:10px;margin:0;font-size:14px;border-color:var(--accent-green);color:var(--accent-green);">¥100</div>
+                  <div class="mock-card" style="text-align:center;padding:10px;margin:0;font-size:14px;">¥200</div>
+                  <div class="mock-card" style="text-align:center;padding:10px;margin:0;font-size:14px;">¥500</div>
+                  <div class="mock-card" style="text-align:center;padding:10px;margin:0;font-size:14px;">自定义</div>
+                </div>
+                <div class="mock-trust-line"><span>🔒</span><span>资金由平台托管，未使用余额可随时提现</span><span class="arrow">›</span></div>
+                <div class="mock-btn mock-btn-primary" style="margin-top:12px;">确认充值 ¥100.00</div>
+                <div class="mock-bottom-links"><span>充值说明</span><span>联系客服</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="phone-label">充值页面</div>
+          <div class="phone-label-sub">信任提示行 · 点击展开保障面板</div>
+        </div>
+
+        <div class="phone-wrapper">
+          <div class="phone-frame">
+            <div class="phone-notch"></div>
+            <div class="phone-screen" style="position:relative;min-height:620px;">
+              <div class="screen-status-bar" style="opacity:0.3;"><span>9:41</span><span>📶 🔋</span></div>
+              <div style="padding:16px;opacity:0.08;"><div style="text-align:center;font-size:28px;font-weight:700;">¥ 100.00</div></div>
+              <div style="position:absolute;inset:0;background:rgba(0,0,0,0.55);border-radius:24px;display:flex;flex-direction:column;justify-content:flex-end;">
+                <div style="background:var(--bg-card);border-radius:20px 20px 24px 24px;padding:20px 16px 28px;">
+                  <div style="width:36px;height:4px;background:var(--text-muted);border-radius:2px;margin:0 auto 16px;"></div>
+                  <div style="font-size:16px;font-weight:700;text-align:center;margin-bottom:16px;">资金安全保障</div>
+                  <div class="mock-card" style="display:flex;gap:12px;align-items:flex-start;">
+                    <span style="font-size:22px;flex-shrink:0;">🔒</span>
+                    <div><div style="font-size:14px;font-weight:600;margin-bottom:4px;">平台托管机制</div><div style="font-size:12px;color:var(--text-muted);line-height:1.6;">您充值的资金存入平台托管账户，仅在任务完成并通过审核后才会结算给接单者</div></div>
+                  </div>
+                  <div class="mock-card" style="display:flex;gap:12px;align-items:flex-start;">
+                    <span style="font-size:22px;flex-shrink:0;">💰</span>
+                    <div><div style="font-size:14px;font-weight:600;margin-bottom:4px;">余额可提现</div><div style="font-size:12px;color:var(--text-muted);line-height:1.6;">未使用的账户余额支持随时提现，T+1个工作日到账</div></div>
+                  </div>
+                  <div class="mock-card" style="display:flex;gap:12px;align-items:flex-start;">
+                    <span style="font-size:22px;flex-shrink:0;">🛡️</span>
+                    <div><div style="font-size:14px;font-weight:600;margin-bottom:4px;">争议保护</div><div style="font-size:12px;color:var(--text-muted);line-height:1.6;">如对任务结果有异议，可发起申诉，平台冻结相关资金直至处理完毕</div></div>
+                  </div>
+                  <div class="mock-btn mock-btn-ghost" style="margin-top:12px;">联系客服</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="phone-label">资金安全保障面板</div>
+          <div class="phone-label-sub">点击信任提示行后展开</div>
+        </div>
+      </div>
+
+      <div class="ceo-section" data-id="a-1.1">
+        <div class="ceo-section-title">👤 CEO快速反馈</div>
+        <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">充值页信任提示行 + 展开式保障面板（三重保障 · 安全认证收纳于此）</p>
+        <div class="ceo-options">
+          <button class="ceo-btn ceo-btn-agree" onclick="toggleCeo(this)">✓ 同意</button>
+          <button class="ceo-btn ceo-btn-discuss" onclick="toggleCeo(this)">💬 需讨论</button>
+          <button class="ceo-btn ceo-btn-disagree" onclick="toggleCeo(this)">✗ 不同意</button>
+        </div>
+        <textarea class="ceo-note" placeholder="补充说明…" oninput="saveCeoNote(this)" style="width:100%;margin-top:10px;padding:8px 12px;background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:8px;color:var(--text-primary);font-size:13px;font-family:inherit;resize:vertical;min-height:32px;"></textarea>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3 class="sub-title">1.2 费用确认弹窗 + 资金监控 <span class="badge badge-popup">弹窗</span></h3>
+      <p class="sub-desc">发布任务时二次确认扣费 + 费用分解 + 托管说明。发布后可在监控页实时查看资金流向。</p>
+      <div class="spec-grid">
+        <div class="spec-item"><div class="spec-label">触发条件</div><div class="spec-value">点击"确认发布"按钮</div></div>
+        <div class="spec-item"><div class="spec-label">弹窗样式</div><div class="spec-value">居中弹窗 · 宽90% · 圆角16px</div></div>
+        <div class="spec-item"><div class="spec-label">遮罩</div><div class="spec-value">rgba(0,0,0,0.6) · 点击可关闭</div></div>
+        <div class="spec-item"><div class="spec-label">关键文案</div><div class="spec-value">🔒 资金托管在平台，审核后才结算</div></div>
+      </div>
+
+      <div class="mockup-container">
+        <div class="phone-wrapper">
+          <div class="phone-frame">
+            <div class="phone-notch"></div>
+            <div class="phone-screen" style="position:relative;min-height:560px;">
+              <div class="screen-status-bar" style="opacity:0.2;"><span>9:41</span><span>📶 🔋</span></div>
+              <div style="padding:16px;opacity:0.08;"><div style="font-size:16px;font-weight:600;">发布任务</div></div>
+              <div style="position:absolute;inset:0;background:rgba(0,0,0,0.6);border-radius:24px;display:flex;align-items:center;justify-content:center;padding:16px;">
+                <div style="background:var(--bg-card);border-radius:16px;padding:24px 18px;width:100%;border:1px solid var(--border-subtle);">
+                  <div style="text-align:center;font-size:17px;font-weight:700;margin-bottom:20px;">确认发布任务</div>
+                  <div style="background:var(--bg-elevated);border-radius:10px;padding:14px;margin-bottom:14px;">
+                    <div class="mock-fee-row"><span class="mock-fee-label">任务类型</span><span class="mock-fee-value">抖音涨粉</span></div>
+                    <div class="mock-fee-row"><span class="mock-fee-label">任务总费用</span><span class="mock-fee-value">¥500.00</span></div>
+                    <div class="mock-fee-row"><span class="mock-fee-label">平台服务费 (0.5%)</span><span class="mock-fee-value" style="color:var(--text-muted);">¥2.50</span></div>
+                    <div class="mock-fee-row mock-fee-total" style="border-top:1px solid var(--border-active);margin-top:4px;padding-top:14px;">
+                      <span class="mock-fee-label" style="font-weight:600;color:var(--text-primary);">合计扣费</span>
+                      <span class="mock-fee-value">¥502.50</span>
+                    </div>
+                  </div>
+                  <div class="mock-trust-line" style="margin-bottom:16px;"><span>🔒</span><span style="font-size:11px;">资金将托管在平台，通过您的审核后才会结算</span></div>
+                  <div style="display:flex;gap:10px;">
+                    <div class="mock-btn mock-btn-ghost" style="flex:1;">取消</div>
+                    <div class="mock-btn mock-btn-primary" style="flex:2;">确认支付 ¥502.50</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="phone-label">费用确认弹窗</div>
+          <div class="phone-label-sub">费用分解 + 托管保障提示</div>
+        </div>
+
+        <div class="phone-wrapper">
+          <div class="phone-frame">
+            <div class="phone-notch"></div>
+            <div class="phone-screen">
+              <div class="screen-status-bar"><span>9:41</span><span>📶 🔋</span></div>
+              <div class="screen-nav-bar"><span class="screen-nav-back">‹</span><span>任务监控</span></div>
+              <div class="screen-content">
+                <div class="mock-card">
+                  <div style="font-size:15px;font-weight:600;margin-bottom:4px;">抖音涨粉 · 500粉丝</div>
+                  <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">发布于 2026-03-27 14:30</div>
+                  <div style="font-size:12px;color:var(--text-secondary);margin-bottom:6px;">资金流向</div>
+                  <div class="mock-progress-bar">
+                    <div class="mock-progress-seg" style="width:30%;background:var(--accent-green);"></div>
+                    <div class="mock-progress-seg" style="width:10%;background:var(--accent-amber);"></div>
+                    <div class="mock-progress-seg" style="width:60%;background:var(--accent-blue);"></div>
+                  </div>
+                  <div class="mock-progress-legend">
+                    <span><span class="legend-dot" style="background:var(--accent-green);"></span>已结算 ¥150</span>
+                    <span><span class="legend-dot" style="background:var(--accent-amber);"></span>待审核 ¥50</span>
+                    <span><span class="legend-dot" style="background:var(--accent-blue);"></span>托管中 ¥300</span>
+                  </div>
+                </div>
+                <div style="font-size:13px;font-weight:600;margin:16px 0 8px;">接取进度 · 6/10 已接</div>
+                <div class="mock-progress-bar" style="height:6px;"><div class="mock-progress-seg" style="width:60%;background:var(--accent-green);"></div></div>
+                <div style="font-size:13px;font-weight:600;margin:16px 0 8px;">待审核提交</div>
+                <div class="mock-card">
+                  <div class="mock-user-row">
+                    <div class="mock-avatar">张</div>
+                    <div class="mock-user-info"><div class="mock-user-name">张小明</div><div class="mock-user-meta">⭐ 4.6 · 完成率 95%</div></div>
+                    <span class="mock-credit-badge credit-silver">⭐ 4.6</span>
+                  </div>
+                  <div style="display:flex;gap:8px;margin-top:8px;">
+                    <div class="mock-btn mock-btn-ghost" style="flex:1;padding:10px;font-size:13px;margin:0;color:var(--accent-red);">驳回</div>
+                    <div class="mock-btn mock-btn-primary" style="flex:1;padding:10px;font-size:13px;margin:0;">通过</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="phone-label">发布者任务监控</div>
+          <div class="phone-label-sub">资金流向可视化 + 接取进度</div>
+        </div>
+      </div>
+
+      <div class="ceo-section" data-id="a-1.2">
+        <div class="ceo-section-title">👤 CEO快速反馈</div>
+        <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">费用确认弹窗（分解+托管说明）+ 发布者侧资金流向可视化监控</p>
+        <div class="ceo-options">
+          <button class="ceo-btn ceo-btn-agree" onclick="toggleCeo(this)">✓ 同意</button>
+          <button class="ceo-btn ceo-btn-discuss" onclick="toggleCeo(this)">💬 需讨论</button>
+          <button class="ceo-btn ceo-btn-disagree" onclick="toggleCeo(this)">✗ 不同意</button>
+        </div>
+        <textarea class="ceo-note" placeholder="补充说明…" oninput="saveCeoNote(this)" style="width:100%;margin-top:10px;padding:8px 12px;background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:8px;color:var(--text-primary);font-size:13px;font-family:inherit;resize:vertical;min-height:32px;"></textarea>
+      </div>
+    </div>
+    <hr class="section-divider">
+  </section>
+
+  <!-- ===== 信用体系 ===== -->
+  <section class="section" id="credit">
+    <div class="section-header">
+      <div class="section-number">维度 1-B</div>
+      <h2 class="section-title">信用评分体系 UI</h2>
+      <p class="section-desc">解决"我凭什么信任对方"。发布者和接单者各有独立信用维度，在任务卡片、详情页、审核页等关键决策节点展示。</p>
+    </div>
+
+    <div class="subsection">
+      <h3 class="sub-title">2.1 信用等级体系 <span class="badge badge-component">组件</span></h3>
+      <div style="overflow-x:auto;">
+        <table class="rating-table">
+          <thead><tr><th>分数区间</th><th>等级称号</th><th>徽章</th><th>特权</th></tr></thead>
+          <tbody>
+            <tr><td>4.8–5.0</td><td style="color:var(--accent-gold);">金牌/专家</td><td><span class="mock-credit-badge credit-gold">⭐ 4.9</span></td><td>优先展示、高接单上限</td></tr>
+            <tr><td>4.5–4.7</td><td style="color:var(--accent-silver);">银牌/熟练</td><td><span class="mock-credit-badge credit-silver">⭐ 4.6</span></td><td>标准权益</td></tr>
+            <tr><td>4.0–4.4</td><td style="color:var(--accent-bronze);">铜牌/合格</td><td><span class="mock-credit-badge" style="background:rgba(217,119,6,0.15);color:var(--accent-bronze);">⭐ 4.2</span></td><td>标准权益</td></tr>
+            <tr><td>&lt;4.0</td><td style="color:var(--text-muted);">待提升</td><td><span class="mock-credit-badge" style="background:rgba(255,255,255,0.05);color:var(--text-muted);">⭐ 3.5</span></td><td>限制部分功能</td></tr>
+            <tr><td>新用户</td><td style="color:var(--accent-blue);">新人</td><td><span class="mock-credit-badge credit-new">🆕 新人</span></td><td>新手保护期</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3 class="sub-title">2.2 信用信息展示位置 <span class="badge badge-page">多页面</span></h3>
+      <div class="mockup-container">
+        <div class="phone-wrapper">
+          <div class="phone-frame">
+            <div class="phone-notch"></div>
+            <div class="phone-screen">
+              <div class="screen-status-bar"><span>9:41</span><span>📶 🔋</span></div>
+              <div class="screen-nav-bar"><span class="screen-nav-back">‹</span><span>任务详情</span></div>
+              <div class="screen-content">
+                <div class="mock-card" style="border-color:rgba(96,165,250,0.2);">
+                  <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">发布者信息</div>
+                  <div class="mock-user-row" style="margin-bottom:4px;">
+                    <div class="mock-avatar" style="background:linear-gradient(135deg,#f59e0b,#d97706);">李</div>
+                    <div class="mock-user-info">
+                      <div style="display:flex;align-items:center;gap:6px;"><span class="mock-user-name">李老板</span><span class="mock-credit-badge credit-gold">⭐ 4.9</span></div>
+                      <div class="mock-user-meta">累计发放 ¥12,580 | 72个任务 | 审核率 98%</div>
+                    </div>
+                  </div>
+                  <div class="mock-tags"><span class="mock-tag tag-green">优质雇主</span><span class="mock-tag tag-blue">快速审核</span></div>
+                </div>
+                <div style="margin-top:14px;">
+                  <div style="font-size:17px;font-weight:700;margin-bottom:4px;">抖音涨粉 · 500粉丝</div>
+                  <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">截止日期：2026-04-15</div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
+                    <div class="mock-card" style="margin:0;text-align:center;"><div style="font-size:11px;color:var(--text-muted);">单次收入</div><div style="font-size:20px;font-weight:700;color:var(--accent-green);">¥50</div></div>
+                    <div class="mock-card" style="margin:0;text-align:center;"><div style="font-size:11px;color:var(--text-muted);">预估耗时</div><div style="font-size:20px;font-weight:700;">30分钟</div></div>
+                  </div>
+                  <div class="mock-card" style="font-size:13px;color:var(--text-secondary);line-height:1.7;">
+                    <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;">任务要求</div>
+                    关注指定抖音账号并保持关注7天以上，需截图证明已关注。
+                  </div>
+                  <div class="mock-trust-line" style="margin-top:10px;"><span>🔒</span><span style="font-size:11px;">报酬由平台托管，审核通过后即时到账</span></div>
+                  <div class="mock-btn mock-btn-primary" style="margin-top:12px;">接取任务</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="phone-label">任务详情页</div>
+          <div class="phone-label-sub">发布者信用卡片 + 信任标签</div>
+        </div>
+
+        <div class="phone-wrapper">
+          <div class="phone-frame">
+            <div class="phone-notch"></div>
+            <div class="phone-screen">
+              <div class="screen-status-bar"><span>9:41</span><span>📶 🔋</span></div>
+              <div class="screen-nav-bar"><span>任务广场</span><span style="font-size:14px;color:var(--text-muted);margin-left:auto;">筛选 ▾</span></div>
+              <div class="screen-content">
+                <div class="mock-card">
+                  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+                    <div style="flex:1;min-width:0;"><div style="font-size:15px;font-weight:600;">抖音涨粉 · 500粉丝</div><div class="mock-tags" style="margin-top:4px;"><span class="mock-tag tag-amber">🔥 热门</span><span class="mock-tag tag-green">支持AI</span></div></div>
+                    <span class="mock-credit-badge credit-gold">⭐ 4.9</span>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted);"><span>单价 ¥50 · 约30分钟</span><span>剩余 4/10</span></div>
+                </div>
+                <div class="mock-card">
+                  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+                    <div style="flex:1;min-width:0;"><div style="font-size:15px;font-weight:600;">小红书种草笔记</div><div class="mock-tags" style="margin-top:4px;"><span class="mock-tag tag-blue">高收益</span></div></div>
+                    <span class="mock-credit-badge credit-silver">⭐ 4.6</span>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted);"><span>单价 ¥120 · 约2小时</span><span>剩余 8/20</span></div>
+                </div>
+                <div class="mock-card">
+                  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+                    <div style="flex:1;min-width:0;"><div style="font-size:15px;font-weight:600;">AI短剧视频制作</div><div class="mock-tags" style="margin-top:4px;"><span class="mock-tag tag-green">支持AI</span></div></div>
+                    <span class="mock-credit-badge credit-new">🆕 新人</span>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted);"><span>单价 ¥200 · 约3小时</span><span>剩余 2/5</span></div>
+                </div>
+                <div class="mock-card">
+                  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+                    <div style="flex:1;min-width:0;"><div style="font-size:15px;font-weight:600;">会员推广 · 3日有效</div><div class="mock-tags" style="margin-top:4px;"><span class="mock-tag tag-amber">🔥 热门</span></div></div>
+                    <span class="mock-credit-badge credit-gold">⭐ 4.8</span>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted);"><span>单价 ¥30 · 约15分钟</span><span>剩余 12/50</span></div>
+                </div>
+              </div>
+              <div class="mock-tabbar">
+                <div class="mock-tab"><div class="mock-tab-icon">🏠</div>首页</div>
+                <div class="mock-tab active"><div class="mock-tab-icon">📋</div>任务</div>
+                <div class="mock-tab"><div class="mock-tab-icon">➕</div>发布</div>
+                <div class="mock-tab"><div class="mock-tab-icon">👤</div>我的</div>
+              </div>
+            </div>
+          </div>
+          <div class="phone-label">任务广场 · 卡片列表</div>
+          <div class="phone-label-sub">右上角迷你信用徽章 + 标签系统</div>
+        </div>
+      </div>
+
+      <div class="ceo-section" data-id="a-1.3">
+        <div class="ceo-section-title">👤 CEO快速反馈</div>
+        <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">信用等级体系（5级）+ 任务卡片/详情页信用展示方案</p>
+        <div class="ceo-options">
+          <button class="ceo-btn ceo-btn-agree" onclick="toggleCeo(this)">✓ 同意</button>
+          <button class="ceo-btn ceo-btn-discuss" onclick="toggleCeo(this)">💬 需讨论</button>
+          <button class="ceo-btn ceo-btn-disagree" onclick="toggleCeo(this)">✗ 不同意</button>
+        </div>
+        <textarea class="ceo-note" placeholder="补充说明…" oninput="saveCeoNote(this)" style="width:100%;margin-top:10px;padding:8px 12px;background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:8px;color:var(--text-primary);font-size:13px;font-family:inherit;resize:vertical;min-height:32px;"></textarea>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3 class="sub-title">2.3 评价触发流程 <span class="badge badge-component">流程</span></h3>
+      <div class="flow-container">
+        <div class="flow-step"><div class="flow-icon" style="background:var(--accent-green-dim);">✅</div><div class="flow-label">任务结算</div><div class="flow-sublabel">自动触发</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><div class="flow-icon" style="background:var(--accent-blue-dim);">⭐</div><div class="flow-label">评价弹窗</div><div class="flow-sublabel">1-5星+标签</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><div class="flow-icon" style="background:var(--accent-amber-dim);">⏱️</div><div class="flow-label">48h窗口</div><div class="flow-sublabel">超时默认好评</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><div class="flow-icon" style="background:var(--accent-green-dim);">📊</div><div class="flow-label">更新信用分</div><div class="flow-sublabel">加权平均</div></div>
+      </div>
+      <div class="collapsible" onclick="this.classList.toggle('open')">
+        <div class="collapsible-header"><span>📋 评价弹窗内容规格</span><span class="collapsible-arrow">▼</span></div>
+        <div class="collapsible-body"><div class="collapsible-content">
+          <p><strong>评分：</strong>1-5星，可点击选择</p>
+          <p style="margin-top:8px;"><strong>预设标签（多选）：</strong></p>
+          <p>发布者评价接单者：沟通顺畅 / 交付质量高 / 按时完成 / 态度认真 / 需改进</p>
+          <p>接单者评价发布者：审核迅速 / 任务描述清晰 / 沟通友善 / 付款及时 / 需改进</p>
+          <p style="margin-top:8px;"><strong>文字评价：</strong>可选，最多200字</p>
+          <p style="margin-top:8px;"><strong>匿名选项：</strong>默认匿名，可选择公开</p>
+        </div></div>
+      </div>
+    </div>
+    <hr class="section-divider">
+  </section>
+
+  <!-- ===== 平台资质 ===== -->
+  <section class="section" id="platform">
+    <div class="section-header">
+      <div class="section-number">维度 1-C</div>
+      <h2 class="section-title">平台资质展示</h2>
+      <p class="section-desc">让用户确认"这是一家正规公司"。通过整体体验的细节隐性传递正规感，不刻意堆砌认证图标。</p>
+    </div>
+
+    <div class="subsection">
+      <h3 class="sub-title">3.1 展示位置策略 <span class="badge badge-component">全局</span></h3>
+      <p class="sub-desc">资质信息两层展示：首页底部常驻轻量信息 + "我的"页面深度查阅。安全认证信息收纳于充值/提现的保障面板中。</p>
+      <div class="spec-grid">
+        <div class="spec-item"><div class="spec-label">首页底部（滚动到底可见）</div><div class="spec-value">公司名称 + ICP备案号 · 10px · #5a6478</div></div>
+        <div class="spec-item"><div class="spec-label">"我的"页面设置区</div><div class="spec-value">"关于MSC.AI"入口 → 完整资质页</div></div>
+        <div class="spec-item"><div class="spec-label">充值/提现保障面板</div><div class="spec-value">安全认证说明收纳于此</div></div>
+        <div class="spec-item"><div class="spec-label">设计原则</div><div class="spec-value">隐性传递正规感，不刻意堆砌</div></div>
+      </div>
+      <div class="collapsible" onclick="this.classList.toggle('open')">
+        <div class="collapsible-header"><span>📋 "关于MSC.AI"页面完整内容</span><span class="collapsible-arrow">▼</span></div>
+        <div class="collapsible-body"><div class="collapsible-content">
+          <p><strong>公司简介：</strong>MSC.AI是一个AI资产交易平台，致力于将AI算力与人的决策能力结合，构建可持有、可交易、可增长的新型资产类别。</p>
+          <p style="margin-top:8px;"><strong>公司资质：</strong></p>
+          <p>· 营业执照编号：91440300XXXXXXXXXX</p>
+          <p>· ICP备案号：粤ICP备XXXXXXXX号</p>
+          <p>· 增值电信业务经营许可证：粤B2-XXXXXXXX</p>
+          <p style="margin-top:8px;"><strong>安全保障：</strong></p>
+          <p>· 资金托管：所有交易资金由平台托管账户管理</p>
+          <p>· 数据加密：全链路SSL/TLS加密传输</p>
+          <p>· 实名认证：所有用户需完成实名认证</p>
+          <p style="margin-top:8px;"><strong>联系我们：</strong></p>
+          <p>· 客服微信：MSC_AI_Support · 邮箱：<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="13606663637c6167537e60703d727a">[email&#160;protected]</a> · 电话：400-XXX-XXXX</p>
+          <p style="margin-top:8px;"><strong>底部链接：</strong>用户协议 | 隐私政策</p>
+        </div></div>
+      </div>
+      <div class="ceo-section" data-id="a-1.4">
+        <div class="ceo-section-title">👤 CEO快速反馈</div>
+        <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">平台资质两层展示（首页底部+关于页）· 安全认证收纳于保障面板 · 不刻意堆砌</p>
+        <div class="ceo-options">
+          <button class="ceo-btn ceo-btn-agree" onclick="toggleCeo(this)">✓ 同意</button>
+          <button class="ceo-btn ceo-btn-discuss" onclick="toggleCeo(this)">💬 需讨论</button>
+          <button class="ceo-btn ceo-btn-disagree" onclick="toggleCeo(this)">✗ 不同意</button>
+        </div>
+        <textarea class="ceo-note" placeholder="补充说明…" oninput="saveCeoNote(this)" style="width:100%;margin-top:10px;padding:8px 12px;background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:8px;color:var(--text-primary);font-size:13px;font-family:inherit;resize:vertical;min-height:32px;"></textarea>
+      </div>
+    </div>
+    <hr class="section-divider">
+  </section>
+
+  <!-- ===== 提现安全 ===== -->
+  <section class="section" id="withdraw">
+    <div class="section-header">
+      <div class="section-number">维度 1-D</div>
+      <h2 class="section-title">提现安全感设计</h2>
+      <p class="section-desc">提现是用户对平台信任的终极检验——"我赚的钱能不能真的拿到手"。</p>
+    </div>
+
+    <div class="subsection">
+      <h3 class="sub-title">4.1 提现页面 + 记录页 <span class="badge badge-page">页面组</span></h3>
+      <div class="mockup-container">
+        <div class="phone-wrapper">
+          <div class="phone-frame">
+            <div class="phone-notch"></div>
+            <div class="phone-screen">
+              <div class="screen-status-bar"><span>9:41</span><span>📶 🔋</span></div>
+              <div class="screen-nav-bar"><span class="screen-nav-back">‹</span><span>提现</span><span style="font-size:13px;color:var(--accent-blue);margin-left:auto;">提现记录</span></div>
+              <div class="screen-content">
+                <div class="mock-amount-display">
+                  <div class="mock-amount-label">可提现金额（元）</div>
+                  <div class="mock-amount-value" style="color:var(--accent-green);">1,280.50</div>
+                  <div class="mock-amount-sub">冻结中 ¥50.00 <span style="color:var(--accent-blue);">ⓘ</span></div>
+                </div>
+                <div class="mock-input-group"><div class="mock-input-label">提现金额</div><div class="mock-input"><span style="font-size:18px;font-weight:700;">¥ 500.00</span><span style="font-size:12px;color:var(--accent-blue);">全部提现</span></div></div>
+                <div class="mock-input-group"><div class="mock-input-label">到账方式</div><div class="mock-input"><div style="display:flex;align-items:center;gap:8px;"><span style="font-size:16px;">💳</span><span style="font-size:14px;">微信钱包</span></div><span style="color:var(--text-muted);">›</span></div></div>
+                <div style="display:flex;align-items:center;gap:8px;padding:14px 0;font-size:14px;font-weight:600;color:var(--accent-green);"><span>⏱️</span><span>预计T+1个工作日内到账</span></div>
+                <div class="mock-btn mock-btn-primary">确认提现</div>
+                <div class="mock-bottom-links"><span>提现规则</span><span>联系客服</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="phone-label">提现页面</div>
+          <div class="phone-label-sub">到账承诺突出 · 底部客服入口</div>
+        </div>
+
+        <div class="phone-wrapper">
+          <div class="phone-frame">
+            <div class="phone-notch"></div>
+            <div class="phone-screen">
+              <div class="screen-status-bar"><span>9:41</span><span>📶 🔋</span></div>
+              <div class="screen-nav-bar"><span class="screen-nav-back">‹</span><span>提现记录</span></div>
+              <div class="screen-content">
+                <div class="mock-history-item"><div class="mock-history-dot" style="background:var(--accent-green);"></div><div class="mock-history-info"><div class="mock-history-amount">¥ 500.00</div><div class="mock-history-time">2026-03-25 14:30 → 微信钱包</div></div><div class="mock-history-status" style="color:var(--accent-green);">已到账</div></div>
+                <div class="mock-history-item"><div class="mock-history-dot" style="background:var(--accent-amber);"></div><div class="mock-history-info"><div class="mock-history-amount">¥ 280.50</div><div class="mock-history-time">2026-03-27 10:15 → 微信钱包</div></div><div class="mock-history-status" style="color:var(--accent-amber);">处理中</div></div>
+                <div class="mock-history-item"><div class="mock-history-dot" style="background:var(--accent-red);"></div><div class="mock-history-info"><div class="mock-history-amount">¥ 1,000.00</div><div class="mock-history-time">2026-03-20 → 银行卡尾号8842</div></div><div class="mock-history-status" style="color:var(--accent-red);">失败 ›</div></div>
+                <div class="mock-history-item"><div class="mock-history-dot" style="background:var(--accent-green);"></div><div class="mock-history-info"><div class="mock-history-amount">¥ 200.00</div><div class="mock-history-time">2026-03-18 16:45 → 微信钱包</div></div><div class="mock-history-status" style="color:var(--accent-green);">已到账</div></div>
+                <div class="mock-history-item"><div class="mock-history-dot" style="background:var(--accent-green);"></div><div class="mock-history-info"><div class="mock-history-amount">¥ 350.00</div><div class="mock-history-time">2026-03-15 11:20 → 微信钱包</div></div><div class="mock-history-status" style="color:var(--accent-green);">已到账</div></div>
+                <div style="padding:20px 0;text-align:center;font-size:12px;color:var(--text-muted);">🟢 已到账 &nbsp; 🟡 处理中 &nbsp; 🔴 失败（点击查看原因）</div>
+              </div>
+            </div>
+          </div>
+          <div class="phone-label">提现记录</div>
+          <div class="phone-label-sub">状态颜色编码 · 失败可查原因</div>
+        </div>
+      </div>
+
+      <div class="ceo-section" data-id="a-1.5">
+        <div class="ceo-section-title">👤 CEO快速反馈</div>
+        <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">提现页（到账承诺+客服入口）+ 提现记录（颜色编码+失败处理）</p>
+        <div class="ceo-options">
+          <button class="ceo-btn ceo-btn-agree" onclick="toggleCeo(this)">✓ 同意</button>
+          <button class="ceo-btn ceo-btn-discuss" onclick="toggleCeo(this)">💬 需讨论</button>
+          <button class="ceo-btn ceo-btn-disagree" onclick="toggleCeo(this)">✗ 不同意</button>
+        </div>
+        <textarea class="ceo-note" placeholder="补充说明…" oninput="saveCeoNote(this)" style="width:100%;margin-top:10px;padding:8px 12px;background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:8px;color:var(--text-primary);font-size:13px;font-family:inherit;resize:vertical;min-height:32px;"></textarea>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3 class="sub-title">4.2 客服入口布局 <span class="badge badge-component">全局</span></h3>
+      <div class="spec-grid">
+        <div class="spec-item"><div class="spec-label">提现页面底部</div><div class="spec-value">"遇到问题？联系客服"</div></div>
+        <div class="spec-item"><div class="spec-label">失败记录旁</div><div class="spec-value">每条失败记录的"联系客服"按钮</div></div>
+        <div class="spec-item"><div class="spec-label">充值保障面板</div><div class="spec-value">面板底部"联系客服"按钮</div></div>
+        <div class="spec-item"><div class="spec-label">个人中心</div><div class="spec-value">"帮助与客服"常驻入口</div></div>
+      </div>
+      <div class="collapsible" onclick="this.classList.toggle('open')">
+        <div class="collapsible-header"><span>📋 客服实现方式</span><span class="collapsible-arrow">▼</span></div>
+        <div class="collapsible-body"><div class="collapsible-content">
+          <p><strong>首选：</strong>接入微信客服（小程序原生支持）</p>
+          <p style="margin-top:8px;"><strong>备选：</strong>小程序内嵌在线聊天（第三方SDK）</p>
+          <p style="margin-top:8px;"><strong>兜底：</strong>客服微信号二维码</p>
+          <p style="margin-top:8px;"><strong>响应承诺：</strong>工作日 9:00-18:00 即时响应，其他时间24小时内回复</p>
+        </div></div>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="subsection" style="margin-top:20px;">
+      <h3 class="sub-title">📊 信任触点全链路汇总</h3>
+      <p class="sub-desc">用户从充值到提现的完整旅程中，每个关键节点的信任信号——通过体验细节隐性传递，而非刻意堆砌。</p>
+      <div class="flow-container" style="flex-wrap:wrap;gap:12px;justify-content:center;">
+        <div class="flow-step"><div class="flow-icon" style="background:var(--accent-green-dim);font-size:16px;">💰</div><div class="flow-label">充值</div><div class="flow-sublabel">信任提示行<br>+保障面板</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><div class="flow-icon" style="background:var(--accent-green-dim);font-size:16px;">📋</div><div class="flow-label">浏览任务</div><div class="flow-sublabel">信用徽章</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><div class="flow-icon" style="background:var(--accent-green-dim);font-size:16px;">📝</div><div class="flow-label">发布/接取</div><div class="flow-sublabel">确认弹窗<br>+托管说明</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><div class="flow-icon" style="background:var(--accent-green-dim);font-size:16px;">📊</div><div class="flow-label">任务监控</div><div class="flow-sublabel">资金流向图</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><div class="flow-icon" style="background:var(--accent-green-dim);font-size:16px;">⭐</div><div class="flow-label">评价</div><div class="flow-sublabel">双向信用</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><div class="flow-icon" style="background:var(--accent-green-dim);font-size:16px;">💳</div><div class="flow-label">提现</div><div class="flow-sublabel">到账承诺<br>+记录追踪</div></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script src="/sync.js"></script>
+<script>
+const SK='msc_ceo_feedback';
+SYNC.init('chatA',SK);
+function ld(){try{return JSON.parse(localStorage.getItem(SK)||'{}')}catch(e){return{}}}
+function sv(d){try{localStorage.setItem(SK,JSON.stringify(d))}catch(e){}}
+function setActive(el) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  el.classList.add('active');
+}
+function toggleCeo(btn) {
+  const siblings = btn.parentElement.querySelectorAll('.ceo-btn');
+  siblings.forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  const sec = btn.closest('.ceo-section');
+  const id = sec.dataset.id;
+  const val = btn.textContent.trim();
+  const c = val.includes('同意') && !val.includes('不') ? 'a' : val.includes('讨论') ? 'd' : 'x';
+  const d = ld(); d[id] = {...(d[id]||{}), c}; sv(d);
+  SYNC.push(id, c);
+}
+function saveCeoNote(ta) {
+  const sec = ta.closest('.ceo-section');
+  const id = sec.dataset.id;
+  const d = ld(); d[id] = {...(d[id]||{}), n: ta.value}; sv(d);
+  SYNC.push(id, undefined, ta.value);
+}
+document.addEventListener('DOMContentLoaded', async () => {
+  await SYNC.pull();
+  const d = ld();
+  document.querySelectorAll('.ceo-section').forEach(sec => {
+    const id = sec.dataset.id;
+    if (!id || !d[id]) return;
+    if (d[id].c) {
+      const btns = sec.querySelectorAll('.ceo-btn');
+      const idx = d[id].c === 'a' ? 0 : d[id].c === 'd' ? 1 : 2;
+      if (btns[idx]) btns[idx].classList.add('selected');
+    }
+    if (d[id].n) {
+      const ta = sec.querySelector('.ceo-note');
+      if (ta) ta.value = d[id].n;
+    }
+  });
+});
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) { const id=e.target.id; document.querySelectorAll('.nav-i

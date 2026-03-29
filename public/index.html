@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>MSC.AI UI/UX 重构 — 8维度审计交付站</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0c10;--bg2:#141820;--bg3:#1a2030;--bg4:#1e2436;--brd:rgba(255,255,255,.06);--brd2:rgba(255,255,255,.12);--t1:#f0f2f5;--t2:#8b95a8;--t3:#5a6478;--green:#34d399;--green-d:rgba(52,211,153,.12);--blue:#60a5fa;--blue-d:rgba(96,165,250,.12);--amber:#fbbf24;--amber-d:rgba(251,191,36,.12);--red:#f87171;--red-d:rgba(248,113,113,.12);--purple:#a78bfa;--purple-d:rgba(167,139,250,.12);--teal:#2dd4bf;--teal-d:rgba(45,212,191,.12)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans SC',-apple-system,sans-serif;background:var(--bg);color:var(--t1);line-height:1.6;-webkit-font-smoothing:antialiased}
+
+.hero{text-align:center;padding:80px 24px 40px}
+.hero-logo{width:56px;height:56px;background:linear-gradient(135deg,var(--green),var(--blue));border-radius:16px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:22px;color:#000;margin-bottom:20px}
+.hero h1{font-size:28px;font-weight:900;margin-bottom:8px}
+.hero p{font-size:15px;color:var(--t2);max-width:500px;margin:0 auto 24px}
+.hero-stats{display:flex;justify-content:center;gap:24px;margin-top:24px;flex-wrap:wrap}
+.hero-stat{text-align:center}
+.hero-stat-val{font-size:28px;font-weight:900}
+.hero-stat-label{font-size:11px;color:var(--t3);margin-top:2px}
+
+.wrap{max-width:900px;margin:0 auto;padding:0 20px 100px}
+
+.section-label{font-size:12px;font-weight:700;letter-spacing:2px;color:var(--t3);margin:48px 0 20px;padding-bottom:8px;border-bottom:1px solid var(--brd)}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:24px}
+
+.card{background:var(--bg2);border:1px solid var(--brd);border-radius:16px;padding:24px;transition:all .3s;cursor:pointer;text-decoration:none;color:inherit;display:block;position:relative;overflow:hidden}
+.card:hover{border-color:var(--brd2);transform:translateY(-2px);box-shadow:0 12px 40px rgba(0,0,0,.3)}
+.card-accent{position:absolute;top:0;left:0;right:0;height:3px}
+.card-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:14px}
+.card-sev{position:absolute;top:20px;right:20px;font-size:10px;padding:3px 10px;border-radius:12px;font-weight:600}
+.sev-crit{background:var(--red-d);color:var(--red)}
+.sev-imp{background:var(--amber-d);color:var(--amber)}
+.card h3{font-size:16px;font-weight:700;margin-bottom:6px}
+.card p{font-size:13px;color:var(--t2);line-height:1.6}
+.card-dims{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}
+.card-dim{font-size:10px;padding:2px 8px;border-radius:4px;font-weight:500}
+.card-meta{display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:12px;border-top:1px solid var(--brd);font-size:12px;color:var(--t3)}
+.card-enter{color:var(--blue);font-weight:600;display:flex;align-items:center;gap:4px}
+
+.fb-overview{background:var(--bg2);border:1px solid var(--amber-d);border-left:3px solid var(--amber);border-radius:12px;padding:20px 24px;margin:32px 0}
+.fb-overview h3{font-size:15px;font-weight:700;color:var(--amber);margin-bottom:4px}
+.fb-overview p{font-size:13px;color:var(--t2);margin-bottom:14px}
+.fb-summary{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:14px}
+.fb-s{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:600}
+.fb-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.fb-export{padding:8px 20px;border-radius:20px;border:1px solid var(--green);background:var(--green-d);color:var(--green);font-size:13px;cursor:pointer;font-family:inherit;font-weight:500;transition:all .2s}
+.fb-export:hover{filter:brightness(1.2)}
+
+.footer{text-align:center;padding:40px 24px;font-size:12px;color:var(--t3);border-top:1px solid var(--brd)}
+
+@media(max-width:600px){
+  .hero h1{font-size:22px}
+  .grid{grid-template-columns:1fr}
+  .hero-stats{gap:16px}
+}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-logo">M</div>
+  <h1>MSC.AI UI/UX 重构</h1>
+  <p>8维度审计交付站 — 点击任意卡片查看完整设计方案、交互demo和UI mockup</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="hero-stat-val" style="color:var(--green)" id="ha">0</div><div class="hero-stat-label">同意</div></div>
+    <div class="hero-stat"><div class="hero-stat-val" style="color:var(--amber)" id="hd">0</div><div class="hero-stat-label">需讨论</div></div>
+    <div class="hero-stat"><div class="hero-stat-val" style="color:var(--red)" id="hx">0</div><div class="hero-stat-label">不同意</div></div>
+    <div class="hero-stat"><div class="hero-stat-val" style="color:var(--t2)" id="ht">0</div><div class="hero-stat-label">总反馈项</div></div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="fb-overview">
+    <h3>CEO 反馈面板</h3>
+    <p>每个子页面中的方案都可以标注"同意/需讨论/不同意"并留言。反馈自动保存在浏览器本地，刷新不丢失。</p>
+    <div class="fb-summary">
+      <div class="fb-s"><div class="fb-dot" style="background:var(--green)"></div><span id="oa">0</span> 同意</div>
+      <div class="fb-s"><div class="fb-dot" style="background:var(--amber)"></div><span id="od">0</span> 需讨论</div>
+      <div class="fb-s"><div class="fb-dot" style="background:var(--red)"></div><span id="ox">0</span> 不同意</div>
+    </div>
+    <button class="fb-export" onclick="exportAll()">导出全部反馈为文件</button>
+  </div>
+
+  <div class="section-label">关键维度 — 不做就不能上线</div>
+
+  <div class="grid">
+    <a class="card" href="chatA.html">
+      <div class="card-accent" style="background:linear-gradient(90deg,var(--green),var(--teal))"></div>
+      <div class="card-sev sev-crit">关键</div>
+      <div class="card-icon" style="background:var(--green-d)">🔒</div>
+      <h3>维度1：信任与安全感</h3>
+      <p>充值信任提示、资金托管面板、信用评分体系、费用确认弹窗、提现安全设计、客服入口布局</p>
+      <div class="card-dims">
+        <span class="card-dim" style="background:var(--green-d);color:var(--green)">4个方案</span>
+        <span class="card-dim" style="background:var(--blue-d);color:var(--blue)">手机mockup</span>
+      </div>
+      <div class="card-meta"><span id="a-fb">— 反馈</span><span class="card-enter">查看完整方案 →</span></div>
+    </a>
+
+    <a class="card" href="chatB.html">
+      <div class="card-accent" style="background:linear-gradient(90deg,var(--blue),var(--purple))"></div>
+      <div class="card-sev sev-crit">关键</div>
+      <div class="card-icon" style="background:var(--blue-d)">📭</div>
+      <h3>维度2+3：空状态 + 反馈闭环</h3>
+      <p>余额/任务/订单空状态引导、任务状态4阶段追踪、发布者进度看板、微信通知模板、首次到账仪式</p>
+      <div class="card-dims">
+        <span class="card-dim" style="background:var(--blue-d);color:var(--blue)">10个方案</span>
+        <span class="card-dim" style="background:var(--purple-d);color:var(--purple)">行为经济学</span>
+      </div>
+      <div class="card-meta"><span id="b-fb">— 反馈</span><span class="card-enter">查看完整方案 →</span></div>
+    </a>
+  </div>
+
+  <div class="section-label">重要维度 — 严重影响转化率和留存</div>
+
+  <div class="grid">
+    <a class="card" href="chatC.html">
+      <div class="card-accent" style="background:linear-gradient(90deg,var(--amber),var(--purple))"></div>
+      <div class="card-sev sev-imp">重要</div>
+      <div class="card-icon" style="background:var(--amber-d)">💰</div>
+      <h3>维度4+5：任务卡片 + 金额感知</h3>
+      <p>卡片4层视觉层次、6大行为驱动器、类型视觉编码、发布者定价面板、接单者时薪锚定、诱饵定价</p>
+      <div class="card-dims">
+        <span class="card-dim" style="background:var(--amber-d);color:var(--amber)">10个交付物</span>
+        <span class="card-dim" style="background:var(--green-d);color:var(--green)">交互mockup</span>
+      </div>
+      <div class="card-meta"><span id="c-fb">— 反馈</span><span class="card-enter">查看完整方案 →</span></div>
+    </a>
+
+    <a class="card" href="chatD.html">
+      <div class="card-accent" style="background:linear-gradient(90deg,var(--red),var(--amber))"></div>
+      <div class="card-sev sev-imp">重要</div>
+      <div class="card-icon" style="background:var(--red-d)">🛡️</div>
+      <h3>维度6+7+8：确认 + 留存 + 异常</h3>
+      <p>摩擦力分级确认、滑动/弹窗/倒计时、4级等级体系、Octalysis覆盖、审核正向框架、AI降级补偿</p>
+      <div class="card-dims">
+        <span class="card-dim" style="background:var(--red-d);color:var(--red)">10个方案</span>
+        <span class="card-dim" style="background:var(--teal-d);color:var(--teal)">Octalysis矩阵</span>
+      </div>
+      <div class="card-meta"><span id="d-fb">— 反馈</span><span class="card-enter">查看完整方案 →</span></div>
+    </a>
+  </div>
+
+</div>
+
+<div class="footer">
+  MSC.AI UI/UX 重构项目 · 2026年3月 · 所有反馈保存在本地浏览器
+</div>
+
+<script>
+async function fetchAll(){
+  try{
+    const res=await fetch('/api/feedback');
+    if(!res.ok) return null;
+    return await res.json();
+  }catch(e){return null}
+}
+function countPage(items){
+  let a=0,d=0,x=0;
+  if(!items)return{a,d,x,total:0};
+  Object.values(items).forEach(v=>{
+    const c=v.c||v;
+    if(c==='a'||(typeof c==='string'&&c.includes('同意')&&!c.includes('不')))a++;
+    else if(c==='d'||(typeof c==='string'&&c.includes('讨论')))d++;
+    else if(c==='x'||(typeof c==='string'&&c.includes('不同意')))x++;
+  });
+  return{a,d,x,total:a+d+x};
+}
+async function update(){
+  const all=await fetchAll()||{};
+  const pages=[['chatA','a'],['chatB','b'],['chatC','c'],['chatD','d']];
+  let ta=0,td=0,tx=0;
+  pages.forEach(([page,label])=>{
+    const c=countPage(all[page]);
+    ta+=c.a;td+=c.d;tx+=c.x;
+    const el=document.getElementById(label+'-fb');
+    if(el)el.textContent=c.total>0?`${c.a}同意 ${c.d}讨论 ${c.x}不同意`:'尚无反馈';
+  });
+  document.getElementById('ha').textContent=ta;
+  document.getElementById('hd').textContent=td;
+  document.getElementById('hx').textContent=tx;
+  document.getElementById('ht').textContent=ta+td+tx;
+  document.getElementById('oa').textContent=ta;
+  document.getElementById('od').textContent=td;
+  document.getElementById('ox').textContent=tx;
+}
+function exportAll(){
+  window.open('/api/export','_blank');
+}
+update();
+setInterval(update,5000);
+</script>
+</body>
+</html>
