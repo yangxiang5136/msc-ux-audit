@@ -753,7 +753,7 @@ SYNC.init('chatD',K);
 function ld(){try{return JSON.parse(localStorage.getItem(K))||{}}catch{return{}}}
 function sv(d){localStorage.setItem(K,JSON.stringify(d));up()}
 function tog(h){h.closest('.card').classList.toggle('open')}
-function sf(b,t,id){const cls=t==='a'?'s-a':t==='d'?'s-d':'s-x';const was=b.classList.contains(cls);const bs=b.parentElement.querySelectorAll('.fb-b');bs.forEach(x=>x.className='fb-b');const d=ld();if(was){d[id]={...d[id],c:undefined};sv(d);SYNC.push(id,'')}else{b.classList.add(cls);d[id]={...d[id],c:t};sv(d);SYNC.push(id,t)}}
+function sf(b,t,id){const cls=t==='a'?'s-a':t==='d'?'s-d':'s-x';const was=b.classList.contains(cls);const bs=b.parentElement.querySelectorAll('.fb-b');bs.forEach(x=>x.className='fb-b');const d=ld();if(was){if(!d[id])d[id]={};delete d[id].c;sv(d);SYNC.push(id,'')}else{b.classList.add(cls);d[id]={...(d[id]||{}),c:t};sv(d);SYNC.push(id,t)}}
 function sn(ta,id){const d=ld();d[id]={...d[id],n:ta.value};sv(d);SYNC.push(id,undefined,ta.value)}
 function up(){const d=ld();let a=0,dd=0,x=0;Object.values(d).forEach(v=>{if(v.c==='a')a++;if(v.c==='d')dd++;if(v.c==='x')x++});document.getElementById('ca').textContent=a;document.getElementById('cd').textContent=dd;document.getElementById('cx').textContent=x}
 

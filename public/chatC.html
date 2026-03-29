@@ -579,8 +579,8 @@ function sel(btn,id,c){
   const row=btn.parentElement;
   row.querySelectorAll('.fb-b').forEach(b=>{b.classList.remove('s-a','s-d','s-x')});
   const d=ld();
-  if(wasSelected){delete (d[id]||{}).c;if(d[id])d[id].c=undefined;sv(d);up();SYNC.push(id,'');}
-  else{btn.classList.add(cls);d[id]={...d[id],c};sv(d);up();SYNC.push(id,c);}
+  if(wasSelected){if(!d[id])d[id]={};delete d[id].c;sv(d);up();SYNC.push(id,'');}
+  else{btn.classList.add(cls);d[id]={...(d[id]||{}),c};sv(d);up();SYNC.push(id,c);}
 }
 function sn(ta,id){const d=ld();d[id]={...d[id],n:ta.value};sv(d);SYNC.push(id,undefined,ta.value)}
 function up(){

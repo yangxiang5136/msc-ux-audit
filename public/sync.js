@@ -15,6 +15,14 @@ const SYNC = {
 
   // Push a single feedback item to server
   async push(id, choice, note) {
+    // Also update local timestamp so pull merge knows this is fresh
+    try {
+      const d = JSON.parse(localStorage.getItem(this.localKey) || '{}');
+      if (!d[id]) d[id] = {};
+      d[id].t = new Date().toISOString();
+      localStorage.setItem(this.localKey, JSON.stringify(d));
+    } catch(e) {}
+
     try {
       await fetch('/api/feedback', {
         method: 'POST',
@@ -22,8 +30,8 @@ const SYNC = {
         body: JSON.stringify({
           page: this.page,
           id: id,
-          choice: choice || undefined,
-          note: note || undefined
+          choice: choice !== undefined ? choice : undefined,
+          note: note !== undefined ? note : undefined
         })
       });
     } catch (e) {

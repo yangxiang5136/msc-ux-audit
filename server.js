@@ -76,7 +76,8 @@ app.get('/api/export', (req, res) => {
   Object.entries(all).forEach(([page, items]) => {
     txt += `【${pageNames[page] || page}】\n` + '─'.repeat(30) + '\n';
     Object.entries(items).forEach(([id, v]) => {
-      const cls = v.c === 'a' ? '✅同意' : v.c === 'd' ? '💬需讨论' : v.c === 'x' ? '❌不同意' : '未选择';
+      if (!v.c && !v.n) return; // skip empty entries
+      const cls = v.c === 'a' ? '✅同意' : v.c === 'd' ? '💬需讨论' : v.c === 'x' ? '❌不同意' : '（仅留言）';
       txt += `  [${id}] ${cls}`;
       if (v.n) txt += `\n    留言：${v.n}`;
       if (v.t) txt += `\n    时间：${v.t}`;
