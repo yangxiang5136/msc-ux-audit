@@ -784,7 +784,7 @@ function toggleCeo(btn) {
   siblings.forEach(b => b.classList.remove('s-a','s-d','s-x'));
   const d = ld();
   if (wasSelected) {
-    delete d[id].c;
+    if(d[id]) delete d[id].c;
     sv(d);
     SYNC.push(id, '');
   } else {
@@ -818,4 +818,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 });
 const obs = new IntersectionObserver(entries => {
-  entries.forEach(e => { if(e.isIntersecting) { const id=e.target.id; document.querySelectorAll('.nav-i
+  entries.forEach(e => { if(e.isIntersecting) { const id=e.target.id; document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active',n.getAttribute('href')==='#'+id)); }});
+}, {rootMargin:'-120px 0px -60% 0px'});
+document.querySelectorAll('.section[id]').forEach(s => obs.observe(s));
+</script>
+</body>
+</html>
