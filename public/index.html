@@ -144,6 +144,24 @@ body{font-family:'Noto Sans SC',-apple-system,sans-serif;background:var(--bg);co
     </a>
   </div>
 
+  <div class="section-label">界面架构 — 团队投票决策</div>
+
+  <div class="grid">
+    <a class="card" href="architecture.html" style="grid-column:1/-1">
+      <div class="card-accent" style="background:linear-gradient(90deg,var(--teal),var(--purple))"></div>
+      <div class="card-sev" style="background:var(--teal-d);color:var(--teal)">投票</div>
+      <div class="card-icon" style="background:var(--teal-d)">🏗️</div>
+      <h3>界面架构方案对比 + 新手引导方式</h3>
+      <p>3种Tab架构方案（合并广场/经典分离/中置发布）+ 2种新手引导方式（蒙版教程/任务驱动）· 可展开交互流程图 · tooltip引用8维度设计</p>
+      <div class="card-dims">
+        <span class="card-dim" style="background:var(--teal-d);color:var(--teal)">3个架构方案</span>
+        <span class="card-dim" style="background:var(--purple-d);color:var(--purple)">团队投票</span>
+        <span class="card-dim" style="background:var(--amber-d);color:var(--amber)">2种引导方式</span>
+      </div>
+      <div class="card-meta"><span id="arch-fb">— 反馈</span><span class="card-enter">查看方案对比 →</span></div>
+    </a>
+  </div>
+
 </div>
 
 <div class="footer">
@@ -171,7 +189,7 @@ function countPage(items){
 }
 async function update(){
   const all=await fetchAll()||{};
-  const pages=[['chatA','a'],['chatB','b'],['chatC','c'],['chatD','d']];
+  const pages=[['chatA','a'],['chatB','b'],['chatC','c'],['chatD','d'],['architecture','arch']];
   let ta=0,td=0,tx=0;
   pages.forEach(([page,label])=>{
     const c=countPage(all[page]);

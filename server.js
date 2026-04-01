@@ -68,7 +68,8 @@ app.get('/api/export', (req, res) => {
     chatA: '维度1-信任安全',
     chatB: '维度2+3-空状态反馈',
     chatC: '维度4+5-卡片金额',
-    chatD: '维度6+7+8-确认留存异常'
+    chatD: '维度6+7+8-确认留存异常',
+    architecture: '界面架构方案投票'
   };
   let txt = 'MSC.AI CEO反馈汇总\n导出时间：' + new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }) + '\n';
   txt += '═'.repeat(40) + '\n\n';
