@@ -573,6 +573,59 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',sans-seri
 </table>
 </div></div></div>
 
+
+<div class="mod">
+<div class="mod-head" onclick="modToggle(this)"><div class="mod-icon" style="background:rgba(74,144,217,.12)">📄</div><span class="mod-name">任务详情页 · 显示内容详解</span><span class="mod-arrow">▼</span></div>
+<div class="mod-body"><div class="mod-inner">
+<table class="fields">
+<tr><th>元素</th><th>数据来源</th><th>说明</th></tr>
+<tr><td class="fname">英雄区收入金额</td><td>task.unit_price</td><td>40px绿色粗体，页面最醒目元素</td></tr>
+<tr><td class="fname">时薪换算</td><td>unit_price / estimated_time × 60</td><td>"≈¥9/时 · ↑18%高于同类均值"</td></tr>
+<tr><td class="fname">任务标题</td><td>task.title</td><td>16px粗体</td></tr>
+<tr><td class="fname">任务类型标签</td><td>task.task_type → 颜色映射</td><td>pill标签 + 类型图标</td></tr>
+<tr><td class="fname">任务描述/要求</td><td>task.description</td><td>正文区域，支持富文本</td></tr>
+<tr><td class="fname">截止时间</td><td>task.deadline</td><td>"剩余2天3小时" 或 红色"即将截止"</td></tr>
+<tr><td class="fname">预计耗时</td><td>task.estimated_time</td><td>"约2分钟"</td></tr>
+<tr><td class="fname">AI可执行标识</td><td>task.ai_executable</td><td>紫色pill "AI可完成"</td></tr>
+<tr><td class="fname">名额进度条</td><td>accepted_count / total_quantity</td><td>绿色进度条 + "剩余7/10"；&lt;20%时红色</td></tr>
+<tr><td class="fname">发布者头像+昵称</td><td>user(publisher_id).avatar + nickname</td><td>可点击查看发布者主页</td></tr>
+<tr><td class="fname">发布者信用分</td><td>user(publisher_id).credit_score</td><td>🥇4.9 + 金/银/新徽章</td></tr>
+<tr><td class="fname">发布者历史数据</td><td>聚合查询 publisher 的 task+order</td><td>"累计发布52个任务 · 结算率100%"</td></tr>
+<tr><td class="fname">滑动接取按钮</td><td>—</td><td>底部固定；已满时置灰+"已被接满"</td></tr>
+<tr><td class="fname">社会证明</td><td>聚合同类任务完成率</td><td>"98%接单者成功完成此类任务"</td></tr>
+</table>
+</div></div></div>
+
+<div class="mod">
+<div class="mod-head" onclick="modToggle(this)"><div class="mod-icon" style="background:rgba(74,144,217,.12)">📝</div><span class="mod-name">发布流程 · 显示内容详解</span><span class="mod-arrow">▼</span></div>
+<div class="mod-body"><div class="mod-inner">
+<div class="p"><strong>Step 2 · 类型选择页</strong></div>
+<table class="fields">
+<tr><th>元素</th><th>数据来源</th><th>说明</th></tr>
+<tr><td class="fname">类型卡片网格</td><td>task_type_config（可配置）</td><td>图标+名称+起步价；2列网格布局</td></tr>
+<tr><td class="fname">热门标签</td><td>近7天该类型发布量排序</td><td>发布量前2的类型标"热门"</td></tr>
+</table>
+<div class="p" style="margin-top:12px"><strong>Step 3 · 定价配置页</strong></div>
+<table class="fields">
+<tr><th>元素</th><th>数据来源</th><th>说明</th></tr>
+<tr><td class="fname">收益框架头部</td><td>task_type_config.result_template</td><td>"预计获得 X 个粉丝"（非"花费¥X"）</td></tr>
+<tr><td class="fname">三档定价卡片</td><td>base_price × [0.67, 1.0, 1.67]</td><td>经济/推荐(默认高亮)/极速 三列</td></tr>
+<tr><td class="fname">每档价格</td><td>base_price × tier_multiplier</td><td>推荐档标"性价比最优"</td></tr>
+<tr><td class="fname">每档预计时长</td><td>base_time × [1.5, 1.0, 0.5]</td><td>经济慢、极速快</td></tr>
+<tr><td class="fname">数量滑块</td><td>用户拖动 → total_quantity</td><td>范围10~1000，默认50</td></tr>
+<tr><td class="fname">实时费用联动</td><td>unit_price × total_quantity</td><td>滑块移动时费用实时变化</td></tr>
+<tr><td class="fname">费用明细（折叠）</td><td>total_cost + service_fee</td><td>点击展开："任务费用¥X + 平台服务费¥Y = 总计¥Z"</td></tr>
+</table>
+<div class="p" style="margin-top:12px"><strong>Step 4 · 确认发布弹窗</strong></div>
+<table class="fields">
+<tr><th>元素</th><th>数据来源</th><th>说明</th></tr>
+<tr><td class="fname">费用分解</td><td>unit_price × quantity + service_fee</td><td>逐行列出</td></tr>
+<tr><td class="fname">ROI预估</td><td>task_type_config.roi_template</td><td>"预计获得50个粉丝，单个成本¥0.30"</td></tr>
+<tr><td class="fname">托管保障提示</td><td>静态文案</td><td>"资金由平台托管，未完成部分可退款"</td></tr>
+<tr><td class="fname">确认按钮</td><td>—</td><td>红色"确认发布并支付¥Z"</td></tr>
+<tr><td class="fname">余额不足状态</td><td>account.available_balance < total</td><td>按钮变"余额不足，去充值¥X"（差额向上取整）</td></tr>
+</table>
+</div></div></div>
 <div class="fb" data-id="ps-task"><div class="fb-t">团队反馈</div><div class="fb-desc">任务模块（实体字段 + 状态机 + 广场页详解）</div><div class="fb-btns"><button class="fb-b" onclick="sf(this,'a','ps-task')">✅ 接受</button><button class="fb-b" onclick="sf(this,'d','ps-task')">💬 讨论</button><button class="fb-b" onclick="sf(this,'x','ps-task')">❌ 拒绝</button></div><textarea class="fb-n" placeholder="补充说明…" onchange="sn(this,'ps-task')"></textarea></div>
 </section>
 
@@ -697,6 +750,38 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',sans-seri
 </table>
 </div></div></div>
 
+
+<div class="mod">
+<div class="mod-head" onclick="modToggle(this)"><div class="mod-icon" style="background:rgba(76,175,125,.12)">📱</div><span class="mod-name">「我的」Tab首页 · 显示内容详解</span><span class="mod-arrow">▼</span></div>
+<div class="mod-body"><div class="mod-inner">
+<div class="p"><strong>收入仪表盘（顶部区域）</strong></div>
+<table class="fields">
+<tr><th>元素</th><th>数据来源</th><th>说明</th></tr>
+<tr><td class="fname">累计总收入</td><td>user.total_earned</td><td>28px粗体绿色，最醒目</td></tr>
+<tr><td class="fname">今日收入</td><td>SUM(tx.amount) WHERE type=settle_earn AND date=today</td><td>与昨日对比箭头 ↑/↓</td></tr>
+<tr><td class="fname">本周收入</td><td>SUM(tx.amount) WHERE 本周</td><td>与上周对比</td></tr>
+<tr><td class="fname">本月收入</td><td>SUM(tx.amount) WHERE 本月</td><td>与上月对比</td></tr>
+<tr><td class="fname">AI占比</td><td>AI订单收入 / 总收入 × 100%</td><td>紫色pill "AI赚了62%"</td></tr>
+<tr><td class="fname">趋势图</td><td>近7天/30天每日收入聚合</td><td>折线图，绿色填充</td></tr>
+</table>
+<div class="p" style="margin-top:12px"><strong>功能入口区（中部）</strong></div>
+<table class="fields">
+<tr><th>元素</th><th>数据来源</th><th>说明</th></tr>
+<tr><td class="fname">可提现余额</td><td>account.available_balance</td><td>点击 → 提现页</td></tr>
+<tr><td class="fname">冻结金额</td><td>account.frozen_balance</td><td>灰色小字"发布中任务托管"</td></tr>
+<tr><td class="fname">我接的任务数</td><td>COUNT(order) WHERE acceptor=me AND status IN (active)</td><td>点击 → 接单列表</td></tr>
+<tr><td class="fname">我发布的任务数</td><td>COUNT(task) WHERE publisher=me AND status IN (active)</td><td>点击 → 发布列表</td></tr>
+<tr><td class="fname">当前等级</td><td>user.level</td><td>等级图标 + 进度条到下一级</td></tr>
+<tr><td class="fname">等级进度</td><td>tasks_completed / next_level_threshold</td><td>"再完成8单升级为⚡能手"</td></tr>
+</table>
+<div class="p" style="margin-top:12px"><strong>AI中心区域</strong></div>
+<table class="fields">
+<tr><th>元素</th><th>数据来源</th><th>说明</th></tr>
+<tr><td class="fname">AI自动赚钱状态</td><td>user.ai_auto_enabled</td><td>开/关 toggle + 今日AI收入</td></tr>
+<tr><td class="fname">AI资产数量</td><td>COUNT(ai_asset) WHERE owner=me</td><td>点击 → AI资产管理页</td></tr>
+<tr><td class="fname">AI资产总价值</td><td>SUM(ai_asset.total_spent + earnings)</td><td>估算值，探索阶段可隐藏</td></tr>
+</table>
+</div></div></div>
 <div class="fb" data-id="ps-user"><div class="fb-t">团队反馈</div><div class="fb-desc">用户模块（实体字段 + 信用分 + 等级体系）</div><div class="fb-btns"><button class="fb-b" onclick="sf(this,'a','ps-user')">✅ 接受</button><button class="fb-b" onclick="sf(this,'d','ps-user')">💬 讨论</button><button class="fb-b" onclick="sf(this,'x','ps-user')">❌ 拒绝</button></div><textarea class="fb-n" placeholder="补充说明…" onchange="sn(this,'ps-user')"></textarea></div>
 </section>
 
@@ -772,6 +857,31 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',sans-seri
 </li></ul></div>
 </div></div></div>
 
+
+<div class="mod">
+<div class="mod-head" onclick="modToggle(this)"><div class="mod-icon" style="background:rgba(212,160,74,.12)">📱</div><span class="mod-name">订单管理页 · 显示内容详解</span><span class="mod-arrow">▼</span></div>
+<div class="mod-body"><div class="mod-inner">
+<div class="p"><strong>我接的任务 · 列表项</strong></div>
+<table class="fields">
+<tr><th>元素</th><th>数据来源</th><th>说明</th></tr>
+<tr><td class="fname">任务标题</td><td>task(order.task_id).title</td><td>14px粗体</td></tr>
+<tr><td class="fname">金额</td><td>order.amount</td><td>绿色粗体</td></tr>
+<tr><td class="fname">订单状态</td><td>order.status</td><td>颜色编码pill：执行中=蓝/待审核=琥珀/已结算=绿/被驳回=红</td></tr>
+<tr><td class="fname">执行模式</td><td>order.execution_mode</td><td>"手动" / "AI执行中" / "AI+手动"</td></tr>
+<tr><td class="fname">倒计时</td><td>task.deadline - now</td><td>红色"剩余3小时"；超时预警</td></tr>
+<tr><td class="fname">操作按钮</td><td>order.status</td><td>执行中→"提交成果"；被驳回→"修改重提(剩余2次)"</td></tr>
+</table>
+<div class="p" style="margin-top:12px"><strong>我发布的任务 · 列表项</strong></div>
+<table class="fields">
+<tr><th>元素</th><th>数据来源</th><th>说明</th></tr>
+<tr><td class="fname">任务标题</td><td>task.title</td><td>14px粗体</td></tr>
+<tr><td class="fname">接取进度</td><td>accepted_count / total_quantity</td><td>进度条 + "3/10已接"</td></tr>
+<tr><td class="fname">待审核数</td><td>COUNT(order) WHERE status=submitted</td><td>红色badge "2待审"</td></tr>
+<tr><td class="fname">已结算数</td><td>COUNT(order) WHERE status=settled</td><td>绿色"5已完成"</td></tr>
+<tr><td class="fname">总支出</td><td>task.total_cost</td><td>"已花费¥15.00 / ¥50.00"</td></tr>
+<tr><td class="fname">操作按钮</td><td>pending submissions count</td><td>有待审 → "去审核"高亮；无 → "查看详情"</td></tr>
+</table>
+</div></div></div>
 <div class="fb" data-id="ps-order"><div class="fb-t">团队反馈</div><div class="fb-desc">订单模块（实体字段 + 状态机）</div><div class="fb-btns"><button class="fb-b" onclick="sf(this,'a','ps-order')">✅ 接受</button><button class="fb-b" onclick="sf(this,'d','ps-order')">💬 讨论</button><button class="fb-b" onclick="sf(this,'x','ps-order')">❌ 拒绝</button></div><textarea class="fb-n" placeholder="补充说明…" onchange="sn(this,'ps-order')"></textarea></div>
 </section>
 
@@ -864,6 +974,32 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',sans-seri
 </table>
 </div></div></div>
 
+
+<div class="mod">
+<div class="mod-head" onclick="modToggle(this)"><div class="mod-icon" style="background:rgba(232,93,93,.12)">📱</div><span class="mod-name">提现页 + 充值页 · 显示内容详解</span><span class="mod-arrow">▼</span></div>
+<div class="mod-body"><div class="mod-inner">
+<div class="p"><strong>提现页</strong></div>
+<table class="fields">
+<tr><th>元素</th><th>数据来源</th><th>说明</th></tr>
+<tr><td class="fname">可提现余额</td><td>account.available_balance</td><td>28px绿色粗体</td></tr>
+<tr><td class="fname">冻结金额说明</td><td>account.frozen_balance</td><td>灰色"¥XX 在发布中任务托管，完成后可提"</td></tr>
+<tr><td class="fname">提现金额输入</td><td>用户输入</td><td>快捷按钮：全部提现 / ¥10 / ¥50 / ¥100</td></tr>
+<tr><td class="fname">到账方式</td><td>用户选择</td><td>微信零钱(默认) / 银行卡</td></tr>
+<tr><td class="fname">到账时间</td><td>静态规则</td><td>"预计T+1工作日到账"</td></tr>
+<tr><td class="fname">手续费提示</td><td>free_withdrawals_left</td><td>"本月免费提现剩余2次" 或 "手续费¥1"</td></tr>
+<tr><td class="fname">提现记录</td><td>tx WHERE type=withdraw ORDER BY created_at DESC</td><td>状态颜色编码：处理中=琥珀/已到账=绿/失败=红</td></tr>
+<tr><td class="fname">客服入口</td><td>—</td><td>底部"提现遇到问题？联系客服"</td></tr>
+</table>
+<div class="p" style="margin-top:12px"><strong>充值页</strong></div>
+<table class="fields">
+<tr><th>元素</th><th>数据来源</th><th>说明</th></tr>
+<tr><td class="fname">当前余额</td><td>account.available_balance</td><td>顶部展示</td></tr>
+<tr><td class="fname">充值金额选择</td><td>预设档位</td><td>¥10 / ¥50 / ¥100 / ¥500 / 自定义</td></tr>
+<tr><td class="fname">信任保障行</td><td>静态文案</td><td>"资金由平台托管，未使用余额可随时提现"</td></tr>
+<tr><td class="fname">三重保障面板</td><td>静态文案（可折叠）</td><td>资金安全 + 即时到账 + 客服保障</td></tr>
+<tr><td class="fname">充值按钮</td><td>—</td><td>"充值¥X" → 调起微信支付</td></tr>
+</table>
+</div></div></div>
 <div class="fb" data-id="ps-fund"><div class="fb-t">团队反馈</div><div class="fb-desc">资金模块（账户 + 流转规则 + 流水记录）</div><div class="fb-btns"><button class="fb-b" onclick="sf(this,'a','ps-fund')">✅ 接受</button><button class="fb-b" onclick="sf(this,'d','ps-fund')">💬 讨论</button><button class="fb-b" onclick="sf(this,'x','ps-fund')">❌ 拒绝</button></div><textarea class="fb-n" placeholder="补充说明…" onchange="sn(this,'ps-fund')"></textarea></div>
 </section>
 
