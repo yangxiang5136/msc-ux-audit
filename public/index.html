@@ -162,6 +162,24 @@ body{font-family:'Noto Sans SC',-apple-system,sans-serif;background:var(--bg);co
     </a>
   </div>
 
+  <div class="section-label">工程交付 — 开发前必读</div>
+
+  <div class="grid">
+    <a class="card" href="product-spec.html" style="grid-column:1/-1">
+      <div class="card-accent" style="background:linear-gradient(90deg,var(--orange),var(--red))"></div>
+      <div class="card-sev" style="background:rgba(232,146,61,.1);color:var(--orange)">工程</div>
+      <div class="card-icon" style="background:rgba(232,146,61,.1)">🏗️</div>
+      <h3>产品规格文档（工程视角）</h3>
+      <p>全局页面地图 · 5大模块实体字段表 · 任务/订单状态机 · 资金流转规则 · 数据实体关系 · 核心查询场景 — 可直接用于设计表结构和开发</p>
+      <div class="card-dims">
+        <span class="card-dim" style="background:rgba(232,146,61,.1);color:var(--orange)">5个模块</span>
+        <span class="card-dim" style="background:rgba(232,93,93,.1);color:var(--red)">字段定义</span>
+        <span class="card-dim" style="background:rgba(155,109,255,.1);color:var(--purple)">状态机</span>
+      </div>
+      <div class="card-meta"><span id="ps-fb">— 反馈</span><span class="card-enter">查看完整规格 →</span></div>
+    </a>
+  </div>
+
 </div>
 
 <div class="footer">
@@ -189,7 +207,7 @@ function countPage(items){
 }
 async function update(){
   const all=await fetchAll()||{};
-  const pages=[['chatA','a'],['chatB','b'],['chatC','c'],['chatD','d'],['architecture','arch']];
+  const pages=[['chatA','a'],['chatB','b'],['chatC','c'],['chatD','d'],['architecture','arch'],['product-spec','ps']];
   let ta=0,td=0,tx=0;
   pages.forEach(([page,label])=>{
     const c=countPage(all[page]);
