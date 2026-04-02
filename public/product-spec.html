@@ -347,19 +347,11 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',sans-seri
 
   <li><span class="tree-toggle tn tn-page" onclick="treeToggle(this)">中间"+"· 发布任务流程</span>
   <ul>
-    <li><span class="tree-toggle tn tn-page" onclick="treeToggle(this)">Step 1 · AI资产确权 <a href="#m-asset" class="tn-jump" style="font-size:9px;color:var(--t3);margin-left:4px">→ AI资产模块</a></span>
+    <li><span class="tree-toggle tn tn-page" onclick="treeToggle(this)">Step 1 · AI资产确权（一键） <a href="#m-asset" class="tn-jump" style="font-size:9px;color:var(--t3);margin-left:4px">→ AI资产模块</a></span>
     <ul>
-      <li><span class="tn tn-gray">
-        <span class="ref">CEO要求<span class="ref-tip"><strong>参考架构投票 f-vA</strong><br>CEO："发任务环节中，逻辑为用户跳转到AI资产；发任务—AI资产—确权—发任务"</span></span>
-      </span></li>
-      <li><span class="tn tn-func">已有AI公司 → 选择已有资产</span></li>
-      <li><span class="tn tn-func">无AI公司 → 快速创建引导</span>
-      <ul>
-        <li><span class="tn tn-action">选择AI公司类型</span></li>
-        <li><span class="tn tn-action">选择行业/受众</span></li>
-        <li><span class="tn tn-action">一键生成</span></li>
-        <li><span class="tn tn-func">确权完成 → 自动进入Step 2</span></li>
-      </ul></li>
+      <li><span class="tn tn-func">已有资产 → 跳过，直接进入Step 2</span></li>
+      <li><span class="tn tn-func">无资产 → 弹出✓确认 → 系统自动生成白版AI资产（免费）</span></li>
+      <li><span class="tn tn-gray">确权后 → 阶梯提醒引导交押金（见AI资产模块详解）</span></li>
     </ul></li>
     <li><span class="tree-toggle tn tn-page" onclick="treeToggle(this)">Step 2 · 选择任务类型</span>
     <ul>
@@ -650,41 +642,68 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',sans-seri
 <tr><td class="fname">company_type</td><td>enum</td><td>AI公司类型（用户选择）</td></tr>
 <tr><td class="fname">industry</td><td>string</td><td>行业身份</td></tr>
 <tr><td class="fname">audience</td><td>string</td><td>受众群体</td></tr>
-<tr><td class="fname">is_verified</td><td>boolean</td><td>是否已确权</td></tr>
+<tr><td class="fname">is_verified</td><td>boolean</td><td>是否已确权（✓勾选即为true）</td></tr>
 <tr><td class="fname">verified_at</td><td>datetime</td><td>确权时间</td></tr>
+<tr><td class="fname">tier</td><td>enum</td><td>white（白版·免费）/ deposited（已交押金）</td></tr>
+<tr><td class="fname">deposit_amount</td><td>decimal</td><td>押金金额（0=白版）<span style="color:var(--t3);font-size:10px"> · 待确认：是否分档</span></td></tr>
+<tr><td class="fname">deposit_paid_at</td><td>datetime</td><td>押金缴纳时间</td></tr>
+<tr><td class="fname">bonus_fund</td><td>decimal</td><td>1:1匹配的任务基金余额 <span style="color:var(--t3);font-size:10px"> · 待确认：仅发任务用还是通用</span></td></tr>
+<tr><td class="fname">reclaim_deadline</td><td>datetime</td><td>白版资产收回截止日 <span style="color:var(--t3);font-size:10px"> · 待确认：宽限期长度</span></td></tr>
+<tr><td class="fname">total_earned</td><td>decimal</td><td>该资产累计产生的收益（增值可视化）</td></tr>
+<tr><td class="fname">estimated_value</td><td>decimal</td><td>资产估值（收益+信用+数据积累 → 计算）</td></tr>
 <tr><td class="fname">total_tasks_published</td><td>int</td><td>通过该资产发布的任务总数</td></tr>
 <tr><td class="fname">total_spent</td><td>decimal</td><td>通过该资产累计支出</td></tr>
-<tr><td class="fname">status</td><td>enum</td><td>active / suspended / deleted</td></tr>
+<tr><td class="fname">status</td><td>enum</td><td>active / pending_reclaim（待收回提醒期）/ frozen / deleted</td></tr>
 <tr><td class="fname">created_at</td><td>datetime</td><td>创建时间</td></tr>
 </table>
 </div></div></div>
 
 <div class="mod">
-<div class="mod-head" onclick="modToggle(this)"><div class="mod-icon" style="background:rgba(155,109,255,.12)">🔀</div><span class="mod-name">AI资产确权流程（发布前置）</span><span class="mod-arrow">▼</span></div>
+<div class="mod-head" onclick="modToggle(this)"><div class="mod-icon" style="background:rgba(155,109,255,.12)">🔀</div><span class="mod-name">AI资产确权策略（三步走）</span><span class="mod-arrow">▼</span></div>
 <div class="mod-body"><div class="mod-inner">
-<div class="decision"><strong>CEO要求：</strong>首次用户的AI资产确权需"丝滑无负担"。<div class="src">来源：架构投票 f-vC</div></div>
-<div class="tree"><ul><li><span class="tn tn-root">用户点击"+"发布</span>
+<div class="decision"><strong>CEO最新方向：</strong>先免费给白版资产 → 阶梯引导交押金 → 资产自然增值。核心逻辑是"先给再收"。<div class="src">来源：CEO最新反馈</div></div>
+
+<div class="tree"><ul><li><span class="tn tn-root">三步走策略</span>
 <ul>
-  <li><span class="tree-toggle tn tn-action" onclick="treeToggle(this)">判断：用户是否有已确权的AI资产？</span>
+  <li><span class="tree-toggle tn tn-func" onclick="treeToggle(this)">Step 1 · 零摩擦确权（发布时一键完成）</span>
   <ul>
-    <li><span class="tn tn-func">有 → 展示资产选择列表</span>
+    <li><span class="tn tn-action">用户点"+"发布 → 勾选✓"同意创建AI资产" → 系统自动生成白版资产</span></li>
+    <li><span class="tn tn-data">白版资产：免费、基础功能、用户几乎无感知即完成确权</span></li>
+    <li><span class="tn tn-func">确权后直接进入任务类型选择 → 继续发布流程</span></li>
+    <li><span class="tn tn-gray">已有资产的用户跳过此步</span></li>
+    <li><span class="tn tn-gray" style="font-size:11px">待确认：白版资产是否有名称/类型？纯接单用户是否也有获得途径？</span></li>
+  </ul></li>
+
+  <li><span class="tree-toggle tn tn-func" onclick="treeToggle(this)">Step 2 · 阶梯式引导交押金</span>
+  <ul>
+    <li><span class="tn tn-action">(a) 利益驱动 · 活动提醒</span>
     <ul>
-      <li><span class="tn tn-action">选择已有资产 → 进入任务类型选择</span></li>
-      <li><span class="tn tn-action">新建资产 → 进入创建流程</span></li>
+      <li><span class="tn tn-data">"押金1:1匹配任务基金"——交¥100押金，送¥100任务基金</span></li>
+      <li><span class="tn tn-gray" style="font-size:11px">待确认：基金仅限发任务使用，还是等同余额？押金金额是否分档？</span></li>
     </ul></li>
-    <li><span class="tree-toggle tn tn-func" onclick="treeToggle(this)">无 → 进入快速创建引导</span>
+    <li><span class="tn tn-alert">(b) 损失厌恶 · AI资产收回提醒</span>
     <ul>
-      <li><span class="tn tn-page">Step A · 选择AI公司类型</span>
-      <ul><li><span class="tn tn-data">预设选项 + 自定义输入</span></li></ul></li>
-      <li><span class="tn tn-page">Step B · 选择行业/受众</span>
-      <ul><li><span class="tn tn-data">多选标签</span></li></ul></li>
-      <li><span class="tn tn-action">Step C · "立即生成" → 自动确权</span></li>
-      <li><span class="tn tn-func">确权完成 → 自动跳转任务类型选择</span></li>
+      <li><span class="tn tn-data">"你的AI资产将在X天后收回"——用户已产生数据/收益，害怕失去</span></li>
+      <li><span class="tn tn-gray" style="font-size:11px">待确认：收回=删除还是冻结？宽限期多长？进行中任务如何处理？</span></li>
     </ul></li>
+    <li><span class="tn tn-action">(c) 功能解锁 · 优化提醒</span>
+    <ul>
+      <li><span class="tn tn-data">"交押金解锁更多功能"——更高效自动接单、更多任务类型、优先匹配</span></li>
+    </ul></li>
+    <li><span class="tn tn-gray">(a)(b)(c)为阶梯式触发，非同时出现</span></li>
+    <li><span class="tn tn-gray" style="font-size:11px">待确认：各阶段触发时机（按天数？按行为？）。提醒形式（弹窗/通知/页面卡片？）。押金是否可退、是否有锁定期？</span></li>
+  </ul></li>
+
+  <li><span class="tree-toggle tn tn-func" onclick="treeToggle(this)">Step 3 · AI资产自然增值（digital me）</span>
+  <ul>
+    <li><span class="tn tn-data">接任务 → 资产积累完成记录和信用</span></li>
+    <li><span class="tn tn-data">AI自动赚钱 → 资产产生被动收益</span></li>
+    <li><span class="tn tn-data">优化AI资产 → 更高效、更值钱</span></li>
+    <li><span class="tn tn-func">资产价值可视化 → "你的AI资产已价值¥XXX"</span></li>
+    <li><span class="tn tn-func">为AI交易（第三营收支柱）打基础 → 有价值才值得交易</span></li>
   </ul></li>
 </ul>
 </li></ul></div>
-<div class="p">设计原则：整个确权流程控制在<strong>3步以内，30秒完成</strong>。用选择代替输入。没有等待审核环节（自动确权）。</div>
 </div></div></div>
 
 <div class="fb" data-id="ps-asset"><div class="fb-t">团队反馈</div><div class="fb-desc">AI资产模块（实体字段 + 确权流程）</div><div class="fb-btns"><button class="fb-b" onclick="sf(this,'a','ps-asset')">✅ 接受</button><button class="fb-b" onclick="sf(this,'d','ps-asset')">💬 讨论</button><button class="fb-b" onclick="sf(this,'x','ps-asset')">❌ 拒绝</button></div><textarea class="fb-n" placeholder="补充说明…" onchange="sn(this,'ps-asset')"></textarea></div>
