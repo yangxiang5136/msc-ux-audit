@@ -171,6 +171,7 @@ strong { color:var(--text); font-weight:600; }
   <a href="#blockchain">E.2 区块链存证</a>
   <a href="#rights">E.3 权利结构</a>
   <a href="#ux-flow">E.4 确权体验</a>
+  <a href="#triggers">E.4.3 触发时机</a>
   <a href="#white-gold">E.5 白版→金版</a>
   <a href="#certificate">E.6 确权证书</a>
   <a href="#compliance">E.7 合规风控</a>
@@ -484,6 +485,11 @@ strong { color:var(--text); font-weight:600; }
 
       <p><span class="tag tag-biz">战略方向</span> AI资产不只是工具，而是可持有、可交易、有收益权的资产。以下是两种核心权益的定义：</p>
 
+      <div class="highlight-box" style="border-left-color:var(--amber);background:var(--amber-bg);">
+        <strong>⚡ CEO定位修正：</strong>收益分红权/配额权属于<strong>全球化交易所功能</strong>，远期方向。<br>
+        <strong>境内当前阶段只做：</strong>确权 · AI运营 · 生态任务板块。与42号文合规结论一致。
+      </div>
+
       <table class="cmp" style="margin-top:12px">
         <tr><th>权益</th><th>定义</th><th>举例</th><th>前提条件</th></tr>
         <tr>
@@ -673,9 +679,149 @@ strong { color:var(--text); font-weight:600; }
 
     </div></div>
   </div>
-</div>
 
-<!-- ==================== E.5 白版→金版 ==================== -->
+  <div class="card">
+    <div class="card-head" onclick="tog(this)">
+      <span class="card-num blue">E.4.3</span>
+      <span class="card-name">三阶段确权触发时机 · 具体mockup <span class="tag tag-new">CEO要求新增</span></span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body"><div class="card-inner">
+
+      <div class="highlight-box" style="border-left-color:var(--amber);background:var(--amber-bg);">
+        <strong>⚡ CEO反馈驱动新增：</strong>需要看到确权在三个具体场景中的触发时机和页面流程。
+      </div>
+
+      <p style="margin-bottom:14px;font-weight:600;color:var(--text);">场景A：发布任务时触发确权</p>
+      <div class="flow">
+        <div class="flow-step">用户点击<br>"发布任务"</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step highlight">检测：是否<br>已确权？</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step gold-hl">未确权：弹出<br>确权引导页</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">确权完成/<br>跳过(白版)</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step green-hl">继续发布<br>任务流程</div>
+      </div>
+
+      <div class="phone-wrap">
+        <div>
+          <div class="phone">
+            <div class="phone-screen">
+              <div style="font-size:14px;font-weight:700;margin-bottom:10px;">发布任务</div>
+              <div class="mock-card" style="border-color:var(--accent);background:rgba(108,92,231,0.08);">
+                <div style="font-size:13px;font-weight:600;margin-bottom:6px;">🔓 解锁AI资产发布权益</div>
+                <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;">
+                  确权后您将获得：<br>
+                  · AI自动执行已发布任务<br>
+                  · 优先匹配高质量接单者<br>
+                  · 任务数据纳入资产产出记录
+                </div>
+                <div class="mock-btn mock-btn-gold" style="margin-top:10px;font-size:12px;">¥699确权 或 ¥19.9/月分期</div>
+                <div style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:6px;cursor:pointer;">暂不确权，以白版身份发布 →</div>
+              </div>
+            </div>
+          </div>
+          <div class="phone-label">场景A：发布任务时的确权引导</div>
+        </div>
+      </div>
+
+      <p style="margin:18px 0 14px;font-weight:600;color:var(--text);">场景B：AI助手解锁时触发确权</p>
+      <div class="flow">
+        <div class="flow-step">用户开启<br>"AI自动赚钱"</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step highlight">检测：是否<br>已确权？</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step gold-hl">未确权：展示<br>AI助手收益预览</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">确权支付</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step green-hl">AI助手<br>立即激活</div>
+      </div>
+
+      <div class="phone-wrap">
+        <div>
+          <div class="phone">
+            <div class="phone-screen">
+              <div style="text-align:center;padding-top:10px;">
+                <div style="font-size:32px;margin-bottom:6px;">🤖</div>
+                <div style="font-size:15px;font-weight:700;">解锁AI助手</div>
+                <div style="font-size:11px;color:var(--text-muted);margin:4px 0 14px;">让AI 24小时自动帮你接单赚钱</div>
+              </div>
+              <div class="mock-card">
+                <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px;">金版用户AI助手数据</div>
+                <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;">
+                  <span>平均月收入</span><span style="color:var(--green);">¥380</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-top:4px;">
+                  <span>日均自动接单</span><span>4.2个</span>
+                </div>
+              </div>
+              <div class="mock-btn mock-btn-gold">¥699 解锁 · 含¥699任务基金</div>
+              <div style="text-align:center;font-size:11px;color:var(--text-muted);margin-top:4px;">或 ¥19.9/月分期开通</div>
+            </div>
+          </div>
+          <div class="phone-label">场景B：AI助手解锁时的确权引导</div>
+        </div>
+      </div>
+
+      <p style="margin:18px 0 14px;font-weight:600;color:var(--text);">场景C：提现时触发确权</p>
+      <div class="flow">
+        <div class="flow-step">用户点击<br>"提现"</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step highlight">检测：是否<br>已确权？</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step gold-hl">未确权：展示<br>确权=即时到账</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">确权/跳过</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step green-hl">提现处理</div>
+      </div>
+
+      <div class="phone-wrap">
+        <div>
+          <div class="phone">
+            <div class="phone-screen">
+              <div style="font-size:14px;font-weight:700;margin-bottom:12px;">提现</div>
+              <div class="mock-card">
+                <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;">
+                  <span>提现金额</span><span style="font-weight:700;">¥85.50</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted);">
+                  <span>到账方式</span><span>微信零钱</span>
+                </div>
+              </div>
+
+              <div class="mock-card" style="border-color:var(--gold);background:var(--gold-bg);">
+                <div style="font-size:12px;font-weight:600;color:var(--gold);margin-bottom:4px;">💡 确权后提现立即到账</div>
+                <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;">
+                  当前预计到账：T+3工作日<br>
+                  确权用户到账：<strong style="color:var(--green);">即时到账</strong>
+                </div>
+                <div class="mock-btn mock-btn-gold" style="margin-top:8px;font-size:12px;padding:8px;">确权并立即提现 · ¥19.9/月起</div>
+              </div>
+
+              <div class="mock-btn mock-btn-ghost" style="font-size:12px;">暂不确权 · 等待T+3到账</div>
+            </div>
+          </div>
+          <div class="phone-label">场景C：提现时的确权引导（即时到账激励）</div>
+        </div>
+      </div>
+
+      <div class="fb" data-id="e4.3">
+        <div class="fb-t">CEO 反馈</div>
+        <div class="fb-btns">
+          <button class="fb-b" onclick="sf(this,'a','e4.3')">✅ 同意</button>
+          <button class="fb-b" onclick="sf(this,'d','e4.3')">💬 需讨论</button>
+          <button class="fb-b" onclick="sf(this,'x','e4.3')">❌ 不同意</button>
+        </div>
+        <textarea class="fb-n" placeholder="备注…" onchange="sn(this,'e4.3')"></textarea>
+      </div>
+
+    </div></div>
+  </div>
+</div>
 <div class="section" id="white-gold">
   <div class="section-head"><span class="num">E.5</span>白版 → 金版渐进升级设计</div>
   <div class="section-sub">设计原则："先给再收"，确权要"丝滑无负担"。利用禀赋效应让用户先拥有再付费。</div>
@@ -803,12 +949,12 @@ strong { color:var(--text); font-weight:600; }
       <table class="cmp">
         <tr><th>功能</th><th>白版（免费）</th><th>金版（保证金）</th></tr>
         <tr><td>AI自动执行任务</td><td>✅ 基础</td><td>✅ 优先 + 高价任务</td></tr>
-        <tr><td>收益提现</td><td>✅ 每周1次</td><td>✅ 随时提现</td></tr>
+        <tr><td>收益提现</td><td>✅ 每周1次 · T+3到账</td><td>✅ 即时到账</td></tr>
         <tr><td>确权证书</td><td>❌</td><td>✅ 含链上存证</td></tr>
         <tr><td>资产转让/交易</td><td>❌</td><td>✅</td></tr>
         <tr><td>收益分红权</td><td>❌</td><td>✅</td></tr>
         <tr><td>排行榜/可见度</td><td>❌</td><td>✅ 优先展示</td></tr>
-        <tr><td>1:1任务基金匹配</td><td>❌</td><td>✅ 交¥100得¥200额度</td></tr>
+        <tr><td>1:1任务基金匹配</td><td>❌</td><td>✅ 交¥699得¥1,398额度</td></tr>
       </table>
 
       <div class="fb" data-id="e5.3">
@@ -1106,29 +1252,70 @@ strong { color:var(--text); font-weight:600; }
 
       <div class="highlight-box">
         <strong>法律定性建议：服务保证金</strong>（非投资、非预付款）<br>
-        用户交付保证金获得高级服务权限（金版资产），保证金在满足条件后可退还。需在用户协议中明确退还条件和时间。
+        用户交付保证金获得高级服务权限（金版资产），保证金在15天冷静期内可无条件退还。
+      </div>
+
+      <div class="highlight-box" style="border-left-color:var(--amber);background:var(--amber-bg);">
+        <strong>⚡ 已根据CEO反馈修改</strong>：三档定价(¥99/299/999)已作废，改为¥699单一档位+分期方案。退还周期从12个月改为15天冷静期。
       </div>
 
       <table class="cmp">
-        <tr><th>金额档位</th><th>匹配活动</th><th>定位</th></tr>
+        <tr><th>支付方式</th><th>金额</th><th>权益</th></tr>
         <tr>
-          <td>¥99</td>
-          <td>+¥99任务基金</td>
-          <td>入门试水，低决策门槛</td>
+          <td><strong>一次性支付</strong> <span class="tag tag-key">推荐</span></td>
+          <td>¥699</td>
+          <td>立即解锁全部金版权益 + 1:1任务基金匹配（¥699基金）</td>
         </tr>
         <tr>
-          <td>¥299</td>
-          <td>+¥399任务基金 <span class="tag tag-key">推荐</span></td>
-          <td>主推档位（诱饵效应：获赠>保证金）</td>
-        </tr>
-        <tr>
-          <td>¥999</td>
-          <td>+¥1,499任务基金 + 专属客服</td>
-          <td>高价值用户</td>
+          <td><strong>分期支付</strong></td>
+          <td>¥19.9/月</td>
+          <td>按月解锁金版权益，持续有效期内享受全部功能</td>
         </tr>
       </table>
 
-      <p style="margin-top:12px"><strong>退还条件：</strong>保证金在确权满12个月后可申请退还（扣除已使用的任务基金）。提前退还 = 资产降级为白版。</p>
+      <div class="phone-wrap">
+        <div>
+          <div class="phone">
+            <div class="phone-screen">
+              <div style="font-size:14px;font-weight:700;margin-bottom:12px;">选择确权方案</div>
+
+              <div class="mock-card" style="border-color:var(--gold);background:var(--gold-bg);">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <div>
+                    <div style="font-size:13px;font-weight:600;color:var(--gold);">一次性确权</div>
+                    <div style="font-size:22px;font-weight:700;margin:4px 0;">¥699</div>
+                    <div style="font-size:11px;color:var(--text-muted);">赠¥699任务基金 · 15天无忧退</div>
+                  </div>
+                  <div style="width:20px;height:20px;border-radius:50%;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;">
+                    <div style="width:10px;height:10px;border-radius:50%;background:var(--gold);"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mock-card">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <div>
+                    <div style="font-size:13px;font-weight:600;">按月分期</div>
+                    <div style="font-size:22px;font-weight:700;margin:4px 0;">¥19.9<span style="font-size:12px;color:var(--text-muted);">/月</span></div>
+                    <div style="font-size:11px;color:var(--text-muted);">按月享受金版权益 · 随时可停</div>
+                  </div>
+                  <div style="width:20px;height:20px;border-radius:50%;border:2px solid var(--border);"></div>
+                </div>
+              </div>
+
+              <div class="mock-divider"></div>
+              <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;">
+                ✓ 15天冷静期内全额退款<br>
+                ✓ 分期用户随时停止，已付不退但不再扣费
+              </div>
+              <div class="mock-btn mock-btn-gold">确认支付</div>
+            </div>
+          </div>
+          <div class="phone-label">确权支付方案选择页</div>
+        </div>
+      </div>
+
+      <p style="margin-top:12px"><strong>退还条件：</strong>15天冷静期内可无条件全额退款，资产降级为白版。分期用户停止付费后权益到期失效，已付金额不退。</p>
 
       <div class="fb" data-id="e8.1">
         <div class="fb-t">CEO 反馈</div>

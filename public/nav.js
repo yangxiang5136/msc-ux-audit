@@ -135,4 +135,27 @@ document.querySelectorAll('.card-body .fb').forEach(fb => {
   }
 });
 
+// Modification indicators — shows what changed based on CEO feedback
+const MODS = {
+  'e8.1': '已修改：三档定价→¥699+分期¥19.9/月；12个月退还→15天冷静期',
+  'e3.2': '已修改：标注为全球化交易所功能，境内当前不涉及',
+  'e4.3': '新增：三阶段确权触发时机mockup（发布任务/AI助手/提现）',
+  'e5.3': '已修改：提现即时到账权益 + 确权入口嵌入',
+};
+const modStyle = document.createElement('style');
+modStyle.textContent = `
+  .mod-tag{display:flex;align-items:center;gap:6px;padding:8px 18px;font-size:11px;color:#fbbf24;background:rgba(251,191,36,.06);border-top:1px solid rgba(251,191,36,.15)}
+  .mod-tag::before{content:'⚡';font-size:13px}
+`;
+document.head.appendChild(modStyle);
+
+Object.entries(MODS).forEach(([id, desc]) => {
+  const fb = document.querySelector(`.fb[data-id="${id}"]`);
+  if (!fb) return;
+  const tag = document.createElement('div');
+  tag.className = 'mod-tag';
+  tag.textContent = desc;
+  fb.parentElement.insertBefore(tag, fb);
+});
+
 })();
