@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MSC.AI · 产品规格文档（工程视角）</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0a12;--bg2:#13131f;--bg3:#1a1a2a;--bg4:#1e1e30;--brd:#2a2a3e;--text:#e8e8f0;--t2:#8888a0;--t3:#555570;--blue:#4a90d9;--amber:#d4a04a;--red:#e85d5d;--green:#4caf7d;--orange:#e8923d;--purple:#9b6dff;--teal:#3db89a}
+*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',sans-serif;font-size:14px;line-height:1.7;-webkit-font-smoothing:antialiased}
+.header{position:sticky;top:36px;z-index:100;background:rgba(10,10,18,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--brd);padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+.header-title{font-size:15px;font-weight:700}.header-badge{font-size:11px;padding:3px 10px;background:rgba(232,146,61,.12);color:var(--orange);border:1px solid rgba(232,146,61,.25);border-radius:20px}
+.nav{position:sticky;top:88px;z-index:90;background:rgba(10,10,18,.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--brd);padding:8px 20px;overflow-x:auto;display:flex;gap:6px;scrollbar-width:none}.nav::-webkit-scrollbar{display:none}
+.nav a{display:inline-block;padding:5px 14px;font-size:12px;font-weight:500;color:var(--t2);text-decoration:none;border-radius:6px;border:1px solid transparent;transition:all .2s;white-space:nowrap}.nav a:hover{color:var(--text);background:var(--bg4)}.nav a.active{color:var(--orange);border-color:rgba(232,146,61,.3);background:rgba(232,146,61,.08)}
+.wrap{max-width:960px;margin:0 auto;padding:28px 20px 80px}
+.sec{margin-bottom:48px;scroll-margin-top:100px}
+.sec-label{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
+.sec-title{font-size:22px;font-weight:900;line-height:1.3;margin-bottom:8px}
+.sec-desc{color:var(--t2);font-size:13px;margin-bottom:20px;line-height:1.8}.sec-desc strong{color:var(--text)}
+
+/* ── tree diagram ── */
+.tree{margin:8px 0;font-size:13px}
+.tree ul{list-style:none;padding-left:0;margin:0}
+.tree li{position:relative;padding:0 0 2px 32px}
+.tree li::before{content:'';position:absolute;left:10px;top:0;bottom:0;width:1.5px;background:rgba(42,42,62,.6)}
+.tree li::after{content:'';position:absolute;left:10px;top:17px;width:18px;height:1.5px;background:rgba(42,42,62,.6)}
+.tree li:last-child::before{bottom:17px}
+.tree>ul>li::before,.tree>ul>li::after{display:none}
+.tree>ul>li{padding-left:0}
+.tree ul ul{margin-top:2px}
+
+/* tree depth colors */
+.tree>ul>li>ul>li::before,.tree>ul>li>ul>li::after{background:rgba(61,184,154,.25)}
+.tree>ul>li>ul>li>ul>li::before,.tree>ul>li>ul>li>ul>li::after{background:rgba(74,144,217,.25)}
+.tree>ul>li>ul>li>ul>li>ul>li::before,.tree>ul>li>ul>li>ul>li>ul>li::after{background:rgba(155,109,255,.25)}
+
+/* expansion controls */
+.tree-controls{display:flex;gap:6px;margin:10px 0;flex-wrap:wrap}
+.tree-ctrl{padding:5px 12px;border-radius:6px;border:1px solid var(--brd);background:transparent;color:var(--t2);font-size:11px;cursor:pointer;font-family:inherit;transition:all .2s}
+.tree-ctrl:hover{background:var(--bg4);color:var(--text)}
+.tree-ctrl.active{background:rgba(61,184,154,.1);border-color:rgba(61,184,154,.3);color:var(--teal)}
+
+/* tree node */
+.tn{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:6px;margin:3px 0;font-weight:500;cursor:default;line-height:1.4;max-width:100%}
+.tn-page{background:rgba(74,144,217,.1);border:1px solid rgba(74,144,217,.25);color:var(--blue)}
+.tn-func{background:rgba(76,175,125,.1);border:1px solid rgba(76,175,125,.25);color:var(--green)}
+.tn-action{background:rgba(212,160,74,.1);border:1px solid rgba(212,160,74,.25);color:var(--amber)}
+.tn-data{background:rgba(155,109,255,.1);border:1px solid rgba(155,109,255,.25);color:var(--purple)}
+.tn-alert{background:rgba(232,93,93,.1);border:1px solid rgba(232,93,93,.25);color:var(--red)}
+.tn-root{background:rgba(61,184,154,.1);border:1px solid rgba(61,184,154,.25);color:var(--teal);font-weight:700}
+.tn-jump{cursor:pointer;text-decoration:none;transition:filter .2s}.tn-jump:hover{filter:brightness(1.3)}
+.tn-gray{background:var(--bg4);border:1px solid var(--brd);color:var(--t2)}
+.tn-label{font-size:10px;padding:1px 6px;border-radius:3px;font-weight:600;flex-shrink:0}
+
+/* expandable tree node */
+.tree-toggle{cursor:pointer;user-select:none}
+.tree-toggle::before{content:'▶';font-size:9px;display:inline-block;margin-right:4px;transition:transform .2s;color:var(--t3)}
+.tree-toggle.open::before{transform:rotate(90deg)}
+.tree-toggle+ul{display:none}
+.tree-toggle.open+ul{display:block}
+
+/* field table */
+.fields{width:100%;border-collapse:collapse;margin:8px 0;font-size:12px}
+.fields th{text-align:left;padding:6px 10px;background:var(--bg4);font-weight:600;border-bottom:1px solid var(--brd);font-size:11px;color:var(--t2)}
+.fields td{padding:6px 10px;border-bottom:1px solid rgba(42,42,62,.3);color:var(--t2);vertical-align:top}
+.fields .fname{color:var(--text);font-weight:500}
+.fields .freq{color:var(--red);font-size:10px}
+.fields .fopt{color:var(--t3);font-size:10px}
+
+/* decision box */
+.decision{background:rgba(232,146,61,.06);border:1px solid rgba(232,146,61,.2);border-left:3px solid var(--orange);border-radius:8px;padding:10px 14px;margin:10px 0;font-size:12px;line-height:1.7}
+.decision strong{color:var(--orange)}
+.decision .src{font-size:10px;color:var(--t3);margin-top:4px}
+
+/* module card */
+.mod{background:var(--bg2);border:1px solid var(--brd);border-radius:12px;margin:12px 0;overflow:hidden}
+.mod-head{padding:14px 18px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:background .2s;user-select:none}
+.mod-head:hover{background:var(--bg3)}
+.mod-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.mod-name{font-size:15px;font-weight:700;flex:1}
+.mod-count{font-size:11px;color:var(--t3)}
+.mod-arrow{font-size:12px;color:var(--t3);transition:transform .3s}
+.mod.open .mod-arrow{transform:rotate(180deg)}
+.mod-body{max-height:0;overflow:hidden;transition:max-height .5s ease}
+.mod.open .mod-body{max-height:30000px;overflow:visible}
+.mod-inner{padding:0 18px 18px;border-top:1px solid var(--brd)}
+
+.p{color:var(--t2);font-size:13px;line-height:1.8;margin-bottom:8px}.p strong{color:var(--text)}
+
+/* tooltip */
+.ref{border-bottom:1px dashed var(--orange);color:var(--orange);cursor:help;font-size:11px;font-weight:600;white-space:nowrap}.ref .ref-tip{display:none}
+#g-tip{display:none;position:fixed;background:var(--bg4);border:1px solid var(--orange);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--text);min-width:200px;max-width:300px;z-index:9999;line-height:1.5;font-weight:400;box-shadow:0 8px 24px rgba(0,0,0,.6);pointer-events:none}
+#g-tip strong{color:var(--orange)}
+
+/* legend */
+.legend{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0;font-size:11px}
+.legend-item{display:flex;align-items:center;gap:4px}
+.legend-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+
+/* ── feedback ── */
+.fb{background:var(--bg4);border:1px solid var(--brd);border-radius:10px;padding:14px;margin:16px 0}
+.fb-t{font-size:11px;font-weight:600;color:var(--t3);margin-bottom:4px}
+.fb-desc{font-size:12px;color:var(--t2);margin-bottom:8px}
+.fb-b{padding:7px 14px;border-radius:20px;border:1px solid var(--brd);background:transparent;color:var(--t2);font-size:12px;cursor:pointer;transition:all .2s;font-family:inherit}
+.fb-b.s-a{background:rgba(76,175,125,.12);border-color:var(--green);color:var(--green)}
+.fb-n{width:100%;padding:7px 10px;background:var(--bg);border:1px solid var(--brd);border-radius:6px;color:var(--text);font-size:12px;font-family:inherit;resize:vertical;min-height:28px}
+.fb-n::placeholder{color:var(--t3)}
+
+.sep{border:none;height:1px;background:linear-gradient(90deg,transparent,var(--brd),transparent);margin:32px 0}
+
+@media(max-width:600px){.sec-title{font-size:18px}.tree{font-size:12px}}
+</style>
+</head>
+<body>
+<!-- MSC NAV --><div style="position:sticky;top:0;z-index:9999;background:rgba(10,12,16,.95);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.08);padding:8px 16px;display:flex;align-items:center;gap:12px;font-family:Noto Sans SC,sans-serif;font-size:12px;overflow-x:auto;scrollbar-width:none"><a href="index.html" style="color:#34d399;text-decoration:none;font-weight:700;white-space:nowrap;display:flex;align-items:center;gap:4px"><span style="display:inline-flex;width:20px;height:20px;background:linear-gradient(135deg,#34d399,#60a5fa);border-radius:5px;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:#000">M</span>首页</a><span style="color:#5a6478">│</span><a href="chatA.html" style="color:#8b95a8;text-decoration:none;white-space:nowrap;padding:3px 8px;border-radius:4px">1·信任</a><a href="chatB.html" style="color:#8b95a8;text-decoration:none;white-space:nowrap;padding:3px 8px;border-radius:4px">2+3·空状态</a><a href="chatC.html" style="color:#8b95a8;text-decoration:none;white-space:nowrap;padding:3px 8px;border-radius:4px">4+5·卡片金额</a><a href="chatD.html" style="color:#8b95a8;text-decoration:none;white-space:nowrap;padding:3px 8px;border-radius:4px">6+7+8·确认留存</a><a href="architecture.html" style="color:#8b95a8;text-decoration:none;white-space:nowrap;padding:3px 8px;border-radius:4px">架构方案</a><a href="product-spec.html" style="color:#e8923d;text-decoration:none;white-space:nowrap;padding:3px 8px;border-radius:4px;background:rgba(232,146,61,.08);border:1px solid rgba(232,146,61,.2)">产品规格</a></div>
+<div id="g-tip"></div>
+
+<div class="header"><span class="header-title">MSC.AI · 产品规格文档</span><span class="header-badge">工程视角 v1</span></div>
+<nav class="nav">
+<a href="#decisions" class="active">决策汇总</a>
+<a href="#sitemap">全局页面地图</a>
+<a href="#m-task">任务模块</a>
+<a href="#m-asset">AI资产模块</a>
+<a href="#m-user">用户模块</a>
+<a href="#m-order">订单模块</a>
+<a href="#m-fund">资金模块</a>
+<a href="#m-data">数据实体</a>
+</nav>
+<div class="wrap">
+<!-- ══════════════════════════════ -->
+<!-- CEO决策汇总 -->
+<!-- ══════════════════════════════ -->
+<section class="sec" id="decisions">
+<div class="sec-label" style="color:var(--orange)">CONTEXT</div>
+<div class="sec-title">项目背景</div>
+
+<div class="mod">
+<div class="mod-head" onclick="modToggle(this)"><div class="mod-icon" style="background:rgba(232,146,61,.12)">📋</div><span class="mod-name">CEO决策汇总（7项已确认）</span><span class="mod-count">点击展开</span><span class="mod-arrow">▼</span></div>
+<div class="mod-body"><div class="mod-inner">
+<div class="decision"><strong>架构方案：方案C（中置发布）确认</strong><br>底部Tab栏：任务广场 | 中间"+"发布 | 我的。发布入口在Tab中间，任务广场纯接单。<div class="src">来源：架构投票 f-vC</div></div>
+<div class="decision"><strong>发任务流程经过AI资产确权</strong><br>发任务 → AI资产创建/选择 → 确权 → 发任务配置。首次用户的AI资产确权需做到"丝滑无负担"。<div class="src">来源：架构投票 f-vA</div></div>
+<div class="decision"><strong>新手引导：任务驱动为主 + 卡点提醒</strong><br>不用全屏蒙版教程。以新手挑战任务驱动引导，在数据显示的特定卡点再添加提示。<div class="src">来源：架构投票 f-tutorial</div></div>
+<div class="decision"><strong>裂变机制：助力/膨胀模式</strong><br>裂变采用助力/膨胀方式（类似拼多多砍价），裂变回退后跳转回任务广场。<div class="src">来源：架构投票 f-common</div></div>
+<div class="decision"><strong>AI生态任务实时到账</strong><br>AI生态任务是否可以实时结算？用户押金15天期限后是否及时到账？——待产品侧确认规则。<div class="src">来源：维度1 a-1.5</div></div>
+<div class="decision"><strong>任务类别可扩展</strong><br>当前4种任务类型只是初始集，筛选/分类系统需设计为可扩展。<div class="src">来源：维度4 c-4.2</div></div>
+<div class="decision"><strong>方案B（4Tab经典分离）否决</strong><div class="src">来源：架构投票 f-vB</div></div>
+</div></div></div>
+
+<div class="mod open">
+<div class="mod-head" onclick="modToggle(this)"><div class="mod-icon" style="background:rgba(61,184,154,.12)">💰</div><span class="mod-name">三大营收支柱（战略方向）</span><span class="mod-arrow">▼</span></div>
+<div class="mod-body"><div class="mod-inner">
+<div class="p">一切页面都是为了让用户完成以下三个核心动作而设计。三条路径<strong>并行存在</strong>，不是线性依赖。早期用户可以只接单赚零花钱（不需要AI资产）。</div>
+<div class="tree"><ul><li><span class="tn tn-root">三条并行路径</span>
+<ul>
+  <li><span class="tn tn-func">① AI资产确权（押金）</span> <span class="tn-label" style="background:rgba(232,93,93,.1);color:var(--red)">优先级最高</span>
+  <ul>
+    <li><span class="tn tn-data">用户拥有AI资产 → 确权交押金 → 资产生效</span></li>
+    <li><span class="tn tn-data">裂变锚点：邀请好友也来拥有AI资产</span></li>
+    <li><span class="tn tn-gray">AI公司是AI资产的一种；未来可能有更多资产类型</span></li>
+    <li><span class="tn tn-gray">早期确权流程在探索中，放在「我的」Tab的AI区域</span></li>
+  </ul></li>
+  <li><span class="tn tn-func">② 生态任务的发布与接取</span>
+  <ul>
+    <li><span class="tn tn-data">接单（零门槛）→ 赚钱 → 流量入口</span></li>
+    <li><span class="tn tn-data">发任务（需绑定AI资产）→ 从接单者升级为发布者</span></li>
+    <li><span class="tn tn-data">平台抽成 0.1~0.5%</span></li>
+  </ul></li>
+  <li><span class="tn tn-func">③ AI交易与排行榜</span> <span class="tn-label" style="background:rgba(212,160,74,.1);color:var(--amber)">需确认设计</span>
+  <ul>
+    <li><span class="tn tn-data">AI资产可交易（二级市场）</span></li>
+    <li><span class="tn tn-data">排行榜：资产收益/用户产出排名</span></li>
+    <li><span class="tn tn-gray">功能方向已定，具体设计待确认</span></li>
+  </ul></li>
+</ul>
+</li></ul></div>
+<div style="margin-top:16px;font-size:14px;font-weight:700;margin-bottom:12px">用户成长金字塔</div>
+<div class="p">三条路径并行，不强制线性升级。但产品在每个层级提供自然的<strong>"升级时刻"</strong>，引导用户向上发展。</div>
+
+<!-- Pyramid -->
+<div style="margin:20px auto;max-width:700px">
+
+  <!-- 顶层 -->
+  <div style="width:45%;margin:0 auto">
+    <div style="background:linear-gradient(135deg,rgba(232,146,61,.12),rgba(232,93,93,.08));border:1.5px solid rgba(232,146,61,.3);padding:14px 16px;position:relative;clip-path:polygon(8% 0%,92% 0%,100% 100%,0% 100%);border-radius:4px 4px 0 0">
+      <div style="text-align:center;margin-bottom:6px">
+        <div style="font-size:13px;font-weight:700;color:var(--orange)">👑 顶层 · AI资产交易与竞争</div>
+        <div style="font-size:10px;color:var(--t3);margin-top:2px">核心用户 · 待确认设计</div>
+      </div>
+      <div style="font-size:11px;color:var(--t2);line-height:1.6;text-align:center">
+        交易AI资产（二级市场）· 排行榜 · Lv.4建团队<br>
+        <span style="font-size:10px;color:var(--t3)">→ BP第二阶段：AI资本市场重构</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 升级时刻 ② -->
+  <div style="width:55%;margin:0 auto;display:flex;align-items:center;gap:6px;padding:4px 0;font-size:10px">
+    <div style="flex:1;height:1px;background:rgba(212,160,74,.3)"></div>
+    <div style="color:var(--amber);font-weight:600;white-space:nowrap">⬆ 资产收益报告 · "你的AI资产价值¥XXX" · 发现交易市场</div>
+    <div style="flex:1;height:1px;background:rgba(212,160,74,.3)"></div>
+  </div>
+
+  <!-- 中层 -->
+  <div style="width:75%;margin:0 auto">
+    <div style="background:linear-gradient(135deg,rgba(155,109,255,.1),rgba(61,184,154,.06));border:1.5px solid rgba(155,109,255,.25);padding:16px;position:relative;clip-path:polygon(5% 0%,95% 0%,100% 100%,0% 100%)">
+      <div style="text-align:center;margin-bottom:8px">
+        <div style="font-size:13px;font-weight:700;color:var(--purple)">🤖 中层 · 拥有AI资产</div>
+        <div style="font-size:10px;color:var(--t3);margin-top:2px">部分转化 · 交押金确权</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:11px;color:var(--t2);line-height:1.6">
+        <div>
+          <div style="font-weight:600;color:var(--text);margin-bottom:3px;font-size:10px">用户行为</div>
+          · 创建AI资产 → 确权交押金<br>
+          · 用AI资产发布任务（花钱方）<br>
+          · AI资产增值：接单+发布双向收益<br>
+          · AI自动执行效率更高
+        </div>
+        <div>
+          <div style="font-weight:600;color:var(--text);margin-bottom:3px;font-size:10px">AI资产的更多作用</div>
+          · 绑定发布任务（发任务的前提）<br>
+          · AI自动赚钱的"智能体"载体<br>
+          · 累积信用/收益 → 资产价值<br>
+          · 未来：更多资产类型可扩展
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 升级时刻 ① -->
+  <div style="width:82%;margin:0 auto;display:flex;align-items:center;gap:6px;padding:4px 0;font-size:10px">
+    <div style="flex:1;height:1px;background:rgba(76,175,125,.3)"></div>
+    <div style="color:var(--green);font-weight:600;white-space:nowrap">⬆ 首次到账庆祝 · AI自动接单收益可视化 · "拥有AI资产可解锁更多"</div>
+    <div style="flex:1;height:1px;background:rgba(76,175,125,.3)"></div>
+  </div>
+
+  <!-- 底层 -->
+  <div style="width:100%;margin:0 auto">
+    <div style="background:linear-gradient(135deg,rgba(74,144,217,.1),rgba(76,175,125,.06));border:1.5px solid rgba(74,144,217,.25);padding:16px;position:relative;clip-path:polygon(3% 0%,97% 0%,100% 100%,0% 100%);border-radius:0 0 4px 4px">
+      <div style="text-align:center;margin-bottom:8px">
+        <div style="font-size:13px;font-weight:700;color:var(--blue)">📋 底层 · 接单赚钱</div>
+        <div style="font-size:10px;color:var(--t3);margin-top:2px">大量用户 · 零门槛进入</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:11px;color:var(--t2);line-height:1.6">
+        <div>
+          <div style="font-weight:600;color:var(--text);margin-bottom:3px;font-size:10px">用户行为</div>
+          · 浏览任务广场 → 接单 → 完成 → 赚钱<br>
+          · 开启AI自动接单（不需要AI资产）<br>
+          · 参与裂变活动获取奖励
+        </div>
+        <div>
+          <div style="font-weight:600;color:var(--text);margin-bottom:3px;font-size:10px">对应功能</div>
+          · 任务广场（筛选/排序/接取）<br>
+          · AI自动赚钱开关<br>
+          · 新手挑战 + 每日首单奖励 + 连签
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="p" style="margin-top:12px;font-size:12px;color:var(--t3)"><strong style="color:var(--t2)">关键设计原则：</strong>底层用户不会看到"你必须确权才能继续"的阻断。AI资产确权是一个自然出现的"想要更多"的选择，而非门槛。每个升级时刻都在用户情绪高点（赚到钱/看到收益）时触发。</div>
+</div></div></div>
+
+<div class="fb" data-id="ps-context"><div class="fb-t">团队反馈</div><div class="fb-desc">项目背景（CEO决策 + 三大营收 + 成长金字塔）</div><div class="fb-btns"><button class="fb-b" onclick="sf(this,'a','ps-context')">✅ 接受</button><button class="fb-b" onclick="sf(this,'d','ps-context')">💬 讨论</button><button class="fb-b" onclick="sf(this,'x','ps-context')">❌ 拒绝</button></div><textarea class="fb-n" placeholder="补充说明…" onchange="sn(this,'ps-context')"></textarea></div>
+</section>
+
+<hr class="sep">
+
+<!-- ══════════════════════════════ -->
+<!-- 全局页面地图 -->
+<!-- ══════════════════════════════ -->
+<section class="sec" id="sitemap">
+<div class="sec-label" style="color:var(--teal)">SITEMAP</div>
+<div class="sec-title">全局页面地图</div>
+<div class="sec-desc">点击 ▶ 展开子节点。线条颜色随层级变化。</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div>入口/根</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div>页面</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>功能/组件</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div>用户操作</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div>数据/字段</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>异常/弹窗</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--t3)"></div>备注</div>
+</div>
+
+<div class="tree-controls">
+  <button class="tree-ctrl" onclick="expandLevel(1)">展开第1级</button>
+  <button class="tree-ctrl" onclick="expandLevel(2)">展开第2级</button>
+  <button class="tree-ctrl" onclick="expandLevel(3)">展开第3级</button>
+  <button class="tree-ctrl" onclick="expandAll()">全部展开</button>
+  <button class="tree-ctrl" onclick="collapseAll()">全部收起</button>
+</div>
+
+<div class="tree">
+<ul>
+<li><span class="tn tn-root">MSC.AI 微信小程序</span>
+<ul>
+  <li><span class="tn tn-gray">开屏</span>
+  <ul>
+    <li><span class="tn tn-action">裂变入口（扫码/链接）</span></li>
+    <li><span class="tn tn-action">直接打开小程序</span></li>
+    <li><span class="tn tn-func">微信授权登录（静默获取openid）</span></li>
+  </ul></li>
+
+  <li><span class="tree-toggle tn tn-page" onclick="treeToggle(this)">Tab 1 · 任务广场（首屏）</span>
+  <ul>
+    <li><span class="tn tn-func">收入概览条</span> <span class="tn-label" style="background:rgba(61,184,154,.1);color:var(--teal)">首屏顶部</span>
+    <ul>
+      <li><span class="tn tn-data">今日可赚范围 · 可接任务数</span></li>
+    </ul></li>
+    <li><span class="tn tn-func">AI自动赚钱入口卡片</span>
+    <ul>
+      <li><span class="tn tn-action">点击 → AI自动赚钱设置页</span></li>
+    </ul></li>
+    <li><span class="tn tn-func">筛选栏（推荐/最新/高收入/分类） <a href="#m-task" class="tn-jump" style="font-size:9px;color:var(--t3);margin-left:4px">→ 任务模块</a></span></li>
+    <li><span class="tree-toggle tn tn-func" onclick="treeToggle(this)">任务卡片列表 <a href="#m-task" class="tn-jump" style="font-size:9px;color:var(--t3);margin-left:4px">→ 任务模块</a></span>
+    <ul>
+      <li><span class="tn tn-data">
+        <span class="ref">卡片字段<span class="ref-tip"><strong>参考「卡片金额」· 4.1</strong><br>4层视觉权重：单次收入→标题+类型→耗时/时薪/期限→信用/名额/标签</span></span>
+      </span></li>
+      <li><span class="tn tn-action">点击卡片 → 任务详情页</span></li>
+    </ul></li>
+    <li><span class="tree-toggle tn tn-page" onclick="treeToggle(this)">任务详情页 <a href="#m-task" class="tn-jump" style="font-size:9px;color:var(--t3);margin-left:4px">→ 任务模块</a></span>
+    <ul>
+      <li><span class="tn tn-data">
+        <span class="ref">英雄区金额展示<span class="ref-tip"><strong>参考「卡片金额」· 5.2</strong><br>40px收入 + 时薪换算 + ↑18%高于均值</span></span>
+      </span></li>
+      <li><span class="tn tn-data">任务描述 · 要求 · 截止时间</span></li>
+      <li><span class="tn tn-data">
+        <span class="ref">发布者信用信号<span class="ref-tip"><strong>参考「信任」· 1.3</strong><br>信用分 + 历史完成率 + 累计发放金额</span></span>
+      </span></li>
+      <li><span class="tn tn-action">
+        <span class="ref">滑动接取<span class="ref-tip"><strong>参考「确认留存」· 6.2</strong><br>滑动确认 + 社会证明 + 接取后显示"开始执行"+"取消任务"</span></span>
+      </span></li>
+      <li><span class="tn tn-alert">
+        <span class="ref">任务已满提示<span class="ref-tip"><strong>参考「卡片金额」· 4.3</strong><br>名额＜20%红色警示；已满时按钮置灰+"已被接满，看看其他任务"</span></span>
+      </span></li>
+    </ul></li>
+    <li><span class="tn tn-func">
+      <span class="ref">新手挑战卡片<span class="ref-tip"><strong>参考架构投票 f-tutorial</strong><br>CEO确认：任务驱动为主。3步：接第一单→完成→到账。卡点时给提示</span></span>
+      </span> <span class="tn-label" style="background:rgba(212,160,74,.1);color:var(--amber)">仅新用户</span>
+    </li>
+  </ul></li>
+
+  <li><span class="tree-toggle tn tn-page" onclick="treeToggle(this)">中间"+"· 发布任务流程</span>
+  <ul>
+    <li><span class="tree-toggle tn tn-page" onclick="treeToggle(this)">Step 1 · AI资产确权（一键） <a href="#m-asset" class="tn-jump" style="font-size:9px;color:var(--t3);margin-left:4px">→ AI资产模块</a></span>
+    <ul>
+      <li><span class="tn tn-func">已有资产 → 跳过，直接进入Step 2</span></li>
+      <li><span class="tn tn-func">无资产 → 弹出✓确认 → 系统自动生成白版AI资产（免费）</span></li>
+      <li><span class="tn tn-gray">确权后 → 阶梯提醒引导交押金（见AI资产模块详解）</span></li>
+    </ul></li>
+    <li><span class="tree-toggle tn tn-page" onclick="treeToggle(this)">Step 2 · 选择任务类型</span>
+    <ul>
+      <li><span class="tn tn-data">类型卡片网格（可扩展）</span></li>
+      <li><span class="tn tn-gray">
+        <span class="ref">类别可扩展<span class="ref-tip"><strong>参考「卡片金额」c-4.2 CEO留言</strong><br>"AI资产平台的任务类别可能会更多，需要再次探讨"</span></span>
+      </span></li>
+    </ul></li>
+    <li><span class="tree-toggle tn tn-page" onclick="treeToggle(this)">Step 3 · 配置定价</span>
+    <ul>
+      <li><span class="tn tn-data">
+        <span class="ref">收益框架头部<span class="ref-tip"><strong>参考「卡片金额」· 5.1</strong><br>"预计获得X个粉丝"框架翻转，费用降为二级信息</span></span>
+      </span></li>
+      <li><span class="tn tn-data">
+        <span class="ref">三档诱饵定价<span class="ref-tip"><strong>参考「卡片金额」· 5.1</strong><br>经济(0.67x)/推荐(1x,默认)/极速(1.67x)</span></span>
+      </span></li>
+      <li><span class="tn tn-data">数量滑块 · 费用实时联动</span></li>
+      <li><span class="tn tn-func">可折叠费用明细</span></li>
+    </ul></li>
+    <li><span class="tree-toggle tn tn-page" onclick="treeToggle(this)">Step 4 · 确认发布 <a href="#m-fund" class="tn-jump" style="font-size:9px;color:var(--t3);margin-left:4px">→ 资金模块</a></span>
+    <ul>
+      <li><span class="tn tn-alert">
+        <span class="ref">费用确认弹窗<span class="ref-tip"><strong>参考「确认留存」· 6.1</strong><br>费用分解 + ROI预估 + 托管保障 + 红色确认按钮</span></span>
+      </span></li>
+      <li><span class="tn tn-alert">
+        <span class="ref">余额不足<span class="ref-tip"><strong>参考「确认留存」· 8.1</strong><br>精确差额 + 一键补充 + 充值后自动返回发布流程</span></span>
+      </span></li>
+      <li><span class="tn tn-func">发布成功 → 跳转监控页</span></li>
+    </ul></li>
+  </ul></li>
+
+  <li><span class="tree-toggle tn tn-page" onclick="treeToggle(this)">Tab 2 · 我的</span>
+  <ul>
+    <li><span class="tn tn-func">
+      <span class="ref">收入仪表盘<span class="ref-tip"><strong>参考「确认留存」· 7.3</strong><br>累计收入 + 今日/本周/本月 + AI占比 + 趋势对比图</span></span>
+    </span></li>
+    <li><span class="tree-toggle tn tn-func" onclick="treeToggle(this)">我接的任务 <a href="#m-order" class="tn-jump" style="font-size:9px;color:var(--t3);margin-left:4px">→ 订单模块</a></span>
+    <ul>
+      <li><span class="tn tn-data">任务列表（按状态分：进行中/待审核/已完成）</span></li>
+      <li><span class="tn tn-page">
+        <span class="ref">任务执行页<span class="ref-tip"><strong>参考「空状态反馈」· 3.1</strong><br>4阶段timeline：已接取→执行中→待审核→已结算</span></span>
+      </span></li>
+      <li><span class="tn tn-action">提交成果（截图/链接上传）</span></li>
+    </ul></li>
+    <li><span class="tree-toggle tn tn-func" onclick="treeToggle(this)">我发布的任务 <a href="#m-order" class="tn-jump" style="font-size:9px;color:var(--t3);margin-left:4px">→ 订单模块</a></span>
+    <ul>
+      <li><span class="tn tn-data">任务列表（按状态：招募中/进行中/已完成）</span></li>
+      <li><span class="tn tn-page">
+        <span class="ref">监控进度看板<span class="ref-tip"><strong>参考「空状态反馈」· 3.2</strong><br>接取进度条 + 提交/结算分阶段</span></span>
+      </span></li>
+      <li><span class="tn tn-action">审核提交物（通过/驳回+理由）</span></li>
+    </ul></li>
+    <li><span class="tree-toggle tn tn-func" onclick="treeToggle(this)">余额与提现 <a href="#m-fund" class="tn-jump" style="font-size:9px;color:var(--t3);margin-left:4px">→ 资金模块</a></span>
+    <ul>
+      <li><span class="tn tn-data">可提现余额 · 冻结金额</span></li>
+      <li><span class="tn tn-page">
+        <span class="ref">提现页<span class="ref-tip"><strong>参考「信任」· 1.4</strong><br>到账承诺T+1 + 微信钱包/银行卡 + 客服入口</span></span>
+      </span></li>
+      <li><span class="tn tn-page">提现记录（颜色编码状态）</span></li>
+      <li><span class="tn tn-page">充值页（
+        <span class="ref">信任提示行<span class="ref-tip"><strong>参考「信任」· 1.1</strong><br>"资金由平台托管" + 展开三重保障面板</span></span>
+      ）</span></li>
+    </ul></li>
+    <li><span class="tree-toggle tn tn-func" onclick="treeToggle(this)">等级与成就 <a href="#m-user" class="tn-jump" style="font-size:9px;color:var(--t3);margin-left:4px">→ 用户模块</a></span>
+    <ul>
+      <li><span class="tn tn-data">
+        <span class="ref">4级等级体系<span class="ref-tip"><strong>参考「确认留存」· 7.1</strong><br>新手→能手→达人→金牌，含进度条+权益阶梯</span></span>
+      </span></li>
+      <li><span class="tn tn-data">
+        <span class="ref">成就徽章<span class="ref-tip"><strong>参考「确认留存」· 7.3原chatD</strong><br>月入过千/AI先锋/助力50家/万元户</span></span>
+      </span></li>
+    </ul></li>
+    <li><span class="tree-toggle tn tn-func" onclick="treeToggle(this)">AI中心（资产+自动赚钱） <a href="#m-asset" class="tn-jump" style="font-size:9px;color:var(--t3);margin-left:4px">→ AI资产模块</a></span>
+    <ul>
+      <li><span class="tn tn-func">AI自动赚钱设置与监控</span></li>
+      <li><span class="tree-toggle tn tn-func" onclick="treeToggle(this)">AI资产管理</span>
+      <ul>
+        <li><span class="tn tn-data">我的AI资产列表（AI公司等）</span></li>
+        <li><span class="tn tn-action">创建新AI资产 → 确权流程（交押金）</span></li>
+        <li><span class="tn tn-data">资产详情（收益统计/关联任务）</span></li>
+      </ul></li>
+      <li><span class="tree-toggle tn tn-func" onclick="treeToggle(this)">AI交易与排行榜</span> <span class="tn-label" style="background:rgba(212,160,74,.1);color:var(--amber)">待确认设计</span>
+      <ul>
+        <li><span class="tn tn-gray">资产交易市场（二级市场）</span></li>
+        <li><span class="tn tn-gray">排行榜（资产收益/用户产出）</span></li>
+        <li><span class="tn tn-gray">架构预留，具体设计待定</span></li>
+      </ul></li>
+    </ul></li>
+    <li><span class="tn tn-func">帮助与客服</span></li>
+    <li><span class="tn tn-func">设置（通知偏好/账号安全）</span></li>
+  </ul></li>
+
+  <li><span class="tree-toggle tn tn-alert" onclick="treeToggle(this)">全局弹窗/覆盖层</span>
+  <ul>
+    <li><span class="tn tn-alert">
+      <span class="ref">审核驳回通知<span class="ref-tip"><strong>参考「确认留存」· 8.2</strong><br>正向文案"改进后即可通过" + 通过率95% + 申诉入口</span></span>
+    </span></li>
+    <li><span class="tn tn-alert">
+      <span class="ref">AI执行失败弹窗<span class="ref-tip"><strong>参考「确认留存」· 8.3</strong><br>"AI需要帮手" + 已完成进度 + 补偿奖励 + 放弃无惩罚</span></span>
+    </span></li>
+    <li><span class="tn tn-alert">
+      <span class="ref">网络异常提示<span class="ref-tip"><strong>参考「确认留存」· 8.4</strong><br>"数据已安全保存" + 缓存清单 + 恢复后自动同步</span></span>
+    </span></li>
+    <li><span class="tn tn-alert">
+      <span class="ref">首次到账庆祝<span class="ref-tip"><strong>参考「空状态反馈」· 3.5</strong><br>全屏🎊 + 分享海报入口 → 裂变</span></span>
+    </span></li>
+    <li><span class="tn tn-alert">
+      <span class="ref">提现倒计时确认<span class="ref-tip"><strong>参考「确认留存」· 6.3</strong><br>3秒冷静期 + AI收益机会成本展示</span></span>
+    </span></li>
+    <li><span class="tn tn-func">
+      <span class="ref">每日首单红包<span class="ref-tip"><strong>参考「确认留存」· 7.2</strong><br>随机¥1~5，0.5%概率¥50</span></span>
+    </span></li>
+    <li><span class="tn tn-func">微信服务通知（5个触发点）</span></li>
+  </ul></li>
+</ul>
+</li></ul>
+</div>
+
+<div class="fb" data-id="ps-sitemap"><div class="fb-t">团队反馈</div><div class="fb-desc">全局页面地图（页面结构 + 层级关系）</div><div class="fb-btns"><button class="fb-b" onclick="sf(this,'a','ps-sitemap')">✅ 接受</button><button class="fb-b" onclick="sf(this,'d','ps-sitemap')">💬 讨论</button><button class="fb-b" onclick="sf(this,'x','ps-sitemap')">❌ 拒绝</button></div><textarea class="fb-n" placeholder="补充说明…" onchange="sn(this,'ps-sitemap')"></textarea></div>
+</section>
+
+<hr class="sep">
+<!-- ══════════════════════════════ -->
+<!-- 任务模块 -->
+<!-- ══════════════════════════════ -->
+<section class="sec" id="m-task">
+<div class="sec-label" style="color:var(--blue)">MODULE · TASK</div>
+<div class="sec-title">任务模块</div>
+<div class="sec-desc">覆盖任务的创建、展示、接取、执行、审核、结算全生命周期。</div>
+
+<div class="mod open">
+<div class="mod-head" onclick="modToggle(this)"><div class="mod-icon" style="background:rgba(74,144,217,.12)">📋</div><span class="mod-name">任务实体（Task）字段定义</span><span class="mod-arrow">▼</span></div>
+<div class="mod-body"><div class="mod-inner">
+<table class="fields">
+<tr><th>字段</th><th>类型</th><th>说明</th><th>必填</th></tr>
+<tr><td class="fname">task_id</td><td>string</td><td>任务唯一ID</td><td class="freq">必填</td></tr>
+<tr><td class="fname">publisher_id</td><td>string</td><td>发布者用户ID</td><td class="freq">必填</td></tr>
+<tr><td class="fname">ai_asset_id</td><td>string</td><td>关联AI资产ID（确权后绑定）</td><td class="freq">必填</td></tr>
+<tr><td class="fname">task_type</td><td>enum</td><td>类型：douyin_follow / video_create / xhs_follow / member_promo / 可扩展</td><td class="freq">必填</td></tr>
+<tr><td class="fname">title</td><td>string</td><td>任务标题（平台根据type自动生成，可修改）</td><td class="freq">必填</td></tr>
+<tr><td class="fname">description</td><td>text</td><td>任务描述/要求</td><td class="freq">必填</td></tr>
+<tr><td class="fname">unit_price</td><td>decimal</td><td>单价（元/个）</td><td class="freq">必填</td></tr>
+<tr><td class="fname">total_quantity</td><td>int</td><td>总需求量</td><td class="freq">必填</td></tr>
+<tr><td class="fname">accepted_count</td><td>int</td><td>已被接取数量</td><td class="fopt">系统维护</td></tr>
+<tr><td class="fname">completed_count</td><td>int</td><td>已完成数量</td><td class="fopt">系统维护</td></tr>
+<tr><td class="fname">pricing_tier</td><td>enum</td><td>定价档位：economy / recommended / express</td><td class="freq">必填</td></tr>
+<tr><td class="fname">total_cost</td><td>decimal</td><td>任务总费用（unit_price × total_quantity）</td><td class="fopt">计算</td></tr>
+<tr><td class="fname">service_fee</td><td>decimal</td><td>平台服务费（0.5%）</td><td class="fopt">计算</td></tr>
+<tr><td class="fname">estimated_time</td><td>int</td><td>预计用时（分钟）</td><td class="fopt">系统估算</td></tr>
+<tr><td class="fname">hourly_rate</td><td>decimal</td><td>时薪换算（用于排序/展示）</td><td class="fopt">计算</td></tr>
+<tr><td class="fname">status</td><td>enum</td><td>见状态机</td><td class="freq">必填</td></tr>
+<tr><td class="fname">deadline</td><td>datetime</td><td>截止时间</td><td class="freq">必填</td></tr>
+<tr><td class="fname">ai_executable</td><td>boolean</td><td>是否支持AI自动完成</td><td class="freq">必填</td></tr>
+<tr><td class="fname">created_at</td><td>datetime</td><td>创建时间</td><td class="fopt">系统</td></tr>
+</table>
+</div></div></div>
+
+<div class="mod">
+<div class="mod-head" onclick="modToggle(this)"><div class="mod-icon" style="background:rgba(74,144,217,.12)">🔄</div><span class="mod-name">任务状态机</span><span class="mod-arrow">▼</span></div>
+<div class="mod-body"><div class="mod-inner">
+<div class="tree">
+<ul><li><span class="tn tn-root">任务生命周期</span>
+<ul>
+  <li><span class="tn tn-data">draft</span> 草稿（未提交，自动保存）
+  <ul><li><span class="tn tn-action">提交 →</span> <span class="tn tn-data">recruiting</span></li></ul></li>
+  <li><span class="tn tn-data">recruiting</span> 招募中（accepted_count < total_quantity）
+  <ul>
+    <li><span class="tn tn-action">有人接取 →</span> <span class="tn tn-data">in_progress</span>（部分被接）</li>
+    <li><span class="tn tn-action">全部接满 →</span> <span class="tn tn-data">fully_accepted</span></li>
+    <li><span class="tn tn-action">超时无人接 →</span> <span class="tn tn-data">expired</span>（资金退回）</li>
+  </ul></li>
+  <li><span class="tn tn-data">in_progress</span> 进行中（有人接取但未满）</li>
+  <li><span class="tn tn-data">fully_accepted</span> 全部接满</li>
+  <li><span class="tn tn-data">completed</span> 全部完成（所有接单结算完毕）</li>
+  <li><span class="tn tn-data">expired</span> 已过期</li>
+  <li><span class="tn tn-data">cancelled</span> 发布者取消（未被接取的部分退款）</li>
+</ul>
+</li></ul></div>
+</div></div></div>
+
+<div class="mod">
+<div class="mod-head" onclick="modToggle(this)"><div class="mod-icon" style="background:rgba(74,144,217,.12)">📱</div><span class="mod-name">任务广场页 · 显示内容详解</span><span class="mod-arrow">▼</span></div>
+<div class="mod-body"><div class="mod-inner">
+<div class="p"><strong>收入概览条</strong>（置顶）</div>
+<table class="fields">
+<tr><th>元素</th><th>数据来源</th><th>说明</th></tr>
+<tr><td class="fname">今日可赚范围</td><td>当前可接任务的unit_price求和范围</td><td>"≈ ¥15~50"</td></tr>
+<tr><td class="fname">可接任务数</td><td>status=recruiting的任务count</td><td>"23个"</td></tr>
+</table>
+<div class="p" style="margin-top:12px"><strong>任务卡片</strong>（列表项）</div>
+<table class="fields">
+<tr><th>元素</th><th>数据来源</th><th>视觉层级</th></tr>
+<tr><td class="fname">单次收入</td><td>task.unit_price</td><td>第1层 · 最大绿色粗体</td></tr>
+<tr><td class="fname">任务标题</td><td>task.title</td><td>第2层 · 14px粗体</td></tr>
+<tr><td class="fname">类型色条</td><td>task.task_type → 颜色映射</td><td>第2层 · 左侧3px色条</td></tr>
+<tr><td class="fname">预计耗时</td><td>task.estimated_time</td><td>第3层 · "~2分钟"</td></tr>
+<tr><td class="fname">时薪</td><td>task.hourly_rate</td><td>第3层 · "≈¥9/时"</td></tr>
+<tr><td class="fname">截止日期</td><td>task.deadline - now</td><td>第3层 · "剩余2天"</td></tr>
+<tr><td class="fname">发布者信用</td><td>user.credit_score(publisher_id)</td><td>第4层 · 🥇4.9</td></tr>
+<tr><td class="fname">剩余名额</td><td>total_quantity - accepted_count</td><td>第4层 · 进度条/红色警示</td></tr>
+<tr><td class="fname">标签</td><td>ai_executable / 热门 / 高收入</td><td>第4层 · pill标签</td></tr>
+</table>
+
+<div class="p" style="margin-top:12px"><strong>筛选排序</strong></div>
+<table class="fields">
+<tr><th>维度</th><th>实现</th></tr>
+<tr><td class="fname">推荐（默认）</td><td>时薪 × 信用分加权排序</td></tr>
+<tr><td class="fname">最新</td><td>created_at DESC</td></tr>
+<tr><td class="fname">高收入</td><td>unit_price DESC</td></tr>
+<tr><td class="fname">分类筛选</td><td>task_type IN (...)</td></tr>
+</table>
+</div></div></div>
+
+
+<div class="mod">
+<div class="mod-head" onclick="modToggle(this)"><div class="mod-icon" style="background:rgba(74,144,217,.12)">📄</div><span class="mod-name">任务详情页 · 显示内容详解</span><span class="mod-arrow">▼</span></div>
+<div class="mod-body"><div class="mod-inner">
+<table class="fields">
+<tr><th>元素</th><th>数据来源</th><th>说明</th></tr>
+<tr><td class="fname">英雄区收入金额</td><td>task.unit_price</td><td>40px绿色粗体，页面最醒目元素</td></tr>
+<tr><td class="fname">时薪换算</td><td>unit_price / estimated_time × 60</td><td>"≈¥9/时 · ↑18%高于同类均值"</td></tr>
+<tr><td class="fname">任务标题</td><td>task.title</td><td>16px粗体</td></tr>
+<tr><td class="fname">任务类型标签</td><td>task.task_type → 颜色映射</td><td>pill标签 + 类型图标</td></tr>
+<tr><td class="fname">任务描述/要求</td><td>task.description</td><td>正文区域，支持富文本</td></tr>
+<tr><td class="fname">截止时间</td><td>task.deadline</td><td>"剩余2天3小时" 或 红色"即将截止"</td></tr>
+<tr><td class="fname">预计耗时</td><td>task.estimated_time</td><td>"约2分钟"</td></tr>
+<tr><td class="fname">AI可执行标识</td><td>task.ai_executable</td><td>紫色pill "AI可完成"</td></tr>
+<tr><td class="fname">名额进度条</td><td>accepted_count / total_quantity</td><td>绿色进度条 + "剩余7/10"；&lt;20%时红色</td></tr>
+<tr><td class="fname">发布者头像+昵称</td><td>user(publisher_id).avatar + nickname</td><td>可点击查看发布者主页</td></tr>
+<tr><td class="fname">发布者信用分</td><td>user(publisher_id).credit_score</td><td>🥇4.9 + 金/银/新徽章</td></tr>
+<tr><td class="fname">发布者历史数据</td><td>聚合查询 publisher 的 task+order</td><td>"累计发布52个任务 · 结算率100%"</td></tr>
+<tr><td class="fname">滑动接取按钮</td><td>—</td><td>底部固定；已满时置灰+"已被接满"</td></tr>
+<tr><td class="fname">社会证明</td><td>聚合同类任务完成率</td><td>"98%接单者成功完成此类任务"</td></tr>
+</table>
+</div></div></div>
+
+<div class="mod">
+<div class="mod-head" onclick="modToggle(this)"><div class="mod-icon" style="background:rgba(74,144,217,.12)">📝</div><span class="mod-name">发布流程 · 显示内容详解</span><span class="mod-arrow">▼</span></div>
+<div class="mod-body"><div class="mod-inner">
+<div class="p"><strong>Step 2 · 类型选择页</strong></div>
+<table class="fields">
+<tr><th>元素</th><th>数据来源</th><th>说明</th></tr>
+<tr><td class="fname">类型卡片网格</td><td>task_type_config（可配置）</td><td>图标+名称+起步价；2列网格布局</td></tr>
+<tr><td class="fname">热门标签</td><td>近7天该类型发布量排序</td><td>发布量前2的类型标"热门"</td></tr>
+</table>
+<div class="p" style="margin-top:12px"><strong>Step 3 · 定价配置页</strong></div>
+<table class="fields">
+<tr><th>元素</th><th>数据来源</th><th>说明</th></tr>
+<tr><td class="fname">收益框架头部</td><td>task_type_config.result_template</td><td>"预计获得 X 个粉丝"（非"花费¥X"）</td></tr>
+<tr><td class="fname">三档定价卡片</td><td>base_price × [0.67, 1.0, 1.67]</td><td>经济/推荐(默认高亮)/极速 三列</td></tr>
+<tr><td class="fname">每档价格</td><td>base_price × tier_multiplier</td><td>推荐档标"性价比最优"</td></tr>
+<tr><td class="fname">每档预计时长</td><td>base_time × [1.5, 1.0, 0.5]</td><td>经济慢、极速快</td></tr>
+<tr><td class="fname">数量滑块</td><td>用户拖动 → total_quantity</td><td>范围10~1000，默认50</td></tr>
+<tr><td class="fname">实时费用联动</td><td>unit_price × total_quantity</td><td>滑块移动时费用实时变化</td></tr>
+<tr><td class="fname">费用明细（折叠）</td><td>total_cost + service_fee</td><td>点击展开："任务费用¥X + 平台服务费¥Y = 总计¥Z"</td></tr>
+</table>
+<div class="p" style="margin-top:12px"><strong>Step 4 · 确认发布弹窗</strong></div>
+<table class="fields">
+<tr><th>元素</th><th>数据来源</th><th>说明</th></tr>
+<tr><td class="fname">费用分解</td><td>unit_price × quantity + service_fee</td><td>逐行列出</td></tr>
+<tr><td class="fname">ROI预估</td><td>task_type_config.roi_template</td><td>"预计获得50个粉丝，单个成本¥0.30"</td></tr>
+<tr><td class="fname">托管保障提示</td><td>静态文案</td><td>"资金由平台托管，未完成部分可退款"</td></tr>
+<tr><td class="fname">确认按钮</td><td>—</td><td>红色"确认发布并支付¥Z"</td></tr>
+<tr><td class="fname">余额不足状态</td><td>account.available_balance < total</td><td>按钮变"余额不足，去充值¥X"（差额向上取整）</td></tr>
+</table>
+</div></div></div>
+<div class="fb" data-id="ps-task"><div class="fb-t">团队反馈</div><div class="fb-desc">任务模块（实体字段 + 状态机 + 广场页详解）</div><div class="fb-btns"><button class="fb-b" onclick="sf(this,'a','ps-task')">✅ 接受</button><button class="fb-b" onclick="sf(this,'d','ps-task')">💬 讨论</button><button class="fb-b" onclick="sf(this,'x','ps-task')">❌ 拒绝</button></div><textarea class="fb-n" placeholder="补充说明…" onchange="sn(this,'ps-task')"></textarea></div>
+</section>
+
+<hr class="sep">
+
+<!-- ══════════════════════════════ -->
+<!-- AI资产模块 -->
+<!-- ══════════════════════════════ -->
+<section class="sec" id="m-asset">
+<div class="sec-label" style="color:var(--purple)">MODULE · AI ASSET</div>
+<div class="sec-title">AI资产模块</div>
+<div class="sec-desc">发布任务的前置条件。CEO确认：发任务 → AI资产确权 → 发任务配置。</div>
+
+<div class="mod open">
+<div class="mod-head" onclick="modToggle(this)"><div class="mod-icon" style="background:rgba(155,109,255,.12)">🤖</div><span class="mod-name">AI资产实体（AiAsset）字段定义</span><span class="mod-arrow">▼</span></div>
+<div class="mod-body"><div class="mod-inner">
+<table class="fields">
+<tr><th>字段</th><th>类型</th><th>说明</th></tr>
+<tr><td class="fname">asset_id</td><td>string</td><td>资产唯一ID</td></tr>
+<tr><td class="fname">owner_id</td><td>string</td><td>所有者用户ID</td></tr>
+<tr><td class="fname">company_name</td><td>string</td><td>AI公司名称（用户设定或自动生成）</td></tr>
+<tr><td class="fname">company_type</td><td>enum</td><td>AI公司类型（用户选择）</td></tr>
+<tr><td class="fname">industry</td><td>string</td><td>行业身份</td></tr>
+<tr><td class="fname">audience</td><td>string</td><td>受众群体</td></tr>
+<tr><td class="fname">is_verified</td><td>boolean</td><td>是否已确权（✓勾选即为true）</td></tr>
+<tr><td class="fname">verified_at</td><td>datetime</td><td>确权时间</td></tr>
+<tr><td class="fname">tier</td><td>enum</td><td>white（白版·免费）/ deposited（已交押金）</td></tr>
+<tr><td class="fname">deposit_amount</td><td>decimal</td><td>押金金额（0=白版）<span style="color:var(--t3);font-size:10px"> · 待确认：是否分档</span></td></tr>
+<tr><td class="fname">deposit_paid_at</td><td>datetime</td><td>押金缴纳时间</td></tr>
+<tr><td class="fname">bonus_fund</td><td>decimal</td><td>1:1匹配的任务基金余额 <span style="color:var(--t3);font-size:10px"> · 待确认：仅发任务用还是通用</span></td></tr>
+<tr><td class="fname">reclaim_deadline</td><td>datetime</td><td>白版资产收回截止日 <span style="color:var(--t3);font-size:10px"> · 待确认：宽限期长度</span></td></tr>
+<tr><td class="fname">total_earned</td><td>decimal</td><td>该资产累计产生的收益（增值可视化）</td></tr>
+<tr><td class="fname">estimated_value</td><td>decimal</td><td>资产估值（收益+信用+数据积累 → 计算）</td></tr>
+<tr><td class="fname">total_tasks_published</td><td>int</td><td>通过该资产发布的任务总数</td></tr>
+<tr><td class="fname">total_spent</td><td>decimal</td><td>通过该资产累计支出</td></tr>
+<tr><td class="fname">status</td><td>enum</td><td>active / pending_reclaim（待收回提醒期）/ frozen / deleted</td></tr>
+<tr><td class="fname">created_at</td><td>datetime</td><td>创建时间</td></tr>
+</table>
+</div></div></div>
+
+<div class="mod">
+<div class="mod-head" onclick="modToggle(this)"><div class="mod-icon" style="background:rgba(155,109,255,.12)">🔀</div><span class="mod-name">AI资产确权策略（三步走）</span><span class="mod-arrow">▼</span></div>
+<div class="mod-body"><div class="mod-inner">
+<div class="decision"><strong>CEO最新方向：</strong>先免费给白版资产 → 阶梯引导交押金 → 资产自然增值。核心逻辑是"先给再收"。<div class="src">来源：CEO最新反馈</div></div>
+
+<div class="tree"><ul><li><span class="tn tn-root">三步走策略</span>
+<ul>
+  <li><span class="tree-toggle tn tn-func" onclick="treeToggle(this)">Step 1 · 零摩擦确权（发布时一键完成）</span>
+  <ul>
+    <li><span class="tn tn-action">用户点"+"发布 → 勾选✓"同意创建AI资产" → 系统自动生成白版资产</span></li>
+    <li><span class="tn tn-data">白版资产：免费、基础功能、用户几乎无感知即完成确权</span></li>
+    <li><span class="tn tn-func">确权后直接进入任务类型选择 → 继续发布流程</span></li>
+    <li><span class="tn tn-gray">已有资产的用户跳过此步</span></li>
+    <li><span class="tn tn-gray" style="font-size:11px">待确认：白版资产是否有名称/类型？纯接单用户是否也有获得途径？</span></li>
+  </ul></li>
+
+  <li><span class="tree-toggle tn tn-func" onclick="treeToggle(this)">Step 2 · 阶梯式引导交押金</span>
+  <ul>
+    <li><span class="tn tn-action">(a) 利益驱动 · 活动提醒</span>
+    <ul>
+      <li><span class="tn tn-data">"押金1:1匹配任务基金"——交¥100押金，送¥100任务基金</span></li>
+      <li><span class="tn tn-gray" style="font-size:11px">待确认：基金仅限发任务使用，还是等同余额？押金金额是否分档？</span></li>
+    </ul></li>
+    <li><span class="tn tn-alert">(b) 损失厌恶 · AI资产收回提醒</span>
+    <ul>
+      <li><span class="tn tn-data">"你的AI资产将在X天后收回"——用户已产生数据/收益，害怕失去</span></li>
+      <li><span class="tn tn-gray" style="font-size:11px">待确认：收回=删除还是冻结？宽限期多长？进行中任务如何处理？</span></li>
+    </ul></li>
+    <li><span class="tn tn-action">(c) 功能解锁 · 优化提醒</span>
+    <ul>
+      <li><span class="tn tn-data">"交押金解锁更多功能"——更高效自动接单、更多任务类型、优先匹配</span></li>
+    </ul></li>
+    <li><span class="tn tn-gray">(a)(b)(c)为阶梯式触发，非同时出现</span></li>
+    <li><span class="tn tn-gray" style="font-size:11px">待确认：各阶段触发时机（按天数？按行为？）。提醒形式（弹窗/通知/页面卡片？）。押金是否可退、是否有锁定期？</span></li>
+  </ul></li>
+
+  <li><span class="tree-toggle tn tn-func" onclick="treeToggle(this)">Step 3 · AI资产自然增值（digital me）</span>
+  <ul>
+    <li><span class="tn tn-data">接任务 → 资产积累完成记录和信用</span></li>
+    <li><span class="tn tn-data">AI自动赚钱 → 资产产生被动收益</span></li>
+    <li><span class="tn tn-data">优化AI资产 → 更高效、更值钱</span></li>
+    <li><span class="tn tn-func">资产价值可视化 → "你的AI资产已价值¥XXX"</span></li>
+    <li><span class="tn tn-func">为AI交易（第三营收支柱）打基础 → 有价值才值得交易</span></li>
+  </ul></li>
+</ul>
+</li></ul></div>
+</div></div></div>
+
+<div class="fb" data-id="ps-asset"><div class="fb-t">团队反馈</div><div class="fb-desc">AI资产模块（实体字段 + 确权流程）</div><div class="fb-btns"><button class="fb-b" onclick="sf(this,'a','ps-asset')">✅ 接受</button><button class="fb-b" onclick="sf(this,'d','ps-asset')">💬 讨论</button><button class="fb-b" onclick="sf(this,'x','ps-asset')">❌ 拒绝</button></div><textarea class="fb-n" placeholder="补充说明…" onchange="sn(this,'ps-asset')"></textarea></div>
+</section>
+
+<hr class="sep">
+<!-- ══════════════════════════════ -->
+<!-- 用户模块 -->
+<!-- ══════════════════════════════ -->
+<section class="sec" id="m-user">
+<div class="sec-label" style="color:var(--green)">MODULE · USER</div>
+<div class="sec-title">用户模块</div>
+<div class="sec-desc">用户身份、信用体系、等级、成就。同一个用户可同时是接单者和发布者。</div>
+
+<div class="mod open">
+<div class="mod-head" onclick="modToggle(this)"><div class="mod-icon" style="background:rgba(76,175,125,.12)">👤</div><span class="mod-name">用户实体（User）字段定义</span><span class="mod-arrow">▼</span></div>
+<div class="mod-body"><div class="mod-inner">
+<table class="fields">
+<tr><th>字段</th><th>类型</th><th>说明</th></tr>
+<tr><td class="fname">user_id</td><td>string</td><td>用户唯一ID</td></tr>
+<tr><td class="fname">openid</td><td>string</td><td>微信openid</td></tr>
+<tr><td class="fname">unionid</td><td>string</td><td>微信unionid（可选）</td></tr>
+<tr><td class="fname">nickname</td><td>string</td><td>微信昵称</td></tr>
+<tr><td class="fname">avatar_url</td><td>string</td><td>头像URL</td></tr>
+<tr><td class="fname">phone</td><td>string</td><td>手机号（微信授权获取）</td></tr>
+<tr><td class="fname">level</td><td>enum</td><td>lv1_newbie / lv2_skilled / lv3_expert / lv4_gold</td></tr>
+<tr><td class="fname">credit_score</td><td>decimal</td><td>信用分（0~5.0）</td></tr>
+<tr><td class="fname">tasks_completed</td><td>int</td><td>累计完成接单数</td></tr>
+<tr><td class="fname">tasks_published</td><td>int</td><td>累计发布任务数</td></tr>
+<tr><td class="fname">total_earned</td><td>decimal</td><td>累计赚取金额</td></tr>
+<tr><td class="fname">total_spent</td><td>decimal</td><td>累计支出金额</td></tr>
+<tr><td class="fname">ai_auto_enabled</td><td>boolean</td><td>是否开启AI自动赚钱</td></tr>
+<tr><td class="fname">referrer_id</td><td>string</td><td>邀请人用户ID（裂变追踪）</td></tr>
+<tr><td class="fname">onboarding_step</td><td>int</td><td>新手挑战进度（0~3, 3=已完成）</td></tr>
+<tr><td class="fname">consecutive_days</td><td>int</td><td>连续活跃天数（奖励计算）</td></tr>
+<tr><td class="fname">freeze_cards</td><td>int</td><td>冻结卡剩余数量</td></tr>
+<tr><td class="fname">created_at</td><td>datetime</td><td>注册时间</td></tr>
+</table>
+</div></div></div>
+
+<div class="mod">
+<div class="mod-head" onclick="modToggle(this)"><div class="mod-icon" style="background:rgba(76,175,125,.12)">⭐</div><span class="mod-name">信用分计算规则</span><span class="mod-arrow">▼</span></div>
+<div class="mod-body"><div class="mod-inner">
+<table class="fields">
+<tr><th>维度</th><th>权重</th><th>计算方式</th></tr>
+<tr><td class="fname">任务完成质量</td><td>40%</td><td>接单者：审核通过率 · 发布者：按时结算率</td></tr>
+<tr><td class="fname">按时交付率</td><td>25%</td><td>在deadline前提交的比例</td></tr>
+<tr><td class="fname">响应速度</td><td>15%</td><td>接单后首次操作的平均时间</td></tr>
+<tr><td class="fname">对方评价</td><td>20%</td><td>1~5星评价的加权平均</td></tr>
+</table>
+<div class="p">信用分 = 各维度得分 × 权重之和。展示为三级徽章：🥇金牌（4.8+）/ 🥈银牌（4.5~4.8）/ 🆕新用户（无数据）。</div>
+</div></div></div>
+
+<div class="mod">
+<div class="mod-head" onclick="modToggle(this)"><div class="mod-icon" style="background:rgba(76,175,125,.12)">📈</div><span class="mod-name">等级升级条件与权益</span><span class="mod-arrow">▼</span></div>
+<div class="mod-body"><div class="mod-inner">
+<table class="fields">
+<tr><th>等级</th><th>升级条件</th><th>功能权益</th><th>身份权益</th></tr>
+<tr><td class="fname">🌱 Lv.1 新手</td><td>注册即得</td><td>基础任务</td><td>—</td></tr>
+<tr><td class="fname">⚡ Lv.2 能手</td><td>完成10单 + 信用4.5+</td><td>中级任务 · 接单上限+5</td><td>蓝色头像框 · ⚡标识</td></tr>
+<tr><td class="fname">🔥 Lv.3 达人</td><td>完成50单 + 信用4.8+</td><td>高价任务 · 优先推荐</td><td>自定义头像框色 · 称号</td></tr>
+<tr><td class="fname">👑 Lv.4 金牌</td><td>完成200单 + 30天连续</td><td>全任务 · 费率优惠 · 专属客服</td><td>金色高亮 · 达人榜 · 可建团队</td></tr>
+</table>
+</div></div></div>
+
+
+<div class="mod">
+<div class="mod-head" onclick="modToggle(this)"><div class="mod-icon" style="background:rgba(76,175,125,.12)">📱</div><span class="mod-name">「我的」Tab首页 · 显示内容详解</span><span class="mod-arrow">▼</span></div>
+<div class="mod-body"><div class="mod-inner">
+<div class="p"><strong>收入仪表盘（顶部区域）</strong></div>
+<table class="fields">
+<tr><th>元素</th><th>数据来源</th><th>说明</th></tr>
+<tr><td class="fname">累计总收入</td><td>user.total_earned</td><td>28px粗体绿色，最醒目</td></tr>
+<tr><td class="fname">今日收入</td><td>SUM(tx.amount) WHERE type=settle_earn AND date=today</td><td>与昨日对比箭头 ↑/↓</td></tr>
+<tr><td class="fname">本周收入</td><td>SUM(tx.amount) WHERE 本周</td><td>与上周对比</td></tr>
+<tr><td class="fname">本月收入</td><td>SUM(tx.amount) WHERE 本月</td><td>与上月对比</td></tr>
+<tr><td class="fname">AI占比</td><td>AI订单收入 / 总收入 × 100%</td><td>紫色pill "AI赚了62%"</td></tr>
+<tr><td class="fname">趋势图</td><td>近7天/30天每日收入聚合</td><td>折线图，绿色填充</td></tr>
+</table>
+<div class="p" style="margin-top:12px"><strong>功能入口区（中部）</strong></div>
+<table class="fields">
+<tr><th>元素</th><th>数据来源</th><th>说明</th></tr>
+<tr><td class="fname">可提现余额</td><td>account.available_balance</td><td>点击 → 提现页</td></tr>
+<tr><td class="fname">冻结金额</td><td>account.frozen_balance</td><td>灰色小字"发布中任务托管"</td></tr>
+<tr><td class="fname">我接的任务数</td><td>COUNT(order) WHERE acceptor=me AND status IN (active)</td><td>点击 → 接单列表</td></tr>
+<tr><td class="fname">我发布的任务数</td><td>COUNT(task) WHERE publisher=me AND status IN (active)</td><td>点击 → 发布列表</td></tr>
+<tr><td class="fname">当前等级</td><td>user.level</td><td>等级图标 + 进度条到下一级</td></tr>
+<tr><td class="fname">等级进度</td><td>tasks_completed / next_level_threshold</td><td>"再完成8单升级为⚡能手"</td></tr>
+</table>
+<div class="p" style="margin-top:12px"><strong>AI中心区域</strong></div>
+<table class="fields">
+<tr><th>元素</th><th>数据来源</th><th>说明</th></tr>
+<tr><td class="fname">AI自动赚钱状态</td><td>user.ai_auto_enabled</td><td>开/关 toggle + 今日AI收入</td></tr>
+<tr><td class="fname">AI资产数量</td><td>COUNT(ai_asset) WHERE owner=me</td><td>点击 → AI资产管理页</td></tr>
+<tr><td class="fname">AI资产总价值</td><td>SUM(ai_asset.total_spent + earnings)</td><td>估算值，探索阶段可隐藏</td></tr>
+</table>
+</div></div></div>
+<div class="fb" data-id="ps-user"><div class="fb-t">团队反馈</div><div class="fb-desc">用户模块（实体字段 + 信用分 + 等级体系）</div><div class="fb-btns"><button class="fb-b" onclick="sf(this,'a','ps-user')">✅ 接受</button><button class="fb-b" onclick="sf(this,'d','ps-user')">💬 讨论</button><button class="fb-b" onclick="sf(this,'x','ps-user')">❌ 拒绝</button></div><textarea class="fb-n" placeholder="补充说明…" onchange="sn(this,'ps-user')"></textarea></div>
+</section>
+
+<hr class="sep">
+
+<!-- ══════════════════════════════ -->
+<!-- 订单模块 -->
+<!-- ══════════════════════════════ -->
+<section class="sec" id="m-order">
+<div class="sec-label" style="color:var(--amber)">MODULE · ORDER</div>
+<div class="sec-title">订单模块</div>
+<div class="sec-desc">一条订单 = 一个接单者接取了一个任务。任务和订单是一对多关系。</div>
+
+<div class="mod open">
+<div class="mod-head" onclick="modToggle(this)"><div class="mod-icon" style="background:rgba(212,160,74,.12)">📝</div><span class="mod-name">订单实体（Order）字段定义</span><span class="mod-arrow">▼</span></div>
+<div class="mod-body"><div class="mod-inner">
+<table class="fields">
+<tr><th>字段</th><th>类型</th><th>说明</th></tr>
+<tr><td class="fname">order_id</td><td>string</td><td>订单唯一ID</td></tr>
+<tr><td class="fname">task_id</td><td>string</td><td>关联任务ID</td></tr>
+<tr><td class="fname">acceptor_id</td><td>string</td><td>接单者用户ID</td></tr>
+<tr><td class="fname">publisher_id</td><td>string</td><td>发布者用户ID（冗余，查询方便）</td></tr>
+<tr><td class="fname">status</td><td>enum</td><td>见状态机</td></tr>
+<tr><td class="fname">execution_mode</td><td>enum</td><td>manual / ai_auto / ai_partial（AI部分完成）</td></tr>
+<tr><td class="fname">ai_progress</td><td>int</td><td>AI已完成数量（若AI执行）</td></tr>
+<tr><td class="fname">submission_url</td><td>string</td><td>提交成果链接</td></tr>
+<tr><td class="fname">submission_images</td><td>array</td><td>提交截图URL列表</td></tr>
+<tr><td class="fname">review_result</td><td>enum</td><td>pending / approved / rejected</td></tr>
+<tr><td class="fname">reject_reason</td><td>string</td><td>驳回原因</td></tr>
+<tr><td class="fname">retry_count</td><td>int</td><td>重新提交次数（上限3次）</td></tr>
+<tr><td class="fname">appeal_status</td><td>enum</td><td>none / appealing / resolved</td></tr>
+<tr><td class="fname">amount</td><td>decimal</td><td>本单金额（= task.unit_price）</td></tr>
+<tr><td class="fname">bonus</td><td>decimal</td><td>额外奖励（AI降级补偿/首单奖励等）</td></tr>
+<tr><td class="fname">accepted_at</td><td>datetime</td><td>接取时间</td></tr>
+<tr><td class="fname">submitted_at</td><td>datetime</td><td>提交时间</td></tr>
+<tr><td class="fname">reviewed_at</td><td>datetime</td><td>审核时间</td></tr>
+<tr><td class="fname">settled_at</td><td>datetime</td><td>结算时间</td></tr>
+</table>
+</div></div></div>
+
+<div class="mod">
+<div class="mod-head" onclick="modToggle(this)"><div class="mod-icon" style="background:rgba(212,160,74,.12)">🔄</div><span class="mod-name">订单状态机（接单者视角）</span><span class="mod-arrow">▼</span></div>
+<div class="mod-body"><div class="mod-inner">
+<div class="tree"><ul><li><span class="tn tn-root">订单生命周期</span>
+<ul>
+  <li><span class="tn tn-data">accepted</span> 已接取
+  <ul>
+    <li><span class="tn tn-action">开始执行 →</span> <span class="tn tn-data">executing</span></li>
+    <li><span class="tn tn-action">取消（24h内免责）→</span> <span class="tn tn-data">cancelled</span></li>
+  </ul></li>
+  <li><span class="tn tn-data">executing</span> 执行中
+  <ul>
+    <li><span class="tn tn-action">提交成果 →</span> <span class="tn tn-data">submitted</span></li>
+    <li><span class="tn tn-alert">AI失败 →</span> <span class="tn tn-data">ai_fallback</span>（降级手动+补偿）</li>
+    <li><span class="tn tn-action">超时未提交 →</span> <span class="tn tn-data">timeout</span>（释放回池）</li>
+  </ul></li>
+  <li><span class="tn tn-data">submitted</span> 已提交，待审核
+  <ul>
+    <li><span class="tn tn-action">审核通过 →</span> <span class="tn tn-data">approved</span></li>
+    <li><span class="tn tn-action">审核驳回 →</span> <span class="tn tn-data">rejected</span>（可重新提交，上限3次）</li>
+  </ul></li>
+  <li><span class="tn tn-data">approved</span> 审核通过 → 自动触发结算
+  <ul><li><span class="tn tn-action">资金释放 →</span> <span class="tn tn-data">settled</span></li></ul></li>
+  <li><span class="tn tn-data">settled</span> 已结算（金额到账）</li>
+  <li><span class="tn tn-data">rejected</span> 被驳回
+  <ul>
+    <li><span class="tn tn-action">修改重提（retry_count < 3）→</span> <span class="tn tn-data">submitted</span></li>
+    <li><span class="tn tn-action">申诉 →</span> <span class="tn tn-data">appealing</span></li>
+    <li><span class="tn tn-action">放弃 →</span> <span class="tn tn-data">abandoned</span></li>
+  </ul></li>
+  <li><span class="tn tn-data">appealing</span> 申诉中（平台24h处理）</li>
+</ul>
+</li></ul></div>
+</div></div></div>
+
+
+<div class="mod">
+<div class="mod-head" onclick="modToggle(this)"><div class="mod-icon" style="background:rgba(212,160,74,.12)">📱</div><span class="mod-name">订单管理页 · 显示内容详解</span><span class="mod-arrow">▼</span></div>
+<div class="mod-body"><div class="mod-inner">
+<div class="p"><strong>我接的任务 · 列表项</strong></div>
+<table class="fields">
+<tr><th>元素</th><th>数据来源</th><th>说明</th></tr>
+<tr><td class="fname">任务标题</td><td>task(order.task_id).title</td><td>14px粗体</td></tr>
+<tr><td class="fname">金额</td><td>order.amount</td><td>绿色粗体</td></tr>
+<tr><td class="fname">订单状态</td><td>order.status</td><td>颜色编码pill：执行中=蓝/待审核=琥珀/已结算=绿/被驳回=红</td></tr>
+<tr><td class="fname">执行模式</td><td>order.execution_mode</td><td>"手动" / "AI执行中" / "AI+手动"</td></tr>
+<tr><td class="fname">倒计时</td><td>task.deadline - now</td><td>红色"剩余3小时"；超时预警</td></tr>
+<tr><td class="fname">操作按钮</td><td>order.status</td><td>执行中→"提交成果"；被驳回→"修改重提(剩余2次)"</td></tr>
+</table>
+<div class="p" style="margin-top:12px"><strong>我发布的任务 · 列表项</strong></div>
+<table class="fields">
+<tr><th>元素</th><th>数据来源</th><th>说明</th></tr>
+<tr><td class="fname">任务标题</td><td>task.title</td><td>14px粗体</td></tr>
+<tr><td class="fname">接取进度</td><td>accepted_count / total_quantity</td><td>进度条 + "3/10已接"</td></tr>
+<tr><td class="fname">待审核数</td><td>COUNT(order) WHERE status=submitted</td><td>红色badge "2待审"</td></tr>
+<tr><td class="fname">已结算数</td><td>COUNT(order) WHERE status=settled</td><td>绿色"5已完成"</td></tr>
+<tr><td class="fname">总支出</td><td>task.total_cost</td><td>"已花费¥15.00 / ¥50.00"</td></tr>
+<tr><td class="fname">操作按钮</td><td>pending submissions count</td><td>有待审 → "去审核"高亮；无 → "查看详情"</td></tr>
+</table>
+</div></div></div>
+<div class="fb" data-id="ps-order"><div class="fb-t">团队反馈</div><div class="fb-desc">订单模块（实体字段 + 状态机）</div><div class="fb-btns"><button class="fb-b" onclick="sf(this,'a','ps-order')">✅ 接受</button><button class="fb-b" onclick="sf(this,'d','ps-order')">💬 讨论</button><button class="fb-b" onclick="sf(this,'x','ps-order')">❌ 拒绝</button></div><textarea class="fb-n" placeholder="补充说明…" onchange="sn(this,'ps-order')"></textarea></div>
+</section>
+
+<hr class="sep">
+
+<!-- ══════════════════════════════ -->
+<!-- 资金模块 -->
+<!-- ══════════════════════════════ -->
+<section class="sec" id="m-fund">
+<div class="sec-label" style="color:var(--red)">MODULE · FUND</div>
+<div class="sec-title">资金模块</div>
+<div class="sec-desc">充值、托管、结算、提现。所有资金操作需有审计日志。</div>
+
+<div class="mod open">
+<div class="mod-head" onclick="modToggle(this)"><div class="mod-icon" style="background:rgba(232,93,93,.12)">💰</div><span class="mod-name">账户实体（Account）</span><span class="mod-arrow">▼</span></div>
+<div class="mod-body"><div class="mod-inner">
+<table class="fields">
+<tr><th>字段</th><th>类型</th><th>说明</th></tr>
+<tr><td class="fname">user_id</td><td>string</td><td>用户ID</td></tr>
+<tr><td class="fname">available_balance</td><td>decimal</td><td>可用余额（可提现/可消费）</td></tr>
+<tr><td class="fname">frozen_balance</td><td>decimal</td><td>冻结金额（已发布任务的托管资金）</td></tr>
+<tr><td class="fname">total_recharged</td><td>decimal</td><td>累计充值</td></tr>
+<tr><td class="fname">total_withdrawn</td><td>decimal</td><td>累计提现</td></tr>
+<tr><td class="fname">total_earned</td><td>decimal</td><td>累计赚取（接单收入）</td></tr>
+<tr><td class="fname">free_withdrawals_left</td><td>int</td><td>本月剩余免费提现次数</td></tr>
+</table>
+</div></div></div>
+
+<div class="mod">
+<div class="mod-head" onclick="modToggle(this)"><div class="mod-icon" style="background:rgba(232,93,93,.12)">🔀</div><span class="mod-name">资金流转规则</span><span class="mod-arrow">▼</span></div>
+<div class="mod-body"><div class="mod-inner">
+<div class="tree"><ul><li><span class="tn tn-root">资金流</span>
+<ul>
+  <li><span class="tree-toggle tn tn-action" onclick="treeToggle(this)">充值</span>
+  <ul>
+    <li><span class="tn tn-data">微信支付 → available_balance 增加</span></li>
+    <li><span class="tn tn-func">
+      <span class="ref">信任提示<span class="ref-tip"><strong>参考「信任」· 1.1</strong><br>"平台托管，未使用余额可随时提现"</span></span>
+    </span></li>
+  </ul></li>
+  <li><span class="tree-toggle tn tn-action" onclick="treeToggle(this)">发布任务（扣款 → 托管）</span>
+  <ul>
+    <li><span class="tn tn-data">available_balance -= (total_cost + service_fee)</span></li>
+    <li><span class="tn tn-data">frozen_balance += total_cost</span></li>
+    <li><span class="tn tn-data">service_fee → 平台收入账户</span></li>
+    <li><span class="tn tn-alert">余额不足 → 引导充值（差额向上取整）</span></li>
+  </ul></li>
+  <li><span class="tree-toggle tn tn-action" onclick="treeToggle(this)">审核通过（托管 → 结算）</span>
+  <ul>
+    <li><span class="tn tn-data">发布者 frozen_balance -= unit_price</span></li>
+    <li><span class="tn tn-data">接单者 available_balance += unit_price</span></li>
+    <li><span class="tn tn-func">触发到账通知</span></li>
+    <li><span class="tn tn-gray">
+      <span class="ref">AI任务实时到账？<span class="ref-tip"><strong>CEO待确认 · a-1.5</strong><br>"AI生态任务是否可以实时到账？用户押金15天期限后也是及时到账？"</span></span>
+    </span></li>
+  </ul></li>
+  <li><span class="tree-toggle tn tn-action" onclick="treeToggle(this)">提现</span>
+  <ul>
+    <li><span class="tn tn-data">available_balance -= amount</span></li>
+    <li><span class="tn tn-data">到账方式：微信零钱（默认）/ 银行卡</span></li>
+    <li><span class="tn tn-data">到账时间：T+1工作日</span></li>
+    <li><span class="tn tn-data">手续费：每月3次免费，之后¥1/次</span></li>
+    <li><span class="tn tn-func">
+      <span class="ref">倒计时确认<span class="ref-tip"><strong>参考「确认留存」· 6.3</strong><br>3秒冷静期 + AI收益机会成本展示</span></span>
+    </span></li>
+  </ul></li>
+  <li><span class="tree-toggle tn tn-action" onclick="treeToggle(this)">退款</span>
+  <ul>
+    <li><span class="tn tn-data">任务过期/取消 → frozen_balance -= 未使用部分</span></li>
+    <li><span class="tn tn-data">available_balance += 退款金额</span></li>
+  </ul></li>
+</ul>
+</li></ul></div>
+</div></div></div>
+
+<div class="mod">
+<div class="mod-head" onclick="modToggle(this)"><div class="mod-icon" style="background:rgba(232,93,93,.12)">📊</div><span class="mod-name">流水记录实体（Transaction）</span><span class="mod-arrow">▼</span></div>
+<div class="mod-body"><div class="mod-inner">
+<table class="fields">
+<tr><th>字段</th><th>类型</th><th>说明</th></tr>
+<tr><td class="fname">tx_id</td><td>string</td><td>流水ID</td></tr>
+<tr><td class="fname">user_id</td><td>string</td><td>用户ID</td></tr>
+<tr><td class="fname">type</td><td>enum</td><td>recharge / publish_freeze / settle_earn / settle_release / withdraw / refund / bonus</td></tr>
+<tr><td class="fname">amount</td><td>decimal</td><td>金额（正=收入，负=支出）</td></tr>
+<tr><td class="fname">related_order_id</td><td>string</td><td>关联订单ID（可空）</td></tr>
+<tr><td class="fname">related_task_id</td><td>string</td><td>关联任务ID（可空）</td></tr>
+<tr><td class="fname">balance_after</td><td>decimal</td><td>操作后余额</td></tr>
+<tr><td class="fname">note</td><td>string</td><td>备注（如"抖音涨粉任务结算"）</td></tr>
+<tr><td class="fname">created_at</td><td>datetime</td><td>时间</td></tr>
+</table>
+</div></div></div>
+
+
+<div class="mod">
+<div class="mod-head" onclick="modToggle(this)"><div class="mod-icon" style="background:rgba(232,93,93,.12)">📱</div><span class="mod-name">提现页 + 充值页 · 显示内容详解</span><span class="mod-arrow">▼</span></div>
+<div class="mod-body"><div class="mod-inner">
+<div class="p"><strong>提现页</strong></div>
+<table class="fields">
+<tr><th>元素</th><th>数据来源</th><th>说明</th></tr>
+<tr><td class="fname">可提现余额</td><td>account.available_balance</td><td>28px绿色粗体</td></tr>
+<tr><td class="fname">冻结金额说明</td><td>account.frozen_balance</td><td>灰色"¥XX 在发布中任务托管，完成后可提"</td></tr>
+<tr><td class="fname">提现金额输入</td><td>用户输入</td><td>快捷按钮：全部提现 / ¥10 / ¥50 / ¥100</td></tr>
+<tr><td class="fname">到账方式</td><td>用户选择</td><td>微信零钱(默认) / 银行卡</td></tr>
+<tr><td class="fname">到账时间</td><td>静态规则</td><td>"预计T+1工作日到账"</td></tr>
+<tr><td class="fname">手续费提示</td><td>free_withdrawals_left</td><td>"本月免费提现剩余2次" 或 "手续费¥1"</td></tr>
+<tr><td class="fname">提现记录</td><td>tx WHERE type=withdraw ORDER BY created_at DESC</td><td>状态颜色编码：处理中=琥珀/已到账=绿/失败=红</td></tr>
+<tr><td class="fname">客服入口</td><td>—</td><td>底部"提现遇到问题？联系客服"</td></tr>
+</table>
+<div class="p" style="margin-top:12px"><strong>充值页</strong></div>
+<table class="fields">
+<tr><th>元素</th><th>数据来源</th><th>说明</th></tr>
+<tr><td class="fname">当前余额</td><td>account.available_balance</td><td>顶部展示</td></tr>
+<tr><td class="fname">充值金额选择</td><td>预设档位</td><td>¥10 / ¥50 / ¥100 / ¥500 / 自定义</td></tr>
+<tr><td class="fname">信任保障行</td><td>静态文案</td><td>"资金由平台托管，未使用余额可随时提现"</td></tr>
+<tr><td class="fname">三重保障面板</td><td>静态文案（可折叠）</td><td>资金安全 + 即时到账 + 客服保障</td></tr>
+<tr><td class="fname">充值按钮</td><td>—</td><td>"充值¥X" → 调起微信支付</td></tr>
+</table>
+</div></div></div>
+<div class="fb" data-id="ps-fund"><div class="fb-t">团队反馈</div><div class="fb-desc">资金模块（账户 + 流转规则 + 流水记录）</div><div class="fb-btns"><button class="fb-b" onclick="sf(this,'a','ps-fund')">✅ 接受</button><button class="fb-b" onclick="sf(this,'d','ps-fund')">💬 讨论</button><button class="fb-b" onclick="sf(this,'x','ps-fund')">❌ 拒绝</button></div><textarea class="fb-n" placeholder="补充说明…" onchange="sn(this,'ps-fund')"></textarea></div>
+</section>
+
+<hr class="sep">
+
+<!-- ══════════════════════════════ -->
+<!-- 数据实体关系 -->
+<!-- ══════════════════════════════ -->
+<section class="sec" id="m-data">
+<div class="sec-label" style="color:var(--teal)">ENTITY RELATIONS</div>
+<div class="sec-title">数据实体关系总览</div>
+
+<div class="tree"><ul><li><span class="tn tn-root">实体关系</span>
+<ul>
+  <li><span class="tn tn-data"><strong>User</strong> 1 → N <strong>AiAsset</strong></span>（一个用户可有多个AI资产）</li>
+  <li><span class="tn tn-data"><strong>User</strong> 1 → N <strong>Task</strong></span>（作为发布者）</li>
+  <li><span class="tn tn-data"><strong>AiAsset</strong> 1 → N <strong>Task</strong></span>（每个任务关联一个AI资产）</li>
+  <li><span class="tn tn-data"><strong>Task</strong> 1 → N <strong>Order</strong></span>（一个任务被多人接取）</li>
+  <li><span class="tn tn-data"><strong>User</strong> 1 → N <strong>Order</strong></span>（作为接单者）</li>
+  <li><span class="tn tn-data"><strong>User</strong> 1 → 1 <strong>Account</strong></span>（每人一个资金账户）</li>
+  <li><span class="tn tn-data"><strong>Account</strong> 1 → N <strong>Transaction</strong></span>（每笔资金变动记录）</li>
+  <li><span class="tn tn-data"><strong>Order</strong> 1 → N <strong>Transaction</strong></span>（一个订单触发多条流水：冻结+结算）</li>
+  <li><span class="tn tn-data"><strong>User</strong> 1 → N <strong>Reward</strong></span>（奖励记录：红包/连签/成就）</li>
+  <li><span class="tn tn-data"><strong>User</strong> N → N <strong>User</strong></span>（裂变邀请关系：referrer_id）</li>
+</ul>
+</li></ul></div>
+
+<div class="p" style="margin-top:16px"><strong>核心查询场景：</strong></div>
+<table class="fields">
+<tr><th>场景</th><th>涉及表</th><th>查询逻辑</th></tr>
+<tr><td class="fname">任务广场列表</td><td>Task + User(publisher)</td><td>status=recruiting, ORDER BY hourly_rate × credit_score DESC</td></tr>
+<tr><td class="fname">我接的任务</td><td>Order + Task</td><td>WHERE acceptor_id=me, GROUP BY status</td></tr>
+<tr><td class="fname">我发布的任务</td><td>Task + Order(count)</td><td>WHERE publisher_id=me</td></tr>
+<tr><td class="fname">收入仪表盘</td><td>Transaction</td><td>WHERE user_id=me AND type IN (settle_earn, bonus), 按日/周/月聚合</td></tr>
+<tr><td class="fname">信用分</td><td>Order + Review</td><td>加权计算：通过率×0.4 + 按时率×0.25 + 响应×0.15 + 评分×0.2</td></tr>
+<tr><td class="fname">裂变统计</td><td>User</td><td>WHERE referrer_id=me, COUNT</td></tr>
+</table>
+
+<div class="fb" data-id="ps-data"><div class="fb-t">团队反馈</div><div class="fb-desc">数据实体关系总览</div><div class="fb-btns"><button class="fb-b" onclick="sf(this,'a','ps-data')">✅ 接受</button><button class="fb-b" onclick="sf(this,'d','ps-data')">💬 讨论</button><button class="fb-b" onclick="sf(this,'x','ps-data')">❌ 拒绝</button></div><textarea class="fb-n" placeholder="补充说明…" onchange="sn(this,'ps-data')"></textarea></div>
+</section>
+
+</div><!-- end wrap -->
+
+<script src="/sync.js"></script>
+<script>
+function treeToggle(el){el.classList.toggle('open')}
+function modToggle(el){el.closest('.mod').classList.toggle('open')}
+
+// Tree level expansion
+function getTreeToggles(){return document.querySelectorAll('#sitemap .tree-toggle')}
+function getToggleDepth(el){
+  let depth=0;let node=el.parentElement;
+  while(node){
+    if(node.tagName==='LI')depth++;
+    if(node.classList&&node.classList.contains('tree'))break;
+    node=node.parentElement;
+  }
+  return depth;
+}
+function expandLevel(level){
+  getTreeToggles().forEach(t=>{
+    const d=getToggleDepth(t);
+    if(d<=level)t.classList.add('open');
+    else t.classList.remove('open');
+  });
+}
+function expandAll(){getTreeToggles().forEach(t=>t.classList.add('open'))}
+function collapseAll(){getTreeToggles().forEach(t=>t.classList.remove('open'))}
+// Tooltip
+const gTip=document.getElementById('g-tip');
+document.querySelectorAll('.ref').forEach(ref=>{
+  const tipContent=ref.querySelector('.ref-tip');
+  if(!tipContent)return;
+  function show(){
+    gTip.innerHTML=tipContent.innerHTML;
+    gTip.style.display='block';
+    const r=ref.getBoundingClientRect();
+    const tw=gTip.offsetWidth,th=gTip.offsetHeight;
+    let left=r.left+r.width/2-tw/2;
+    let top=r.top-th-10;
+    if(left<8)left=8;
+    if(left+tw>window.innerWidth-8)left=window.innerWidth-tw-8;
+    if(top<8)top=r.bottom+10;
+    gTip.style.left=left+'px';gTip.style.top=top+'px';
+  }
+  function hide(){gTip.style.display='none'}
+  ref.addEventListener('mouseenter',show);
+  ref.addEventListener('mouseleave',hide);
+  ref.addEventListener('touchstart',e=>{e.preventDefault();show();setTimeout(hide,3000)},{passive:false});
+});
+// Nav highlight
+const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){const id=e.target.id;document.querySelectorAll('.nav a').forEach(a=>{a.classList.toggle('active',a.getAttribute('href')==='#'+id)})}})},{rootMargin:'-100px 0px -60% 0px'});
+document.querySelectorAll('.sec[id]').forEach(s=>obs.observe(s));
+
+// Feedback system
+const FK='msc_ps_fb';
+function ld(){try{return JSON.parse(localStorage.getItem(FK))||{}}catch{return{}}}
+function sv(d){localStorage.setItem(FK,JSON.stringify(d))}
+function sf(b,t,id){
+  const cls=t==='a'?'s-a':t==='d'?'s-d':'s-x';
+  const was=b.classList.contains(cls);
+  b.parentElement.querySelectorAll('.fb-b').forEach(x=>x.className='fb-b');
+  const d=ld();
+  if(was){if(!d[id])d[id]={};delete d[id].c;d[id].t=new Date().toISOString();sv(d);if(typeof SYNC!=='undefined')SYNC.push(id,'')}
+  else{b.classList.add(cls);d[id]={...(d[id]||{}),c:t,t:new Date().toISOString()};sv(d);if(typeof SYNC!=='undefined')SYNC.push(id,t)}
+}
+function sn(ta,id){const d=ld();d[id]={...(d[id]||{}),n:ta.value,t:new Date().toISOString()};sv(d);if(typeof SYNC!=='undefined')SYNC.push(id,undefined,ta.value)}
+function renderFB(){
+  const d=ld();
+  Object.entries(d).forEach(([id,v])=>{
+    const w=document.querySelector('.fb[data-id="'+id+'"]');
+    if(!w)return;
+    if(v.c){const bs=w.querySelectorAll('.fb-b');bs.forEach(x=>x.className='fb-b');const idx=v.c==='a'?0:v.c==='d'?1:2;if(bs[idx])bs[idx].classList.add(v.c==='a'?'s-a':v.c==='d'?'s-d':'s-x')}
+    if(v.n){const ta=w.querySelector('.fb-n');if(ta)ta.value=v.n}
+  });
+}
+document.addEventListener('DOMContentLoaded',async()=>{if(typeof SYNC!=='undefined'){SYNC.init('product-spec','msc_ps_fb');await SYNC.pull()}renderFB()});
+</script>
+</body>
+</html>

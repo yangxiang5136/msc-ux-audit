@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>MSC.AI — 产品设计与战略交付站</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0c10;--bg2:#141820;--bg3:#1a2030;--brd:rgba(255,255,255,.06);--brd2:rgba(255,255,255,.12);--t1:#f0f2f5;--t2:#8b95a8;--t3:#5a6478;--green:#34d399;--green-d:rgba(52,211,153,.12);--blue:#60a5fa;--blue-d:rgba(96,165,250,.12);--amber:#fbbf24;--amber-d:rgba(251,191,36,.12);--red:#f87171;--red-d:rgba(248,113,113,.12);--purple:#a78bfa;--purple-d:rgba(167,139,250,.12);--teal:#2dd4bf;--teal-d:rgba(45,212,191,.12);--orange:#e8923d;--sw:250px}
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Noto Sans SC',sans-serif;background:var(--bg);color:var(--t1);line-height:1.6;display:flex;min-height:100vh;-webkit-font-smoothing:antialiased}
+.sb{width:var(--sw);background:var(--bg2);border-right:1px solid var(--brd);position:fixed;top:0;left:0;bottom:0;overflow-y:auto;z-index:100;display:flex;flex-direction:column}
+.sb-l{padding:20px 18px 14px;border-bottom:1px solid var(--brd)}.sb-l h2{font-size:15px;font-weight:800}.sb-l h2 span{background:linear-gradient(135deg,var(--green),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent}.sb-l p{font-size:10px;color:var(--t3);margin-top:3px}
+.sb-n{flex:1;padding:10px 0;overflow-y:auto}
+.nc{padding:0 10px;margin-bottom:2px}.nch{display:flex;align-items:center;gap:7px;padding:7px 10px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:700;color:var(--t2);transition:all .15s;user-select:none}.nch:hover{background:var(--bg3);color:var(--t1)}.nci{font-size:15px}.nca{margin-left:auto;font-size:9px;color:var(--t3);transition:transform .2s}.nch.open .nca{transform:rotate(90deg)}
+.nis{display:none;padding:2px 0 6px}.nis.show{display:block}.ni{display:flex;align-items:center;gap:7px;padding:5px 10px 5px 34px;font-size:11px;color:var(--t3);text-decoration:none;border-radius:5px;transition:all .15s;line-height:1.4}.ni:hover{background:var(--bg3);color:var(--t2)}.nid{width:5px;height:5px;border-radius:50%;flex-shrink:0}.nib{margin-left:auto;font-size:9px;padding:1px 5px;border-radius:3px;font-weight:600;flex-shrink:0}
+.sb-s{padding:14px 18px;border-top:1px solid var(--brd)}.sb-st{font-size:10px;color:var(--t3);font-weight:600;margin-bottom:6px}.ssr{display:flex;gap:10px}.ssi{text-align:center;flex:1}.ssv{font-size:16px;font-weight:800}.ssl{font-size:9px;color:var(--t3)}
+.sb-e{padding:10px 18px 18px}.sb-e button{width:100%;padding:7px;border-radius:7px;border:1px solid var(--green);background:var(--green-d);color:var(--green);font-size:11px;cursor:pointer;font-family:inherit;font-weight:600}
+.mn{margin-left:var(--sw);flex:1;padding:28px 36px 80px}.mh{margin-bottom:28px}.mh h1{font-size:24px;font-weight:900;margin-bottom:4px}.mh p{font-size:13px;color:var(--t2)}
+.cs{margin-bottom:36px}.ct{font-size:11px;font-weight:700;letter-spacing:2px;color:var(--t3);margin-bottom:14px;padding-bottom:7px;border-bottom:1px solid var(--brd);display:flex;align-items:center;gap:7px}
+.gr{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.cd{background:var(--bg2);border:1px solid var(--brd);border-radius:12px;padding:18px;transition:all .3s;cursor:pointer;text-decoration:none;color:inherit;display:block;position:relative;overflow:hidden}.cd:hover{border-color:var(--brd2);transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,0,0,.25)}.cd-ac{position:absolute;top:0;left:0;right:0;height:3px}.cd-ic{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;margin-bottom:10px}.cd-sv{position:absolute;top:14px;right:14px;font-size:9px;padding:2px 8px;border-radius:8px;font-weight:600}
+.sc{background:var(--red-d);color:var(--red)}.si{background:var(--amber-d);color:var(--amber)}.sn{background:var(--green-d);color:var(--green)}
+.cd h3{font-size:14px;font-weight:700;margin-bottom:3px}.cd p{font-size:11px;color:var(--t2);line-height:1.5}.cd-dm{display:flex;gap:4px;margin-top:8px;flex-wrap:wrap}.cd-dm span{font-size:9px;padding:2px 6px;border-radius:3px;font-weight:500}.cd-mt{display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:8px;border-top:1px solid var(--brd);font-size:10px;color:var(--t3)}.cd-en{color:var(--blue);font-weight:600}.cd.full{grid-column:1/-1}
+.mtabs{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-top:1px solid var(--brd);z-index:200;padding:5px 6px env(safe-area-inset-bottom)}.mti{display:flex;justify-content:space-around}.mt{display:flex;flex-direction:column;align-items:center;gap:1px;padding:5px 10px;border-radius:7px;font-size:9px;color:var(--t3);cursor:pointer;border:none;background:none;font-family:inherit}.mt.active{color:var(--green);background:var(--green-d)}.mt-i{font-size:16px}
+.mb{display:none;position:fixed;top:10px;left:10px;z-index:300;width:32px;height:32px;border-radius:7px;background:var(--bg2);border:1px solid var(--brd);color:var(--t1);font-size:16px;cursor:pointer;align-items:center;justify-content:center}
+@media(max-width:768px){.sb{transform:translateX(-100%);transition:transform .3s}.sb.open{transform:translateX(0)}.mn{margin-left:0;padding:16px 14px 90px}.mh h1{font-size:18px}.gr{grid-template-columns:1fr}.mtabs{display:block}.mb{display:flex}.cd.full{grid-column:1}}
+</style>
+</head>
+<body>
+<button class="mb" onclick="document.querySelector('.sb').classList.toggle('open')">&#9776;</button>
+<aside class="sb">
+<div class="sb-l"><h2>&#129302; <span>MSC.AI</span></h2><p>产品设计与战略交付站</p></div>
+<nav class="sb-n">
+<div class="nc"><div class="nch open" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')"><span class="nci">&#128203;</span>产品体验设计<span class="nca">&#9654;</span></div><div class="nis show"><a class="ni" href="chatA.html"><span class="nid" style="background:var(--green)"></span>信任与安全感<span class="nib" style="background:var(--red-d);color:var(--red)">关键</span></a><a class="ni" href="chatB.html"><span class="nid" style="background:var(--blue)"></span>空状态+反馈闭环<span class="nib" style="background:var(--red-d);color:var(--red)">关键</span></a><a class="ni" href="chatC.html"><span class="nid" style="background:var(--amber)"></span>任务卡片+金额感知</a><a class="ni" href="chatD.html"><span class="nid" style="background:var(--red)"></span>确认+留存+异常</a><a class="ni" href="architecture.html"><span class="nid" style="background:var(--teal)"></span>界面架构方案</a></div></div>
+<div class="nc"><div class="nch open" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')"><span class="nci">&#128274;</span>AI资产确权<span class="nca">&#9654;</span></div><div class="nis show"><a class="ni" href="chatE.html"><span class="nid" style="background:var(--purple)"></span>确权机制与体验<span class="nib" style="background:var(--green-d);color:var(--green)">新</span></a></div></div>
+<div class="nc"><div class="nch open" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')"><span class="nci">&#128640;</span>增长与任务<span class="nca">&#9654;</span></div><div class="nis show"><a class="ni" href="chatF.html"><span class="nid" style="background:var(--green)"></span>裂变·任务·成长<span class="nib" style="background:var(--green-d);color:var(--green)">新</span></a></div></div>
+<div class="nc"><div class="nch" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')"><span class="nci">&#127959;</span>工程交付<span class="nca">&#9654;</span></div><div class="nis"><a class="ni" href="product-spec.html"><span class="nid" style="background:var(--orange)"></span>产品规格文档</a></div></div>
+</nav>
+<div class="sb-s"><div class="sb-st">CEO反馈汇总</div><div class="ssr"><div class="ssi"><div class="ssv" style="color:var(--green)" id="sa">0</div><div class="ssl">同意</div></div><div class="ssi"><div class="ssv" style="color:var(--amber)" id="sd">0</div><div class="ssl">讨论</div></div><div class="ssi"><div class="ssv" style="color:var(--red)" id="sx">0</div><div class="ssl">不同意</div></div></div></div>
+<div class="sb-e"><button onclick="window.open('/api/export','_blank')">导出全部反馈</button></div>
+</aside>
+<div class="mn">
+<div class="mh"><h1>MSC.AI 产品设计与战略交付站</h1><p>点击任意卡片查看完整方案 · 每个方案可标注反馈</p></div>
+<div class="cs" id="sec-ux"><div class="ct">&#128203; 产品体验设计 — 8维度UX审计</div><div class="gr">
+<a class="cd" href="chatA.html"><div class="cd-ac" style="background:linear-gradient(90deg,var(--green),var(--teal))"></div><div class="cd-sv sc">关键</div><div class="cd-ic" style="background:var(--green-d)">&#128274;</div><h3>信任与安全感</h3><p>充值信任·资金托管·信用评分·费用确认·提现安全</p><div class="cd-mt"><span id="a-fb">—</span><span class="cd-en">查看→</span></div></a>
+<a class="cd" href="chatB.html"><div class="cd-ac" style="background:linear-gradient(90deg,var(--blue),var(--purple))"></div><div class="cd-sv sc">关键</div><div class="cd-ic" style="background:var(--blue-d)">&#128235;</div><h3>空状态+反馈闭环</h3><p>空状态引导·任务追踪·进度看板·通知·到账仪式</p><div class="cd-mt"><span id="b-fb">—</span><span class="cd-en">查看→</span></div></a>
+<a class="cd" href="chatC.html"><div class="cd-ac" style="background:linear-gradient(90deg,var(--amber),var(--purple))"></div><div class="cd-sv si">重要</div><div class="cd-ic" style="background:var(--amber-d)">&#128176;</div><h3>任务卡片+金额感知</h3><p>卡片层次·行为驱动·定价面板·时薪锚定</p><div class="cd-mt"><span id="c-fb">—</span><span class="cd-en">查看→</span></div></a>
+<a class="cd" href="chatD.html"><div class="cd-ac" style="background:linear-gradient(90deg,var(--red),var(--amber))"></div><div class="cd-sv si">重要</div><div class="cd-ic" style="background:var(--red-d)">&#128737;</div><h3>确认+留存+异常</h3><p>摩擦力分级·等级体系·Octalysis·降级补偿</p><div class="cd-mt"><span id="d-fb">—</span><span class="cd-en">查看→</span></div></a>
+<a class="cd" href="architecture.html"><div class="cd-ac" style="background:linear-gradient(90deg,var(--teal),var(--purple))"></div><div class="cd-ic" style="background:var(--teal-d)">&#127963;</div><h3>界面架构+新手引导</h3><p>3种Tab架构·团队投票·2种引导方式</p><div class="cd-mt"><span id="arch-fb">—</span><span class="cd-en">查看→</span></div></a>
+</div></div>
+<div class="cs" id="sec-asset"><div class="ct">&#128274; AI资产确权 — 机制·合规·体验</div><div class="gr">
+<a class="cd full" href="chatE.html"><div class="cd-ac" style="background:linear-gradient(90deg,var(--purple),var(--teal))"></div><div class="cd-sv sn">新</div><div class="cd-ic" style="background:var(--purple-d)">&#128274;</div><h3>AI资产确权 — 机制与体验设计</h3><p>确权方案对比·三权分置·白版→金版·确权证书·42号文合规·非法集资风险·保证金·资产仪表盘</p><div class="cd-dm"><span style="background:var(--purple-d);color:var(--purple)">9板块</span><span style="background:var(--red-d);color:var(--red)">42号文</span><span style="background:var(--blue-d);color:var(--blue)">mockup</span></div><div class="cd-mt"><span id="e-fb">—</span><span class="cd-en">查看完整方案→</span></div></a>
+</div></div>
+<div class="cs" id="sec-growth"><div class="ct">&#128640; 增长与任务 — 裂变·品类·成长</div><div class="gr">
+<a class="cd full" href="chatF.html"><div class="cd-ac" style="background:linear-gradient(90deg,var(--green),var(--amber))"></div><div class="cd-sv sn">新</div><div class="cd-ic" style="background:var(--green-d)">&#128640;</div><h3>裂变增长·任务体系·用户成长</h3><p>飞轮模型·冷启动·膨胀红包·任务品类矩阵·用户画像·5级成长阶梯·B2B对接·内容营销</p><div class="cd-dm"><span style="background:var(--green-d);color:var(--green)">8板块</span><span style="background:var(--amber-d);color:var(--amber)">裂变mockup</span><span style="background:var(--blue-d);color:var(--blue)">成长路径</span></div><div class="cd-mt"><span id="f-fb">—</span><span class="cd-en">查看完整方案→</span></div></a>
+</div></div>
+<div class="cs" id="sec-eng"><div class="ct">&#127959; 工程交付 — 开发前必读</div><div class="gr">
+<a class="cd full" href="product-spec.html"><div class="cd-ac" style="background:linear-gradient(90deg,var(--orange),var(--red))"></div><div class="cd-ic" style="background:rgba(232,146,61,.1)">&#128208;</div><h3>产品规格文档（工程视角）</h3><p>页面地图·字段表·状态机·资金流转·数据关系</p><div class="cd-mt"><span id="ps-fb">—</span><span class="cd-en">查看→</span></div></a>
+</div></div>
+</div>
+<div class="mtabs"><div class="mti">
+<button class="mt active" onclick="showCat('ux',this)"><span class="mt-i">&#128203;</span>产品</button>
+<button class="mt" onclick="showCat('asset',this)"><span class="mt-i">&#128274;</span>确权</button>
+<button class="mt" onclick="showCat('growth',this)"><span class="mt-i">&#128640;</span>增长</button>
+<button class="mt" onclick="showCat('eng',this)"><span class="mt-i">&#127959;</span>工程</button>
+</div></div>
+<script>
+function showCat(c,el){document.querySelectorAll('.mt').forEach(function(t){t.classList.remove('active')});el.classList.add('active');var m={ux:'sec-ux',asset:'sec-asset',growth:'sec-growth',eng:'sec-eng'};document.querySelectorAll('.cs').forEach(function(s){s.style.display='none'});document.getElementById(m[c]).style.display='block';document.getElementById(m[c]).scrollIntoView({behavior:'smooth'});document.querySelector('.sb').classList.remove('open')}
+window.addEventListener('resize',function(){if(window.innerWidth>768)document.querySelectorAll('.cs').forEach(function(s){s.style.display='block'})});
+async function updateFB(){try{var r=await fetch('/api/feedback');if(!r.ok)return;var all=await r.json();var pp=[['chatA','a'],['chatB','b'],['chatC','c'],['chatD','d'],['architecture','arch'],['chatE','e'],['chatF','f'],['product-spec','ps']];var ta=0,td=0,tx=0;pp.forEach(function(x){var it=all[x[0]]||{};var a=0,d=0,xx=0;Object.values(it).forEach(function(v){if(v.c==='a')a++;else if(v.c==='d')d++;else if(v.c==='x')xx++});ta+=a;td+=d;tx+=xx;var el=document.getElementById(x[1]+'-fb');if(el)el.textContent=(a+d+xx)>0?a+' ✓  '+d+' 💬  '+xx+' ✗':'尚无反馈'});document.getElementById('sa').textContent=ta;document.getElementById('sd').textContent=td;document.getElementById('sx').textContent=tx}catch(e){}}
+updateFB();setInterval(updateFB,5000);
+</script>
+</body>
+</html>

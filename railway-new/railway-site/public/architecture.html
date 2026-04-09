@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MSC.AI · 界面架构方案对比</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0a12;--bg2:#13131f;--bg3:#1a1a2a;--bg4:#1e1e30;--brd:#2a2a3e;--text:#e8e8f0;--t2:#8888a0;--t3:#555570;--blue:#4a90d9;--amber:#d4a04a;--red:#e85d5d;--green:#4caf7d;--orange:#e8923d;--purple:#9b6dff;--teal:#3db89a}
+*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',sans-serif;font-size:15px;line-height:1.75;-webkit-font-smoothing:antialiased}
+.header{position:sticky;top:36px;z-index:100;background:rgba(10,10,18,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--brd);padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+.header-title{font-size:15px;font-weight:700}.header-badge{font-size:11px;padding:3px 10px;background:rgba(61,184,154,.12);color:var(--teal);border:1px solid rgba(61,184,154,.25);border-radius:20px}
+.nav{position:sticky;top:88px;z-index:90;background:rgba(10,10,18,.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--brd);padding:8px 20px;overflow-x:auto;display:flex;gap:6px;scrollbar-width:none}.nav::-webkit-scrollbar{display:none}
+.nav a{display:inline-block;padding:5px 14px;font-size:12px;font-weight:500;color:var(--t2);text-decoration:none;border-radius:6px;border:1px solid transparent;transition:all .2s;white-space:nowrap}.nav a:hover{color:var(--text);background:var(--bg4)}.nav a.active{color:var(--teal);border-color:rgba(61,184,154,.3);background:rgba(61,184,154,.08)}
+.wrap{max-width:860px;margin:0 auto;padding:28px 20px 100px}.sec{margin-bottom:56px;scroll-margin-top:100px}
+.sec-label{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}.sec-title{font-size:24px;font-weight:900;line-height:1.3;margin-bottom:8px}.sec-desc{color:var(--t2);font-size:14px;margin-bottom:24px;line-height:1.8}.sec-desc strong{color:var(--text)}
+.p{color:var(--t2);font-size:13px;line-height:1.8;margin-bottom:8px}.p strong{color:var(--text)}.st{font-size:13px;font-weight:700;margin:14px 0 6px}
+.tab-mock{display:flex;background:var(--bg4);border-radius:10px;overflow:hidden;margin:12px 0;border:1px solid var(--brd)}.tab-m{flex:1;padding:10px 4px;text-align:center;font-size:11px;font-weight:600;color:var(--t3);border-right:1px solid var(--brd)}.tab-m:last-child{border-right:none}.tab-m.on{color:var(--teal);background:rgba(61,184,154,.06)}.tab-m .ti{font-size:16px;display:block;margin-bottom:2px}
+.cflow{background:var(--bg2);border:1px solid var(--brd);border-radius:12px;margin:10px 0}.cflow-head{padding:12px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:background .2s;user-select:none}.cflow-head:hover{background:var(--bg3)}.cflow-icon{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;font-weight:700}.cflow-name{font-size:13px;font-weight:700;flex:1}.cflow-tags{display:flex;gap:4px}.cflow-tag{font-size:9px;padding:2px 6px;border-radius:3px;font-weight:600}.ct-green{background:rgba(76,175,125,.1);color:var(--green)}.ct-blue{background:rgba(74,144,217,.1);color:var(--blue)}.ct-amber{background:rgba(212,160,74,.1);color:var(--amber)}.ct-purple{background:rgba(155,109,255,.1);color:var(--purple)}.ct-teal{background:rgba(61,184,154,.1);color:var(--teal)}.cflow-arrow{font-size:12px;color:var(--t3);transition:transform .3s;flex-shrink:0}.cflow.open .cflow-arrow{transform:rotate(180deg)}.cflow-body{max-height:0;overflow:hidden;transition:max-height .4s ease}.cflow.open .cflow-body{max-height:5000px;overflow:visible}.cflow-inner{padding:0 16px 16px;border-top:1px solid var(--brd)}
+.flow-d{background:var(--bg);border:1px solid var(--brd);border-radius:10px;padding:12px;margin:8px 0;overflow-x:auto}.flow-row{display:flex;align-items:center;gap:6px;margin:4px 0;flex-wrap:nowrap;min-width:max-content}.flow-node{padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;white-space:nowrap;border:1px solid}.fn-green{background:rgba(76,175,125,.1);border-color:rgba(76,175,125,.3);color:var(--green)}.fn-blue{background:rgba(74,144,217,.1);border-color:rgba(74,144,217,.3);color:var(--blue)}.fn-amber{background:rgba(212,160,74,.1);border-color:rgba(212,160,74,.3);color:var(--amber)}.fn-purple{background:rgba(155,109,255,.1);border-color:rgba(155,109,255,.3);color:var(--purple)}.fn-teal{background:rgba(61,184,154,.1);border-color:rgba(61,184,154,.3);color:var(--teal)}.fn-red{background:rgba(232,93,93,.1);border-color:rgba(232,93,93,.3);color:var(--red)}.fn-gray{background:var(--bg4);border-color:var(--brd);color:var(--t2)}.flow-arr{color:var(--t3);font-size:12px;flex-shrink:0}.flow-label{font-size:10px;color:var(--t3);margin:6px 0 2px}
+.ref{border-bottom:1px dashed var(--teal);color:var(--teal);cursor:help;font-size:11px;font-weight:600;white-space:nowrap}.ref .ref-tip{display:none}
+#g-tip{display:none;position:fixed;background:var(--bg4);border:1px solid var(--teal);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--text);min-width:200px;max-width:280px;z-index:9999;line-height:1.5;font-weight:400;box-shadow:0 8px 24px rgba(0,0,0,.6);pointer-events:none}
+#g-tip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--teal)}
+#g-tip strong{color:var(--teal)}
+.phone{width:100%;max-width:340px;min-width:280px;background:#0d0d18;border:2px solid var(--brd);border-radius:24px;padding:8px 12px 12px;margin:0 auto}.phone-bar{height:20px;display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--t3);margin-bottom:4px}.phone-scr{background:var(--bg2);border-radius:14px;overflow:hidden;font-size:12px}.phone-nav{display:flex;align-items:center;padding:8px 12px;font-size:13px;font-weight:600;gap:6px;border-bottom:1px solid var(--brd)}.phone-body{padding:12px 14px;min-height:220px}.phones{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin:12px 0}.phone-wrap{display:flex;flex-direction:column;align-items:center;max-width:340px}.phone-label{text-align:center;margin-top:8px;font-size:11px;font-weight:600;color:var(--t2)}.phone-label-sub{text-align:center;font-size:10px;color:var(--t3);margin-top:2px}
+.m-card{background:var(--bg4);border:1px solid var(--brd);border-radius:8px;padding:8px 10px;margin:6px 0;font-size:11px}.m-seg{display:flex;background:var(--bg);border-radius:8px;overflow:hidden;margin:8px 0;border:1px solid var(--brd)}.m-seg-item{flex:1;padding:7px;text-align:center;font-size:11px;font-weight:600;color:var(--t3)}.m-seg-item.on{background:var(--teal);color:#fff}.m-dim{color:var(--t2);font-size:10px}.m-tabbar{display:flex;background:var(--bg);border-top:1px solid var(--brd);padding:6px 0 8px}.m-tab{flex:1;text-align:center;font-size:9px;color:var(--t3)}.m-tab.on{color:var(--teal)}.m-tab .mti{font-size:14px;display:block;margin-bottom:1px}
+.tut-overlay{position:absolute;inset:0;background:rgba(0,0,0,.7);border-radius:14px;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:12px;z-index:2}.tut-highlight{border:2px solid var(--teal);border-radius:10px;padding:8px 14px;background:rgba(61,184,154,.08);text-align:center}.tut-text{font-size:11px;color:var(--teal);font-weight:600;text-align:center;line-height:1.5;max-width:200px;margin:6px 0}.tut-skip{font-size:10px;color:var(--t3);margin-top:8px;padding:4px 12px;border:1px solid var(--brd);border-radius:12px}
+.pc{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}.pc-col{padding:10px 12px;border-radius:8px;font-size:12px;line-height:1.6}.pc-pro{background:rgba(76,175,125,.06);border:1px solid rgba(76,175,125,.15)}.pc-con{background:rgba(232,93,93,.06);border:1px solid rgba(232,93,93,.15)}.pc-title{font-size:11px;font-weight:700;margin-bottom:4px}
+.tb{width:100%;border-collapse:collapse;margin:12px 0;font-size:12px}.tb th{text-align:left;padding:8px 10px;background:var(--bg4);font-weight:600;border-bottom:1px solid var(--brd);font-size:11px}.tb td{padding:8px 10px;border-bottom:1px solid rgba(42,42,62,.4);color:var(--t2);vertical-align:top}
+.fb{background:var(--bg4);border:1px solid var(--brd);border-radius:10px;padding:14px;margin:16px 0}.fb-t{font-size:11px;font-weight:600;color:var(--t3);margin-bottom:4px}.fb-desc{font-size:12px;color:var(--t2);margin-bottom:8px}.fb-btns{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}.fb-b{padding:7px 14px;border-radius:20px;border:1px solid var(--brd);background:transparent;color:var(--t2);font-size:12px;cursor:pointer;transition:all .2s;font-family:inherit}.fb-b:hover{background:var(--bg3);color:var(--text)}.fb-b.s-a{background:rgba(76,175,125,.12);border-color:var(--green);color:var(--green)}.fb-b.s-d{background:rgba(212,160,74,.12);border-color:var(--amber);color:var(--amber)}.fb-b.s-x{background:rgba(232,93,93,.12);border-color:var(--red);color:var(--red)}.fb-n{width:100%;padding:7px 10px;background:var(--bg);border:1px solid var(--brd);border-radius:6px;color:var(--text);font-size:12px;font-family:inherit;resize:vertical;min-height:28px}.fb-n::placeholder{color:var(--t3)}
+.vote-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(10,10,18,.95);backdrop-filter:blur(16px);border-top:1px solid var(--brd);padding:10px 20px;display:flex;align-items:center;justify-content:center;gap:16px;font-size:12px;z-index:100}.vi{display:flex;align-items:center;gap:4px}.vd{width:8px;height:8px;border-radius:50%}
+@media(max-width:600px){.sec-title{font-size:20px}.phones{flex-direction:column;align-items:center}.pc{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="g-tip"></div>
+<!-- MSC NAV --><div style="position:sticky;top:0;z-index:9999;background:rgba(10,12,16,.95);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.08);padding:8px 16px;display:flex;align-items:center;gap:12px;font-family:Noto Sans SC,sans-serif;font-size:12px;overflow-x:auto;scrollbar-width:none"><a href="index.html" style="color:#34d399;text-decoration:none;font-weight:700;white-space:nowrap;display:flex;align-items:center;gap:4px"><span style="display:inline-flex;width:20px;height:20px;background:linear-gradient(135deg,#34d399,#60a5fa);border-radius:5px;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:#000">M</span>首页</a><span style="color:#5a6478">│</span><a href="chatA.html" style="color:#8b95a8;text-decoration:none;white-space:nowrap;padding:3px 8px;border-radius:4px">1·信任</a><a href="chatB.html" style="color:#8b95a8;text-decoration:none;white-space:nowrap;padding:3px 8px;border-radius:4px">2+3·空状态</a><a href="chatC.html" style="color:#8b95a8;text-decoration:none;white-space:nowrap;padding:3px 8px;border-radius:4px">4+5·卡片金额</a><a href="chatD.html" style="color:#8b95a8;text-decoration:none;white-space:nowrap;padding:3px 8px;border-radius:4px">6+7+8·确认留存</a><a href="architecture.html" style="color:#3db89a;text-decoration:none;white-space:nowrap;padding:3px 8px;border-radius:4px;background:rgba(61,184,154,.08);border:1px solid rgba(61,184,154,.2)">架构方案</a><a href="product-spec.html" style="color:#8b95a8;text-decoration:none;white-space:nowrap;padding:3px 8px;border-radius:4px">产品规格</a></div>
+<div class="header"><span class="header-title">MSC.AI · 界面架构方案对比</span><span class="header-badge">团队评审</span></div>
+<nav class="nav"><a href="#common" class="active">通用逻辑</a><a href="#vA">方案A · 合并广场</a><a href="#vB">方案B · 经典分离</a><a href="#vC">方案C · 中置发布</a><a href="#compare">对比投票</a></nav>
+<div class="wrap">
+
+<section class="sec" id="common">
+<div class="sec-label" style="color:var(--teal)">SHARED LOGIC</div>
+<div class="sec-title">三版共享的底层逻辑</div>
+<div class="sec-desc">团队需要做<strong>两层选择</strong>：① 新手引导方式（蒙版教程 vs 任务驱动）② 界面架构（A/B/C三选一）。以下入口逻辑是确定的，引导方式待选。</div>
+<div class="cflow open"><div class="cflow-head" onclick="tog(this)"><div class="cflow-icon" style="background:rgba(61,184,154,.12);color:var(--teal)">⏩</div><span class="cflow-name">入口流程：所有用户 → 任务广场</span><span class="cflow-arrow">▼</span></div><div class="cflow-body"><div class="cflow-inner">
+<div class="flow-d">
+<div class="flow-label">裂变新用户（分享链接进入）</div>
+<div class="flow-row"><span class="flow-node fn-purple">分享链接/小程序码</span><span class="flow-arr">→</span><span class="flow-node fn-teal">打开小程序</span><span class="flow-arr">→</span><span class="flow-node fn-green">任务广场</span><span class="flow-arr">→</span><span class="flow-node fn-amber">新手引导（见下方选择）</span></div>
+<div class="flow-label" style="margin-top:10px">常用用户（直接打开）</div>
+<div class="flow-row"><span class="flow-node fn-blue">打开小程序</span><span class="flow-arr">→</span><span class="flow-node fn-green">任务广场</span></div>
+</div></div></div></div>
+
+<div class="sec-label" style="color:var(--amber);margin-top:32px">DECISION 1</div>
+<div class="sec-title" style="font-size:18px;margin-bottom:16px">新手引导方式选择</div>
+
+<div class="phones">
+<!-- Option α: Mask Tutorial -->
+<div class="phone-wrap" style="max-width:340px">
+<div style="font-size:13px;font-weight:700;text-align:center;margin-bottom:8px;color:var(--amber)">α 蒙版教程</div>
+<div class="phone"><div class="phone-bar">MSC.AI</div><div class="phone-scr" style="position:relative;min-height:340px">
+  <div class="phone-nav" style="opacity:.25">任务广场</div>
+  <div class="phone-body" style="opacity:.1">
+    <div class="m-card">抖音涨粉 ¥0.30</div>
+    <div class="m-card">视频制作 ¥3.00</div>
+    <div class="m-card">会员推广 ¥0.50</div>
+  </div>
+  <div class="tut-overlay">
+    <div class="tut-text" style="margin-bottom:8px">这里是任务广场<br>浏览并接取任务赚钱</div>
+    <div style="color:var(--teal);font-size:18px">↓</div>
+    <div class="tut-highlight" style="padding:10px 16px">
+      <div style="font-size:12px;font-weight:700">抖音涨粉</div>
+      <div style="font-size:11px;color:var(--teal)">¥0.30/个 · ~2分钟</div>
+    </div>
+    <div style="color:var(--teal);font-size:18px;margin-top:4px">↓</div>
+    <div class="tut-text">点击任务卡片<br>查看详情并接取</div>
+    <div class="tut-skip" style="margin-top:10px">知道了（1/3）</div>
+  </div>
+</div></div>
+<div class="phone-label">首次进入 → 蒙版覆盖</div>
+<div class="phone-label-sub">逐步讲解界面元素</div>
+</div>
+
+<!-- Option β: Task-driven -->
+<div class="phone-wrap" style="max-width:340px">
+<div style="font-size:13px;font-weight:700;text-align:center;margin-bottom:8px;color:var(--teal)">β 任务驱动式引导</div>
+<div class="phone"><div class="phone-bar">MSC.AI</div><div class="phone-scr" style="min-height:340px">
+  <div class="phone-nav">任务广场</div>
+  <div class="phone-body">
+    <!-- 新手挑战卡 -->
+    <div style="background:linear-gradient(135deg,rgba(61,184,154,.1),rgba(155,109,255,.08));border:1px solid rgba(61,184,154,.25);border-radius:10px;padding:12px;margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <div style="font-size:12px;font-weight:700;color:var(--teal)">🎯 新手挑战</div>
+        <div style="font-size:10px;color:var(--t3)">1/3</div>
+      </div>
+      <div style="font-size:13px;font-weight:600;margin-bottom:4px">接取你的第一个任务</div>
+      <div style="font-size:11px;color:var(--t2)">点击下方任意任务卡片 → 查看详情 → 滑动接取</div>
+      <div style="height:4px;background:var(--bg);border-radius:2px;margin-top:8px;overflow:hidden"><div style="height:4px;width:33%;background:var(--teal);border-radius:2px"></div></div>
+    </div>
+    <!-- 指向箭头 -->
+    <div style="text-align:center;color:var(--teal);font-size:14px;margin-bottom:4px">↓ 从这里开始</div>
+    <!-- 高亮第一张卡 -->
+    <div class="m-card" style="border-left:3px solid var(--teal);border-color:rgba(61,184,154,.4);background:rgba(61,184,154,.04)">
+      <div style="display:flex;justify-content:space-between"><span style="font-weight:600">抖音涨粉</span><span style="font-weight:900;color:var(--green)">¥0.30</span></div>
+      <div class="m-dim">~2分钟 · ≈¥9/时 · 适合新手</div>
+    </div>
+    <!-- 普通卡 -->
+    <div class="m-card" style="border-left:3px solid var(--blue)">
+      <div style="display:flex;justify-content:space-between"><span style="font-weight:600">短视频制作</span><span style="font-weight:900;color:var(--green)">¥3.00</span></div>
+      <div class="m-dim">~15分钟 · AI可完成</div>
+    </div>
+  </div>
+</div></div>
+<div class="phone-label">首次进入 → 嵌入式引导</div>
+<div class="phone-label-sub">直接给任务，做完就学会</div>
+</div>
+</div>
+
+<div class="cflow"><div class="cflow-head" onclick="tog(this)"><div class="cflow-icon" style="background:rgba(212,160,74,.12);color:var(--amber)">α</div><span class="cflow-name">蒙版教程 · 详细说明</span><span class="cflow-arrow">▼</span></div><div class="cflow-body"><div class="cflow-inner">
+<div class="p"><strong>首次进入任何新界面</strong>触发全屏蒙版。半透明黑色背景 + 高亮目标区域 + 箭头 + 文字说明 + "知道了（1/N）"步进按钮。每个界面独立记录，看过后不再弹出。</div>
+<div class="pc"><div class="pc-col pc-pro"><div class="pc-title" style="color:var(--green)">✅ 优势</div>· 信息传达完整<br>· 用户被动接收，无需猜测<br>· 开发实现简单</div><div class="pc-col pc-con"><div class="pc-title" style="color:var(--red)">⚠️ 风险</div>· 业界数据：蒙版教程完成率＜30%<br>· 大部分用户直接点"跳过"<br>· 打断用户想快速开始的意愿<br>· 看完教程≠真正理解</div></div>
+</div></div></div>
+
+<div class="cflow"><div class="cflow-head" onclick="tog(this)"><div class="cflow-icon" style="background:rgba(61,184,154,.12);color:var(--teal)">β</div><span class="cflow-name">任务驱动式引导 · 详细说明</span><span class="cflow-arrow">▼</span></div><div class="cflow-body"><div class="cflow-inner">
+<div class="p">不讲解界面，直接给用户一个<strong>新手挑战任务</strong>。完成挑战 = 学会使用。引导融入界面本身（空状态文案 + 高亮首张卡片 + 进度条），不需要额外的覆盖层。</div>
+<div class="flow-d">
+<div class="flow-label">新手挑战 3 步</div>
+<div class="flow-row"><span class="flow-node fn-teal">① 接取第一个任务</span><span class="flow-arr">→</span><span class="flow-node fn-teal">② 完成并提交</span><span class="flow-arr">→</span><span class="flow-node fn-teal">③ 收到第一笔到账</span></div>
+</div>
+<div class="p">每步完成后自动解锁下一步提示。第③步完成后触发 <span class="ref">首次到账庆祝<span class="ref-tip"><strong>参考「空状态反馈」 · 3.5</strong><br>全屏庆祝 + 分享入口 → 裂变</span></span>，同时新手挑战卡片消失，用户已完全理解平台流程。</div>
+<div class="pc"><div class="pc-col pc-pro"><div class="pc-title" style="color:var(--green)">✅ 优势</div>· "做中学"，记忆留存率高<br>· 不打断用户，无跳过率问题<br>· 学完 = 已完成首次激活（AARRR）<br>· 可与裂变配套（③后分享）<br>· 参考：Duolingo、Notion</div><div class="pc-col pc-con"><div class="pc-title" style="color:var(--red)">⚠️ 风险</div>· 开发复杂度略高（需状态管理）<br>· 用户可能忽略挑战卡直接操作<br>· 需要准备"适合新手"的种子任务</div></div>
+</div></div></div>
+
+<div class="fb" data-id="f-tutorial"><div class="fb-t">选择引导方式</div><div class="fb-desc">新用户进入后如何学会使用平台？</div><div class="fb-btns"><button class="fb-b" onclick="sf(this,'a','f-tutorial')">α 蒙版教程</button><button class="fb-b" onclick="sf(this,'d','f-tutorial')">β 任务驱动</button><button class="fb-b" onclick="sf(this,'x','f-tutorial')">混合（两者结合）</button></div><textarea class="fb-n" placeholder="补充说明…" onchange="sn(this,'f-tutorial')"></textarea></div>
+
+<div class="cflow open"><div class="cflow-head" onclick="tog(this)"><div class="cflow-icon" style="background:rgba(155,109,255,.12);color:var(--purple)">🔗</div><span class="cflow-name">裂变入口设计</span><span class="cflow-tags"><span class="cflow-tag ct-purple">增长飞轮</span></span><span class="cflow-arrow">▼</span></div><div class="cflow-body"><div class="cflow-inner">
+
+<!-- Visual loop -->
+<div style="background:var(--bg);border:1px solid var(--brd);border-radius:14px;padding:20px 16px;margin:8px 0;overflow-x:auto">
+
+  <!-- Row 1: Existing user triggers sharing -->
+  <div style="text-align:center;font-size:10px;color:var(--t3);margin-bottom:6px">老用户完成任务</div>
+  <div style="display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:nowrap;min-width:max-content">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+      <div style="width:56px;height:56px;border-radius:14px;background:rgba(76,175,125,.1);border:1px solid rgba(76,175,125,.3);display:flex;align-items:center;justify-content:center;font-size:24px">💰</div>
+      <div style="font-size:10px;font-weight:600;color:var(--green)">首次到账</div>
+    </div>
+    <div style="color:var(--t3);font-size:14px">→</div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+      <div style="width:56px;height:56px;border-radius:14px;background:rgba(155,109,255,.1);border:1px solid rgba(155,109,255,.3);display:flex;align-items:center;justify-content:center;font-size:24px">🎊</div>
+      <div style="font-size:10px;font-weight:600;color:var(--purple)">庆祝页</div>
+      <div style="font-size:9px;color:var(--t3)"><span class="ref" style="font-size:9px">空状态反馈·3.5<span class="ref-tip"><strong>参考「空状态反馈」 · 3.5</strong><br>全屏庆祝 + 分享按钮 + 小程序码</span></span></div>
+    </div>
+    <div style="color:var(--t3);font-size:14px">→</div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+      <div style="width:56px;height:56px;border-radius:14px;background:rgba(74,144,217,.1);border:1px solid rgba(74,144,217,.3);display:flex;align-items:center;justify-content:center;font-size:24px">📤</div>
+      <div style="font-size:10px;font-weight:600;color:var(--blue)">分享海报</div>
+      <div style="font-size:9px;color:var(--t3)">带小程序码</div>
+    </div>
+  </div>
+
+  <!-- Connector arrow down -->
+  <div style="text-align:center;color:var(--purple);font-size:18px;margin:10px 0">⬇</div>
+  <div style="text-align:center;font-size:10px;color:var(--purple);font-weight:600;margin-bottom:10px">好友看到海报 → 扫码/点链接</div>
+
+  <!-- Row 2: New user enters and activates -->
+  <div style="display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:nowrap;min-width:max-content">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+      <div style="width:56px;height:56px;border-radius:14px;background:rgba(61,184,154,.1);border:1px solid rgba(61,184,154,.3);display:flex;align-items:center;justify-content:center;font-size:24px">📱</div>
+      <div style="font-size:10px;font-weight:600;color:var(--teal)">打开小程序</div>
+    </div>
+    <div style="color:var(--t3);font-size:14px">→</div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+      <div style="width:56px;height:56px;border-radius:14px;background:rgba(76,175,125,.1);border:1px solid rgba(76,175,125,.3);display:flex;align-items:center;justify-content:center;font-size:24px">📋</div>
+      <div style="font-size:10px;font-weight:600;color:var(--green)">任务广场</div>
+    </div>
+    <div style="color:var(--t3);font-size:14px">→</div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+      <div style="width:56px;height:56px;border-radius:14px;background:rgba(212,160,74,.1);border:1px solid rgba(212,160,74,.3);display:flex;align-items:center;justify-content:center;font-size:24px">🎯</div>
+      <div style="font-size:10px;font-weight:600;color:var(--amber)">新手挑战</div>
+      <div style="font-size:9px;color:var(--t3)"><span class="ref" style="font-size:9px">空状态反馈·2.1<span class="ref-tip"><strong>参考「空状态反馈」 · 2.1~2.5</strong><br>空状态引导 + 首充锚定 + 挑战进度</span></span></div>
+    </div>
+  </div>
+
+  <!-- Connector arrow down -->
+  <div style="text-align:center;color:var(--teal);font-size:18px;margin:10px 0">⬇</div>
+
+  <!-- Row 3: New user completes challenge → becomes sharing user (loop) -->
+  <div style="display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:nowrap;min-width:max-content">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+      <div style="width:56px;height:56px;border-radius:14px;background:rgba(61,184,154,.1);border:1px solid rgba(61,184,154,.3);display:flex;align-items:center;justify-content:center;font-size:24px">✅</div>
+      <div style="font-size:10px;font-weight:600;color:var(--teal)">完成首单</div>
+    </div>
+    <div style="color:var(--t3);font-size:14px">→</div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+      <div style="width:56px;height:56px;border-radius:14px;background:rgba(76,175,125,.1);border:1px solid rgba(76,175,125,.3);display:flex;align-items:center;justify-content:center;font-size:24px">💰</div>
+      <div style="font-size:10px;font-weight:600;color:var(--green)">首次到账</div>
+    </div>
+    <div style="color:var(--t3);font-size:14px">→</div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;position:relative">
+      <div style="width:56px;height:56px;border-radius:14px;background:rgba(155,109,255,.15);border:2px solid var(--purple);display:flex;align-items:center;justify-content:center;font-size:24px">🔄</div>
+      <div style="font-size:10px;font-weight:700;color:var(--purple)">循环开始</div>
+      <div style="font-size:9px;color:var(--t3)">新用户→分享者</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="p" style="margin-top:10px">新手挑战建议与裂变配套：<strong>接第一单 → 完成第一单 → 邀请1位好友</strong>（第③步即触发裂变循环）。每个被邀请的好友完成首单后，邀请者获得额外奖励。</div>
+</div></div></div>
+
+<div class="fb" data-id="f-common"><div class="fb-t">团队反馈</div><div class="fb-desc">入口逻辑（所有用户首屏=任务广场）+ 裂变路径</div><div class="fb-btns"><button class="fb-b" onclick="sf(this,'a','f-common')">✅ 同意</button><button class="fb-b" onclick="sf(this,'d','f-common')">💬 需讨论</button><button class="fb-b" onclick="sf(this,'x','f-common')">❌ 不同意</button></div><textarea class="fb-n" placeholder="补充说明…" onchange="sn(this,'f-common')"></textarea></div>
+</section>
+
+<section class="sec" id="vA">
+<div class="sec-label" style="color:var(--green)">VERSION A</div>
+<div class="sec-title">方案A：合并广场</div>
+<div class="sec-desc">接和发<strong>合并在同一个Tab</strong>，用顶部分段切换。Tab栏简化为3个。</div>
+<div class="tab-mock"><div class="tab-m on"><span class="ti">📋</span>任务广场</div><div class="tab-m"><span class="ti">🤖</span>AI中心</div><div class="tab-m"><span class="ti">👤</span>我的</div></div>
+<div class="phones">
+<div class="phone-wrap"><div class="phone"><div class="phone-bar">MSC.AI</div><div class="phone-scr"><div class="phone-nav">任务广场</div><div class="phone-body"><div class="m-seg"><div class="m-seg-item on">接任务（赚钱）</div><div class="m-seg-item">发任务（花钱）</div></div><div class="m-card" style="border-left:3px solid var(--blue)"><div style="display:flex;justify-content:space-between"><span style="font-weight:600">抖音涨粉</span><span style="font-weight:900;color:var(--green)">¥0.30</span></div><div class="m-dim">~2分钟 · ≈¥9/时 · 🥇4.9</div></div><div class="m-card" style="border-left:3px solid var(--green)"><div style="display:flex;justify-content:space-between"><span style="font-weight:600">短视频制作</span><span style="font-weight:900;color:var(--green)">¥3.00</span></div><div class="m-dim">~15分钟 · AI可完成</div></div></div><div class="m-tabbar"><div class="m-tab on"><span class="mti">📋</span>广场</div><div class="m-tab"><span class="mti">🤖</span>AI</div><div class="m-tab"><span class="mti">👤</span>我的</div></div></div></div><div class="phone-label">接任务视图</div></div>
+<div class="phone-wrap"><div class="phone"><div class="phone-bar">MSC.AI</div><div class="phone-scr"><div class="phone-nav">任务广场</div><div class="phone-body"><div class="m-seg"><div class="m-seg-item">接任务（赚钱）</div><div class="m-seg-item on">发任务（花钱）</div></div><div style="font-size:11px;font-weight:600;margin:8px 0 6px">选择任务类型</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px"><div class="m-card" style="text-align:center"><div style="font-size:16px">📱</div><div style="font-size:10px;font-weight:600">抖音涨粉</div></div><div class="m-card" style="text-align:center"><div style="font-size:16px">🎬</div><div style="font-size:10px;font-weight:600">视频制作</div></div><div class="m-card" style="text-align:center"><div style="font-size:16px">📕</div><div style="font-size:10px;font-weight:600">小红书涨粉</div></div><div class="m-card" style="text-align:center"><div style="font-size:16px">👥</div><div style="font-size:10px;font-weight:600">会员推广</div></div></div></div><div class="m-tabbar"><div class="m-tab on"><span class="mti">📋</span>广场</div><div class="m-tab"><span class="mti">🤖</span>AI</div><div class="m-tab"><span class="mti">👤</span>我的</div></div></div></div><div class="phone-label">发任务视图</div></div>
+</div>
+
+<div class="cflow"><div class="cflow-head" onclick="tog(this)"><div class="cflow-icon" style="background:rgba(74,144,217,.12);color:var(--blue)">📥</div><span class="cflow-name">接单完整路径</span><span class="cflow-tags"><span class="cflow-tag ct-blue">接单者</span></span><span class="cflow-arrow">▼</span></div><div class="cflow-body"><div class="cflow-inner">
+<div class="flow-d">
+<div class="flow-row"><span class="flow-node fn-green">广场（接任务）</span><span class="flow-arr">→</span><span class="flow-node fn-blue"><span class="ref">任务卡片<span class="ref-tip"><strong>参考「卡片金额」 · 4.1</strong><br>4层视觉权重：单次收入→标题→耗时/时薪→信用/标签。6大行为驱动器</span></span></span><span class="flow-arr">→</span><span class="flow-node fn-blue"><span class="ref">任务详情<span class="ref-tip"><strong>参考「卡片金额」 · 5.2</strong><br>英雄区40px收入 + 时薪锚定 + 发布者信用信号</span></span></span></div>
+<div class="flow-row" style="margin-top:6px"><span style="width:20px"></span><span class="flow-arr">→</span><span class="flow-node fn-blue"><span class="ref">滑动接取<span class="ref-tip"><strong>参考「确认留存」 · 6.2</strong><br>低摩擦滑动确认 + 社会证明 + 取消按钮</span></span></span><span class="flow-arr">→</span><span class="flow-node fn-blue">执行（AI/手动）</span><span class="flow-arr">→</span><span class="flow-node fn-blue">提交成果</span></div>
+<div class="flow-row" style="margin-top:6px"><span style="width:20px"></span><span class="flow-arr">→</span><span class="flow-node fn-teal"><span class="ref">审核追踪<span class="ref-tip"><strong>参考「空状态反馈」 · 3.1</strong><br>4阶段：已接取→执行中→待审核→已结算</span></span></span><span class="flow-arr">→</span><span class="flow-node fn-green"><span class="ref">到账通知<span class="ref-tip"><strong>参考「空状态反馈」 · 3.5</strong><br>首次全屏庆祝 + 分享入口；后续轻量toast</span></span></span></div>
+</div>
+<div class="p" style="font-size:11px">异常分支：<span class="ref">审核驳回<span class="ref-tip"><strong>参考「确认留存」 · 8.2</strong><br>正向框架"改进后即可通过" + 申诉入口</span></span> · <span class="ref">AI失败<span class="ref-tip"><strong>参考「确认留存」 · 8.3</strong><br>补偿式降级 · 延长截止+额外奖励</span></span> · <span class="ref">网络异常<span class="ref-tip"><strong>参考「确认留存」 · 8.4</strong><br>零损失承诺 · 自动缓存</span></span></div>
+</div></div></div>
+
+<div class="cflow"><div class="cflow-head" onclick="tog(this)"><div class="cflow-icon" style="background:rgba(212,160,74,.12);color:var(--amber)">📤</div><span class="cflow-name">发布完整路径</span><span class="cflow-tags"><span class="cflow-tag ct-amber">发布者</span></span><span class="cflow-arrow">▼</span></div><div class="cflow-body"><div class="cflow-inner">
+<div class="flow-d">
+<div class="flow-row"><span class="flow-node fn-green">广场（发任务）</span><span class="flow-arr">→</span><span class="flow-node fn-amber">选择类型</span><span class="flow-arr">→</span><span class="flow-node fn-amber"><span class="ref">配置定价<span class="ref-tip"><strong>参考「卡片金额」 · 5.1</strong><br>收益框架翻转 + 三档诱饵定价</span></span></span><span class="flow-arr">→</span><span class="flow-node fn-amber">费用预览</span></div>
+<div class="flow-row" style="margin-top:6px"><span style="width:20px"></span><span class="flow-arr">→</span><span class="flow-node fn-red"><span class="ref">确认发布<span class="ref-tip"><strong>参考「确认留存」 · 6.1</strong><br>中摩擦弹窗：费用分解 + ROI预估 + 托管保障</span></span></span><span class="flow-arr">→</span><span class="flow-node fn-amber"><span class="ref">监控进度<span class="ref-tip"><strong>参考「空状态反馈」 · 3.2</strong><br>实时看板：接取进度条 + 提交/结算分阶段</span></span></span></div>
+</div>
+<div class="p" style="font-size:11px">异常：<span class="ref">余额不足<span class="ref-tip"><strong>参考「确认留存」 · 8.1</strong><br>精确差额 + 一键补充 + 充值后自动返回</span></span></div>
+</div></div></div>
+
+<div class="cflow"><div class="cflow-head" onclick="tog(this)"><div class="cflow-icon" style="background:rgba(61,184,154,.12);color:var(--teal)">👤</div><span class="cflow-name">个人中心 + 信任体系</span><span class="cflow-tags"><span class="cflow-tag ct-teal">通用</span></span><span class="cflow-arrow">▼</span></div><div class="cflow-body"><div class="cflow-inner">
+<div class="flow-d">
+<div class="flow-row"><span class="flow-node fn-teal">我的 Tab</span><span class="flow-arr">→</span><span class="flow-node fn-gray"><span class="ref">收入仪表盘<span class="ref-tip"><strong>参考「确认留存」 · 7.3</strong><br>累计收入 + 今日/本周/本月 + AI占比 + 趋势图</span></span></span></div>
+<div class="flow-row" style="margin-top:6px"><span style="width:20px"></span><span class="flow-arr">→</span><span class="flow-node fn-gray"><span class="ref">余额/提现<span class="ref-tip"><strong>参考「信任」 · 1.4</strong><br>到账承诺T+1 + 颜色编码状态 + 客服入口</span></span></span><span class="flow-arr">/</span><span class="flow-node fn-gray"><span class="ref">等级体系<span class="ref-tip"><strong>参考「确认留存」 · 7.1</strong><br>4级：新手→能手→达人→金牌</span></span></span><span class="flow-arr">/</span><span class="flow-node fn-gray">订单/设置</span></div>
+</div>
+<div class="p" style="font-size:11px">信任触点：<span class="ref">充值保障<span class="ref-tip"><strong>参考「信任」 · 1.1</strong><br>"平台托管，余额可随时提现" + 三重保障面板</span></span> · <span class="ref">信用评分<span class="ref-tip"><strong>参考「信任」 · 1.3</strong><br>金/银/新三级 · 加权计算</span></span></div>
+</div></div></div>
+
+<div class="cflow"><div class="cflow-head" onclick="tog(this)"><div class="cflow-icon" style="background:rgba(155,109,255,.12);color:var(--purple)">🤖</div><span class="cflow-name">AI中心 Tab</span><span class="cflow-tags"><span class="cflow-tag ct-purple">方案A专属</span></span><span class="cflow-arrow">▼</span></div><div class="cflow-body"><div class="cflow-inner">
+<div class="p">独立Tab承载AI相关功能：AI自动赚钱设置与监控、AI公司创建与管理、OpenClaw代理配置。也可作为未来BP第一阶段"AI资产"的承载空间。</div>
+</div></div></div>
+
+<div class="pc"><div class="pc-col pc-pro"><div class="pc-title" style="color:var(--green)">✅ 优势</div>· 接和发同屏可见<br>· 3Tab更简洁<br>· 发布入口曝光率高<br>· 新用户一眼看到全貌</div><div class="pc-col pc-con"><div class="pc-title" style="color:var(--red)">⚠️ 风险</div>· 接/发内容形态差异大<br>· 切换增加一步操作<br>· 接单者可能被发布分散注意力<br>· AI中心Tab定位需明确</div></div>
+<div class="fb" data-id="f-vA"><div class="fb-t">团队反馈 — 方案A</div><div class="fb-desc">3Tab · 广场内分段切换接/发</div><div class="fb-btns"><button class="fb-b" onclick="sf(this,'a','f-vA')">✅ 选这个</button><button class="fb-b" onclick="sf(this,'d','f-vA')">💬 需讨论</button><button class="fb-b" onclick="sf(this,'x','f-vA')">❌ 不选</button></div><textarea class="fb-n" placeholder="补充说明…" onchange="sn(this,'f-vA')"></textarea></div>
+</section>
+
+<section class="sec" id="vB">
+<div class="sec-label" style="color:var(--blue)">VERSION B</div>
+<div class="sec-title">方案B：经典分离</div>
+<div class="sec-desc">接和发各占独立Tab。<strong>4个Tab</strong>，结构最清晰。参考美团/滴滴双端模式。</div>
+<div class="tab-mock"><div class="tab-m on"><span class="ti">📋</span>任务广场</div><div class="tab-m"><span class="ti">📝</span>发布</div><div class="tab-m"><span class="ti">🤖</span>AI</div><div class="tab-m"><span class="ti">👤</span>我的</div></div>
+<div class="phones"><div class="phone-wrap"><div class="phone"><div class="phone-bar">MSC.AI</div><div class="phone-scr"><div class="phone-nav">任务广场</div><div class="phone-body"><div class="m-card" style="border-left:3px solid var(--blue)"><div style="display:flex;justify-content:space-between"><span style="font-weight:600">抖音涨粉</span><span style="font-weight:900;color:var(--green)">¥0.30</span></div><div class="m-dim">~2分钟 · ≈¥9/时</div></div><div class="m-card" style="border-left:3px solid var(--green)"><div style="display:flex;justify-content:space-between"><span style="font-weight:600">短视频制作</span><span style="font-weight:900;color:var(--green)">¥3.00</span></div><div class="m-dim">~15分钟 · AI可完成</div></div><div class="m-card" style="background:rgba(212,160,74,.04);border-color:rgba(212,160,74,.2)"><div style="font-size:10px;color:var(--amber);font-weight:600">💡 想发布任务？</div><div style="font-size:10px">切到「发布」Tab →</div></div></div><div class="m-tabbar"><div class="m-tab on"><span class="mti">📋</span>广场</div><div class="m-tab"><span class="mti">📝</span>发布</div><div class="m-tab"><span class="mti">🤖</span>AI</div><div class="m-tab"><span class="mti">👤</span>我的</div></div></div></div><div class="phone-label">任务广场（纯接单）</div><div class="phone-label-sub">底部引导卡做互通</div></div></div>
+
+<div class="cflow"><div class="cflow-head" onclick="tog(this)"><div class="cflow-icon" style="background:rgba(74,144,217,.12);color:var(--blue)">🔀</div><span class="cflow-name">B方案跳转流程</span><span class="cflow-arrow">▼</span></div><div class="cflow-body"><div class="cflow-inner">
+<div class="flow-d">
+<div class="flow-label">接单路径（任务广场Tab）</div>
+<div class="flow-row"><span class="flow-node fn-blue">任务列表</span><span class="flow-arr">→</span><span class="flow-node fn-blue"><span class="ref">详情<span class="ref-tip"><strong>参考「卡片金额」 · 5.2</strong><br>收入+时薪+信用</span></span></span><span class="flow-arr">→</span><span class="flow-node fn-blue"><span class="ref">滑动接取<span class="ref-tip"><strong>参考「确认留存」 · 6.2</strong></span></span></span><span class="flow-arr">→</span><span class="flow-node fn-teal">执行→审核→结算</span></div>
+<div class="flow-label" style="margin-top:8px">发布路径（发布Tab）</div>
+<div class="flow-row"><span class="flow-node fn-amber">选类型</span><span class="flow-arr">→</span><span class="flow-node fn-amber"><span class="ref">定价<span class="ref-tip"><strong>参考「卡片金额」 · 5.1</strong><br>三档诱饵</span></span></span><span class="flow-arr">→</span><span class="flow-node fn-red"><span class="ref">确认<span class="ref-tip"><strong>参考「确认留存」 · 6.1</strong><br>费用弹窗</span></span></span><span class="flow-arr">→</span><span class="flow-node fn-amber">监控</span></div>
+</div></div></div></div>
+
+<div class="pc"><div class="pc-col pc-pro"><div class="pc-title" style="color:var(--green)">✅ 优势</div>· 架构最清晰<br>· 成熟竞品验证<br>· 各功能有完整空间<br>· 4Tab微信规范上限</div><div class="pc-col pc-con"><div class="pc-title" style="color:var(--red)">⚠️ 风险</div>· 接和发不同屏<br>· 发布需主动切Tab<br>· 小屏4Tab较拥挤<br>· 新用户可能忽略发布</div></div>
+<div class="fb" data-id="f-vB"><div class="fb-t">团队反馈 — 方案B</div><div class="fb-desc">4Tab · 接单/发布各自独立</div><div class="fb-btns"><button class="fb-b" onclick="sf(this,'a','f-vB')">✅ 选这个</button><button class="fb-b" onclick="sf(this,'d','f-vB')">💬 需讨论</button><button class="fb-b" onclick="sf(this,'x','f-vB')">❌ 不选</button></div><textarea class="fb-n" placeholder="补充说明…" onchange="sn(this,'f-vB')"></textarea></div>
+</section>
+
+<section class="sec" id="vC">
+<div class="sec-label" style="color:var(--purple)">VERSION C</div>
+<div class="sec-title">方案C：广场 + 中置发布入口</div>
+<div class="sec-desc">任务广场<strong>纯粹服务接单者</strong>，顶部用筛选维度（推荐/最新/高收入）代替"接/发"切换。发布入口放在<strong>Tab栏中间凸出按钮</strong>（参考小红书"+"），点击后进入独立发布流程。AI自动赚钱在广场首屏就有入口卡片。</div>
+
+<div class="st">Tab栏结构</div>
+<div style="display:flex;background:var(--bg4);border-radius:10px;overflow:hidden;margin:12px 0;border:1px solid var(--brd);align-items:flex-end">
+  <div class="tab-m on" style="flex:1;border-right:1px solid var(--brd)"><span class="ti">📋</span>任务广场</div>
+  <div style="flex:0 0 64px;display:flex;justify-content:center;padding-bottom:6px;border-right:1px solid var(--brd)">
+    <div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--blue));display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;margin-top:-10px;box-shadow:0 4px 12px rgba(61,184,154,.3)">+</div>
+  </div>
+  <div class="tab-m" style="flex:1"><span class="ti">👤</span>我的</div>
+</div>
+<div class="p" style="font-size:11px;text-align:center;color:var(--t3)">2个常规Tab + 中间凸出发布按钮 · 类似小红书底栏</div>
+
+<div class="phones">
+<div class="phone-wrap"><div class="phone"><div class="phone-bar">MSC.AI</div><div class="phone-scr">
+  <div class="phone-nav">任务广场</div>
+  <div class="phone-body">
+    <!-- 收入概览条 -->
+    <div style="background:linear-gradient(135deg,rgba(61,184,154,.1),rgba(74,144,217,.1));border:1px solid rgba(61,184,154,.2);border-radius:10px;padding:10px 12px;margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div><div style="font-size:10px;color:var(--teal)">今日可赚</div><div style="font-size:20px;font-weight:900;color:var(--green)">≈ ¥15~50</div></div>
+        <div style="text-align:right"><div style="font-size:10px;color:var(--t3)">可接任务</div><div style="font-size:16px;font-weight:700">23个</div></div>
+      </div>
+    </div>
+    <!-- AI入口卡片 -->
+    <div style="background:rgba(155,109,255,.06);border:1px solid rgba(155,109,255,.15);border-radius:8px;padding:8px 10px;margin-bottom:8px;display:flex;align-items:center;gap:8px">
+      <span style="font-size:16px">🤖</span>
+      <div style="flex:1"><div style="font-size:11px;font-weight:600">AI自动赚钱</div><div style="font-size:10px;color:var(--t3)">睡觉时也能接单</div></div>
+      <div style="font-size:10px;padding:4px 10px;background:var(--purple);color:#fff;border-radius:12px">开启</div>
+    </div>
+    <!-- 筛选栏 -->
+    <div style="display:flex;gap:4px;margin-bottom:8px;font-size:10px">
+      <span style="padding:3px 8px;border-radius:12px;background:rgba(61,184,154,.12);color:var(--teal)">推荐</span>
+      <span style="padding:3px 8px;border-radius:12px;border:1px solid var(--brd);color:var(--t3)">最新</span>
+      <span style="padding:3px 8px;border-radius:12px;border:1px solid var(--brd);color:var(--t3)">高收入</span>
+      <span style="padding:3px 8px;border-radius:12px;border:1px solid var(--brd);color:var(--t3)">涨粉</span>
+    </div>
+    <!-- 任务卡片 -->
+    <div class="m-card" style="border-left:3px solid var(--blue)">
+      <div style="display:flex;justify-content:space-between"><span style="font-weight:600">抖音涨粉</span><span style="font-weight:900;color:var(--green)">¥0.30</span></div>
+      <div class="m-dim">~2分钟 · ≈¥9/时 · 🥇4.9</div>
+    </div>
+    <div class="m-card" style="border-left:3px solid var(--green)">
+      <div style="display:flex;justify-content:space-between"><span style="font-weight:600">短视频制作</span><span style="font-weight:900;color:var(--green)">¥3.00</span></div>
+      <div class="m-dim">~15分钟 · AI可完成 · <span style="color:var(--red)">剩3名额</span></div>
+    </div>
+  </div>
+  <!-- 底部Tab栏 -->
+  <div style="display:flex;background:var(--bg);border-top:1px solid var(--brd);padding:4px 0 6px;align-items:flex-end">
+    <div class="m-tab on" style="flex:1"><span class="mti">📋</span>广场</div>
+    <div style="flex:0 0 52px;display:flex;justify-content:center"><div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--blue));display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;margin-top:-8px;box-shadow:0 2px 8px rgba(61,184,154,.3)">+</div></div>
+    <div class="m-tab" style="flex:1"><span class="mti">👤</span>我的</div>
+  </div>
+</div></div><div class="phone-label">任务广场</div><div class="phone-label-sub">收入概览 + AI入口 + 智能筛选</div></div>
+
+<div class="phone-wrap"><div class="phone"><div class="phone-bar">MSC.AI</div><div class="phone-scr">
+  <div class="phone-nav"><span style="font-size:16px;color:var(--t2)">×</span> 发布新任务</div>
+  <div class="phone-body">
+    <div style="font-size:12px;font-weight:700;margin-bottom:8px">选择任务类型</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+      <div class="m-card" style="text-align:center;padding:12px 8px"><div style="font-size:20px">📱</div><div style="font-size:11px;font-weight:600;margin-top:4px">抖音涨粉</div><div class="m-dim">¥0.30起/个</div></div>
+      <div class="m-card" style="text-align:center;padding:12px 8px"><div style="font-size:20px">🎬</div><div style="font-size:11px;font-weight:600;margin-top:4px">视频制作</div><div class="m-dim">¥3.00起/个</div></div>
+      <div class="m-card" style="text-align:center;padding:12px 8px"><div style="font-size:20px">📕</div><div style="font-size:11px;font-weight:600;margin-top:4px">小红书涨粉</div><div class="m-dim">¥0.20起/个</div></div>
+      <div class="m-card" style="text-align:center;padding:12px 8px"><div style="font-size:20px">👥</div><div style="font-size:11px;font-weight:600;margin-top:4px">会员推广</div><div class="m-dim">¥0.50起/个</div></div>
+    </div>
+    <div class="m-dim" style="text-align:center;margin-top:10px">选择后进入定价配置 →</div>
+  </div>
+</div></div><div class="phone-label">点击"+"后</div><div class="phone-label-sub">独立发布流程页 · 非弹出菜单</div></div>
+</div>
+
+<div class="cflow"><div class="cflow-head" onclick="tog(this)"><div class="cflow-icon" style="background:rgba(74,144,217,.12);color:var(--blue)">📥</div><span class="cflow-name">接单完整路径</span><span class="cflow-tags"><span class="cflow-tag ct-blue">接单者</span></span><span class="cflow-arrow">▼</span></div><div class="cflow-body"><div class="cflow-inner">
+<div class="flow-d">
+<div class="flow-row"><span class="flow-node fn-green">广场首屏</span><span class="flow-arr">→</span><span class="flow-node fn-gray">收入概览条（锚定）</span><span class="flow-arr">→</span><span class="flow-node fn-blue"><span class="ref">任务卡片<span class="ref-tip"><strong>参考「卡片金额」 · 4.1</strong><br>4层视觉权重 + 6大行为驱动器</span></span></span></div>
+<div class="flow-row" style="margin-top:6px"><span style="width:20px"></span><span class="flow-arr">→</span><span class="flow-node fn-blue"><span class="ref">任务详情<span class="ref-tip"><strong>参考「卡片金额」 · 5.2</strong><br>40px收入 + 时薪锚定 + 信用信号</span></span></span><span class="flow-arr">→</span><span class="flow-node fn-blue"><span class="ref">滑动接取<span class="ref-tip"><strong>参考「确认留存」 · 6.2</strong><br>低摩擦滑动 + 取消按钮</span></span></span><span class="flow-arr">→</span><span class="flow-node fn-blue">执行/提交</span></div>
+<div class="flow-row" style="margin-top:6px"><span style="width:20px"></span><span class="flow-arr">→</span><span class="flow-node fn-teal"><span class="ref">审核追踪<span class="ref-tip"><strong>参考「空状态反馈」 · 3.1</strong><br>4阶段timeline</span></span></span><span class="flow-arr">→</span><span class="flow-node fn-green"><span class="ref">到账通知<span class="ref-tip"><strong>参考「空状态反馈」 · 3.5</strong><br>首次庆祝 + 分享裂变入口</span></span></span></div>
+</div>
+</div></div></div>
+
+<div class="cflow"><div class="cflow-head" onclick="tog(this)"><div class="cflow-icon" style="background:rgba(212,160,74,.12);color:var(--amber)">📤</div><span class="cflow-name">发布完整路径（点"+"触发）</span><span class="cflow-tags"><span class="cflow-tag ct-amber">发布者</span></span><span class="cflow-arrow">▼</span></div><div class="cflow-body"><div class="cflow-inner">
+<div class="flow-d">
+<div class="flow-row"><span class="flow-node fn-purple">点击"+"</span><span class="flow-arr">→</span><span class="flow-node fn-amber">独立页：选类型</span><span class="flow-arr">→</span><span class="flow-node fn-amber"><span class="ref">配置定价<span class="ref-tip"><strong>参考「卡片金额」 · 5.1</strong><br>收益框架 + 三档诱饵</span></span></span><span class="flow-arr">→</span><span class="flow-node fn-amber">费用预览</span></div>
+<div class="flow-row" style="margin-top:6px"><span style="width:20px"></span><span class="flow-arr">→</span><span class="flow-node fn-red"><span class="ref">确认发布<span class="ref-tip"><strong>参考「确认留存」 · 6.1</strong><br>费用分解弹窗 + ROI + 托管</span></span></span><span class="flow-arr">→</span><span class="flow-node fn-amber"><span class="ref">监控进度<span class="ref-tip"><strong>参考「空状态反馈」 · 3.2</strong><br>实时看板</span></span></span></div>
+</div>
+<div class="p" style="font-size:11px">发布完成后返回广场。已发布任务在「我的」Tab中管理，不占广场空间。异常：<span class="ref">余额不足<span class="ref-tip"><strong>参考「确认留存」 · 8.1</strong><br>差额提示 + 一键补充</span></span></div>
+</div></div></div>
+
+<div class="cflow"><div class="cflow-head" onclick="tog(this)"><div class="cflow-icon" style="background:rgba(61,184,154,.12);color:var(--teal)">👤</div><span class="cflow-name">「我的」Tab 承载内容</span><span class="cflow-tags"><span class="cflow-tag ct-teal">双角色</span></span><span class="cflow-arrow">▼</span></div><div class="cflow-body"><div class="cflow-inner">
+<div class="p">「我的」同时承载接单者和发布者的管理功能：</div>
+<div class="flow-d">
+<div class="flow-row"><span class="flow-node fn-teal">我的</span><span class="flow-arr">→</span><span class="flow-node fn-gray"><span class="ref">收入仪表盘<span class="ref-tip"><strong>参考「确认留存」 · 7.3</strong><br>累计收入 + AI占比 + 趋势图</span></span></span></div>
+<div class="flow-row" style="margin-top:6px"><span style="width:20px"></span><span class="flow-arr">→</span><span class="flow-node fn-blue">我接的任务</span><span class="flow-arr">/</span><span class="flow-node fn-amber">我发布的任务</span><span class="flow-arr">/</span><span class="flow-node fn-gray"><span class="ref">余额/提现<span class="ref-tip"><strong>参考「信任」 · 1.4</strong><br>T+1到账 + 状态追踪</span></span></span></div>
+<div class="flow-row" style="margin-top:6px"><span style="width:20px"></span><span class="flow-arr">→</span><span class="flow-node fn-gray"><span class="ref">等级体系<span class="ref-tip"><strong>参考「确认留存」 · 7.1</strong><br>4级进度 + 权益</span></span></span><span class="flow-arr">/</span><span class="flow-node fn-gray">AI公司管理</span><span class="flow-arr">/</span><span class="flow-node fn-gray">设置</span></div>
+</div>
+</div></div></div>
+
+<div class="pc"><div class="pc-col pc-pro"><div class="pc-title" style="color:var(--green)">✅ 优势</div>· 广场纯粹服务接单——无干扰<br>· 收入概览条强化首屏价值感<br>· "+"在Tab栏中间，可发现性高<br>· AI入口在首屏，不藏在子Tab<br>· 2+1 Tab最简洁</div><div class="pc-col pc-con"><div class="pc-title" style="color:var(--red)">⚠️ 风险</div>· "我的"Tab承载较重（接+发+设置）<br>· 发布流程是独立页面，离开广场<br>· 中间凸出按钮需自定义TabBar<br>· 只有2个常规Tab，信息密度高</div></div>
+<div class="fb" data-id="f-vC"><div class="fb-t">团队反馈 — 方案C</div><div class="fb-desc">2Tab + 中置发布 · 广场纯接单 + 收入概览</div><div class="fb-btns"><button class="fb-b" onclick="sf(this,'a','f-vC')">✅ 选这个</button><button class="fb-b" onclick="sf(this,'d','f-vC')">💬 需讨论</button><button class="fb-b" onclick="sf(this,'x','f-vC')">❌ 不选</button></div><textarea class="fb-n" placeholder="补充说明…" onchange="sn(this,'f-vC')"></textarea></div>
+</section>
+
+<section class="sec" id="compare">
+<div class="sec-label" style="color:var(--amber)">COMPARISON</div>
+<div class="sec-title">对比总结</div>
+<table class="tb">
+<tr><th>维度</th><th style="color:var(--green)">A · 合并广场</th><th style="color:var(--blue)">B · 经典分离</th><th style="color:var(--purple)">C · 中置发布</th></tr>
+<tr><td>Tab数</td><td>3</td><td>4</td><td>2 + 中间"+"</td></tr>
+<tr><td>接/发关系</td><td>同Tab切换</td><td>独立Tab</td><td>广场纯接单 · "+"触发发布</td></tr>
+<tr><td>发布入口曝光</td><td style="color:var(--green)">高</td><td style="color:var(--red)">低</td><td style="color:var(--green)">高（Tab中间位）</td></tr>
+<tr><td>接发同屏</td><td style="color:var(--green)">✅ 切换可见</td><td style="color:var(--red)">❌</td><td style="color:var(--amber)">⚠️ 发布按钮常驻</td></tr>
+<tr><td>广场纯粹度</td><td style="color:var(--amber)">中（含发布Tab）</td><td style="color:var(--green)">高</td><td style="color:var(--green)">高（纯接单）</td></tr>
+<tr><td>首屏价值感</td><td style="color:var(--amber)">中</td><td style="color:var(--amber)">中</td><td style="color:var(--green)">高（收入概览条）</td></tr>
+<tr><td>竞品参考</td><td>淘宝买/卖</td><td>美团/滴滴</td><td>小红书（中置+）</td></tr>
+<tr><td>开发复杂度</td><td>低</td><td>低</td><td>中（自定义TabBar）</td></tr>
+</table>
+<div class="fb" data-id="f-final"><div class="fb-t">最终投票</div><div class="fb-desc">倾向哪个方案？可以补充混合想法</div><div class="fb-btns"><button class="fb-b" onclick="sf(this,'a','f-final')">🅰️ 合并广场</button><button class="fb-b" onclick="sf(this,'d','f-final')">🅱️ 经典分离</button><button class="fb-b" onclick="sf(this,'x','f-final')">🅲 中置发布</button></div><textarea class="fb-n" placeholder="你的想法 / 混合方案…" onchange="sn(this,'f-final')"></textarea></div>
+</section>
+
+</div>
+<div class="vote-bar"><span class="vi"><span class="vd" style="background:var(--green)"></span>A票 <strong id="ca">0</strong></span><span class="vi"><span class="vd" style="background:var(--blue)"></span>B票 <strong id="cd">0</strong></span><span class="vi"><span class="vd" style="background:var(--purple)"></span>C票 <strong id="cx">0</strong></span></div>
+
+<script src="/sync.js"></script>
+<script>
+const K='msc_arch_fb';
+SYNC.init('architecture',K);
+function ld(){try{return JSON.parse(localStorage.getItem(K))||{}}catch{return{}}}
+function sv(d){localStorage.setItem(K,JSON.stringify(d));up()}
+function tog(h){h.closest('.cflow').classList.toggle('open')}
+function sf(b,t,id){const cls=t==='a'?'s-a':t==='d'?'s-d':'s-x';const was=b.classList.contains(cls);b.parentElement.querySelectorAll('.fb-b').forEach(x=>x.className='fb-b');const d=ld();if(was){if(!d[id])d[id]={};delete d[id].c;d[id].t=new Date().toISOString();sv(d);SYNC.push(id,'')}else{b.classList.add(cls);d[id]={...(d[id]||{}),c:t,t:new Date().toISOString()};sv(d);SYNC.push(id,t)}}
+function sn(ta,id){const d=ld();d[id]={...(d[id]||{}),n:ta.value,t:new Date().toISOString()};sv(d);SYNC.push(id,undefined,ta.value)}
+function up(){const d=ld();let a=0,dd=0,x=0;Object.values(d).forEach(v=>{if(v.c==='a')a++;if(v.c==='d')dd++;if(v.c==='x')x++});document.getElementById('ca').textContent=a;document.getElementById('cd').textContent=dd;document.getElementById('cx').textContent=x}
+function render(d){Object.entries(d).forEach(([id,v])=>{const w=document.querySelector('.fb[data-id="'+id+'"]');if(!w)return;if(v.c){const bs=w.querySelectorAll('.fb-b');bs.forEach(x=>x.className='fb-b');const idx=v.c==='a'?0:v.c==='d'?1:2;if(bs[idx])bs[idx].classList.add(v.c==='a'?'s-a':v.c==='d'?'s-d':'s-x')}if(v.n){const ta=w.querySelector('.fb-n');if(ta)ta.value=v.n}});up()}
+document.addEventListener('DOMContentLoaded',async()=>{await SYNC.pull();render(ld())});
+const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){const id=e.target.id;document.querySelectorAll('.nav a').forEach(a=>{a.classList.toggle('active',a.getAttribute('href')==='#'+id)})}})},{rootMargin:'-100px 0px -60% 0px'});
+document.querySelectorAll('.sec[id]').forEach(s=>obs.observe(s));
+
+// Tooltip system — fixed positioning, no overflow clipping
+const gTip=document.getElementById('g-tip');
+document.querySelectorAll('.ref').forEach(ref=>{
+  const tipContent=ref.querySelector('.ref-tip');
+  if(!tipContent)return;
+  function show(e){
+    gTip.innerHTML=tipContent.innerHTML;
+    gTip.style.display='block';
+    const r=ref.getBoundingClientRect();
+    const tw=gTip.offsetWidth;
+    const th=gTip.offsetHeight;
+    let left=r.left+r.width/2-tw/2;
+    let top=r.top-th-10;
+    if(left<8)left=8;
+    if(left+tw>window.innerWidth-8)left=window.innerWidth-tw-8;
+    if(top<8){top=r.bottom+10;gTip.style.setProperty('--arr','top');} // flip below if no room above
+    gTip.style.left=left+'px';
+    gTip.style.top=top+'px';
+  }
+  function hide(){gTip.style.display='none';}
+  ref.addEventListener('mouseenter',show);
+  ref.addEventListener('mouseleave',hide);
+  ref.addEventListener('touchstart',e=>{e.preventDefault();show(e);setTimeout(hide,3000);},{passive:false});
+});
+</script>
+</body>
+</html>

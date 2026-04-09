@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MSC.AI · 维度E：AI资产确权机制与体验设计</title>
+<style>
+:root {
+  --bg: #0D0F14;
+  --bg-card: #161922;
+  --bg-card-hover: #1C1F2B;
+  --bg-input: #1E2130;
+  --border: #2A2D3A;
+  --border-light: #353849;
+  --text: #E8E9ED;
+  --text-secondary: #9CA0B0;
+  --text-muted: #6B7084;
+  --accent: #6C5CE7;
+  --accent-light: #A29BFE;
+  --green: #00B894;
+  --green-bg: rgba(0,184,148,0.12);
+  --amber: #FDCB6E;
+  --amber-bg: rgba(253,203,110,0.12);
+  --red: #FF6B6B;
+  --red-bg: rgba(255,107,107,0.12);
+  --blue: #74B9FF;
+  --blue-bg: rgba(116,185,255,0.12);
+  --cyan: #81ECEC;
+  --gold: #F9CA24;
+  --gold-bg: rgba(249,202,36,0.12);
+  --chain: #00CEC9;
+  --chain-bg: rgba(0,206,201,0.10);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 2px 12px rgba(0,0,0,0.3);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--text); font-family:'PingFang SC','Microsoft YaHei','Helvetica Neue',sans-serif; line-height:1.7; -webkit-font-smoothing:antialiased; }
+
+/* Header */
+.header { position:sticky; top:0; z-index:100; background:rgba(13,15,20,0.92); backdrop-filter:blur(16px); border-bottom:1px solid var(--border); padding:16px 24px; }
+.header-inner { max-width:900px; margin:0 auto; }
+.header h1 { font-size:18px; font-weight:700; margin-bottom:4px; }
+.header h1 span { color:var(--accent-light); }
+.header p { font-size:13px; color:var(--text-muted); }
+.nav { display:flex; gap:6px; margin-top:12px; flex-wrap:wrap; }
+.nav a { font-size:12px; padding:4px 10px; border-radius:20px; background:var(--bg-card); color:var(--text-secondary); text-decoration:none; border:1px solid var(--border); transition:all .2s; white-space:nowrap; }
+.nav a:hover, .nav a.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+
+/* Main */
+.main { max-width:900px; margin:0 auto; padding:24px 16px 80px; }
+
+/* Section */
+.section { margin-bottom:40px; }
+.section-head { font-size:20px; font-weight:700; margin-bottom:6px; padding-top:20px; }
+.section-head .num { color:var(--accent-light); margin-right:8px; }
+.section-sub { font-size:14px; color:var(--text-secondary); margin-bottom:20px; line-height:1.6; }
+
+/* Cards */
+.card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); margin-bottom:14px; overflow:hidden; }
+.card-head { display:flex; align-items:center; gap:10px; padding:14px 18px; cursor:pointer; user-select:none; transition:background .15s; }
+.card-head:hover { background:var(--bg-card-hover); }
+.card-num { font-size:13px; font-weight:700; padding:2px 8px; border-radius:6px; flex-shrink:0; }
+.card-num.purple { background:rgba(108,92,231,0.2); color:var(--accent-light); }
+.card-num.green { background:var(--green-bg); color:var(--green); }
+.card-num.blue { background:var(--blue-bg); color:var(--blue); }
+.card-num.gold { background:var(--gold-bg); color:var(--gold); }
+.card-num.chain { background:var(--chain-bg); color:var(--chain); }
+.card-num.red { background:var(--red-bg); color:var(--red); }
+.card-name { font-size:14px; font-weight:600; flex:1; }
+.card-arrow { color:var(--text-muted); font-size:12px; transition:transform .2s; }
+.card-head.open .card-arrow { transform:rotate(180deg); }
+.card-body { display:none; padding:0 18px 18px; }
+.card-body.show { display:block; }
+.card-inner { font-size:13px; line-height:1.8; color:var(--text-secondary); }
+
+/* Tags */
+.tag { display:inline-block; font-size:11px; padding:2px 8px; border-radius:10px; font-weight:600; margin:0 3px; vertical-align:middle; }
+.tag-new { background:var(--green-bg); color:var(--green); }
+.tag-key { background:rgba(108,92,231,0.15); color:var(--accent-light); }
+.tag-chain { background:var(--chain-bg); color:var(--chain); }
+.tag-biz { background:var(--amber-bg); color:var(--amber); }
+.tag-ux { background:var(--blue-bg); color:var(--blue); }
+.tag-risk { background:var(--red-bg); color:var(--red); }
+
+/* Wireframe blocks */
+.wf { background:var(--bg-input); border:1px solid var(--border); border-radius:var(--radius-sm); padding:16px; margin:12px 0; font-family:'SF Mono','Fira Code','Courier New',monospace; font-size:12px; line-height:1.8; white-space:pre-wrap; color:var(--text); overflow-x:auto; }
+
+/* Flow diagrams */
+.flow { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:14px 0; padding:14px; background:var(--bg-input); border-radius:var(--radius-sm); }
+.flow-step { background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:8px 14px; font-size:12px; font-weight:600; text-align:center; min-width:80px; }
+.flow-step.highlight { border-color:var(--accent); background:rgba(108,92,231,0.12); color:var(--accent-light); }
+.flow-step.chain-hl { border-color:var(--chain); background:var(--chain-bg); color:var(--chain); }
+.flow-step.gold-hl { border-color:var(--gold); background:var(--gold-bg); color:var(--gold); }
+.flow-arrow { color:var(--text-muted); font-size:16px; flex-shrink:0; }
+
+/* Comparison tables */
+.cmp { width:100%; border-collapse:collapse; margin:14px 0; font-size:13px; }
+.cmp th { text-align:left; padding:10px 12px; background:var(--bg-input); border-bottom:1px solid var(--border); color:var(--text-muted); font-weight:600; font-size:12px; }
+.cmp td { padding:10px 12px; border-bottom:1px solid var(--border); vertical-align:top; }
+.cmp tr:last-child td { border-bottom:none; }
+.cmp .label { color:var(--text-muted); font-size:12px; }
+
+/* Phone mockup */
+.phone-wrap { display:flex; justify-content:center; margin:18px 0; }
+.phone { width:280px; background:#000; border-radius:28px; padding:12px; border:2px solid #333; }
+.phone-screen { background:var(--bg); border-radius:20px; overflow:hidden; padding:16px; min-height:360px; }
+.phone-label { text-align:center; font-size:12px; color:var(--text-muted); margin-top:8px; }
+.mock-card { background:var(--bg-card); border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:10px; }
+.mock-btn { display:block; text-align:center; padding:10px; border-radius:8px; font-size:13px; font-weight:600; margin:6px 0; cursor:default; }
+.mock-btn-primary { background:var(--accent); color:#fff; }
+.mock-btn-gold { background:linear-gradient(135deg,var(--gold),#E17055); color:#fff; }
+.mock-btn-ghost { background:transparent; border:1px solid var(--border); color:var(--text-secondary); }
+.mock-badge { display:inline-block; font-size:10px; padding:2px 6px; border-radius:4px; font-weight:600; }
+.mock-divider { height:1px; background:var(--border); margin:10px 0; }
+
+/* CEO Feedback */
+.fb { margin-top:16px; padding:14px; background:rgba(108,92,231,0.06); border:1px solid rgba(108,92,231,0.15); border-radius:var(--radius-sm); }
+.fb-t { font-size:12px; color:var(--accent-light); font-weight:600; margin-bottom:8px; }
+.fb-btns { display:flex; gap:8px; margin-bottom:8px; }
+.fb-b { font-size:12px; padding:6px 14px; border-radius:6px; border:1px solid var(--border); background:var(--bg-card); color:var(--text-secondary); cursor:pointer; transition:all .15s; }
+.fb-b:hover { border-color:var(--text-muted); }
+.fb-b.s-a { background:var(--green-bg); color:var(--green); border-color:var(--green); }
+.fb-b.s-d { background:var(--amber-bg); color:var(--amber); border-color:var(--amber); }
+.fb-b.s-x { background:var(--red-bg); color:var(--red); border-color:var(--red); }
+.fb-n { width:100%; background:var(--bg-input); border:1px solid var(--border); border-radius:6px; padding:8px 10px; color:var(--text); font-size:12px; resize:vertical; min-height:36px; font-family:inherit; }
+.fb-n::placeholder { color:var(--text-muted); }
+
+/* Summary bar */
+.summary-bar { position:fixed; bottom:0; left:0; right:0; background:rgba(13,15,20,0.95); backdrop-filter:blur(12px); border-top:1px solid var(--border); padding:10px 24px; z-index:100; }
+.summary-inner { max-width:900px; margin:0 auto; display:flex; align-items:center; justify-content:center; gap:20px; font-size:13px; }
+.summary-inner span { display:flex; align-items:center; gap:4px; }
+
+/* Highlight boxes */
+.highlight-box { background:rgba(108,92,231,0.08); border-left:3px solid var(--accent); padding:12px 16px; margin:12px 0; border-radius:0 var(--radius-sm) var(--radius-sm) 0; font-size:13px; line-height:1.7; }
+.chain-box { background:var(--chain-bg); border-left:3px solid var(--chain); padding:12px 16px; margin:12px 0; border-radius:0 var(--radius-sm) var(--radius-sm) 0; font-size:13px; line-height:1.7; }
+
+/* Expand/collapse controls */
+.controls { display:flex; gap:8px; margin-bottom:16px; }
+.ctrl-btn { font-size:12px; padding:5px 12px; border-radius:6px; border:1px solid var(--border); background:var(--bg-card); color:var(--text-secondary); cursor:pointer; transition:all .15s; }
+.ctrl-btn:hover { border-color:var(--accent); color:var(--accent-light); }
+
+strong { color:var(--text); font-weight:600; }
+
+@media(max-width:600px) {
+  .header { padding:12px 16px; }
+  .nav a { font-size:11px; padding:3px 8px; }
+  .phone { width:260px; }
+  .flow { gap:6px; }
+  .flow-step { font-size:11px; padding:6px 10px; min-width:60px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <h1>MSC.AI · <span>维度E：AI资产确权</span></h1>
+    <p>机制设计 + 区块链存证 + 用户体验流程 | Chat E 交付物</p>
+    <div class="nav">
+      <a href="#mechanism" class="active">E.1 确权是什么</a>
+      <a href="#blockchain">E.2 区块链存证</a>
+      <a href="#rights">E.3 确权后拥有什么</a>
+      <a href="#ux-flow">E.4 确权体验设计</a>
+      <a href="#white-gold">E.5 白版→金版</a>
+      <a href="#certificate">E.6 确权证书</a>
+      <a href="#compliance">E.7 合规与风控</a>
+      <a href="#deposit">E.8 保证金机制</a>
+      <a href="#dashboard">E.9 资产仪表盘</a>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- Controls -->
+<div class="controls">
+  <button class="ctrl-btn" onclick="toggleAll(true)">全部展开</button>
+  <button class="ctrl-btn" onclick="toggleAll(false)">全部收起</button>
+</div>
+
+<!-- Expert Review Summary -->
+<div class="card" style="border-color:var(--accent); margin-bottom:28px;">
+  <div class="card-head" onclick="tog(this)">
+    <span class="card-num purple">⚡</span>
+    <span class="card-name">专业审核摘要 — 10个修正点</span>
+    <span class="card-arrow">▼</span>
+  </div>
+  <div class="card-body show"><div class="card-inner">
+    <p>本文档经法律合规、UX设计、市场营销、商业模式、技术架构五个维度的专业审核后，做了以下关键修正：</p>
+    <table class="cmp" style="margin-top:12px">
+      <tr><th>#</th><th>修正点</th><th>维度</th><th>位置</th></tr>
+      <tr><td>1</td><td><strong>数据交易所</strong>替代Polygon成为确权首推路径</td><td>法律</td><td>E.1.1</td></tr>
+      <tr><td>2</td><td>42号文（2026.2.6）已<strong>全面禁止境内RWA代币化</strong>，Phase 3方向关闭</td><td>法律</td><td>E.2.2</td></tr>
+      <tr><td>3</td><td>权利框架从自创模型改为法定<strong>"三权分置"</strong>制度</td><td>法律</td><td>E.3.1</td></tr>
+      <tr><td>4</td><td>收益分红权/配额权<strong>涉嫌非法集资</strong>，改为"自有资产产出收益"</td><td>法律</td><td>E.7.3</td></tr>
+      <tr><td>5</td><td>白版确权从"完全无感"改为<strong>"低摩擦+有仪式感"</strong></td><td>UX</td><td>E.5.1</td></tr>
+      <tr><td>6</td><td>确权流程加入<strong>"确权后能多赚多少"</strong>的价值预览</td><td>UX</td><td>E.4.2</td></tr>
+      <tr><td>7</td><td>分享卡片加入<strong>裂变钩子</strong>（扫码获得白版资产）</td><td>营销</td><td>E.6.2</td></tr>
+      <tr><td>8</td><td>新增<strong>文案红线</strong>：代币/通证/RWA/上链交易等词全面禁用</td><td>法律</td><td>E.7.2</td></tr>
+      <tr><td>9</td><td>新增<strong>确权后资产仪表盘</strong>设计，解决"确权后用户看到什么"</td><td>UX</td><td>E.9</td></tr>
+      <tr><td>10</td><td>保证金三档加入<strong>价值锚定</strong>（投入产出比对照）</td><td>营销</td><td>E.8.1</td></tr>
+    </table>
+  </div></div>
+</div>
+
+<!-- ==================== E.1 确权机制 ==================== -->
+<div class="section" id="mechanism">
+  <div class="section-head"><span class="num">E.1</span>AI资产确权到底是什么</div>
+  <div class="section-sub">确权本质是回答三个问题：这个AI资产<strong>是什么</strong>、<strong>属于谁</strong>、<strong>怎么证明</strong>。以下拆解四种主流方案及MSC.AI的选择。</div>
+
+  <div class="card">
+    <div class="card-head" onclick="tog(this)">
+      <span class="card-num purple">E.1.1</span>
+      <span class="card-name">四种确权方案对比</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body"><div class="card-inner">
+
+      <table class="cmp">
+        <tr><th>方案</th><th>原理</th><th>成本</th><th>公信力</th><th>适用阶段</th></tr>
+        <tr>
+          <td><strong>A. 平台数据库</strong></td>
+          <td>中心化记录，平台维护权属表</td>
+          <td style="color:var(--green)">极低</td>
+          <td style="color:var(--amber)">依赖平台信誉</td>
+          <td>现在（基础层）</td>
+        </tr>
+        <tr>
+          <td><strong>B. 数据交易所登记</strong> <span class="tag tag-key">推荐</span></td>
+          <td>通过国内数据交易所（上海/深圳/贵阳等）进行数据资产登记确权，获得官方凭证</td>
+          <td style="color:var(--amber)">中等（需对接）</td>
+          <td style="color:var(--green)">强 — 可用于融资、入表、仲裁</td>
+          <td>A轮后优先推进</td>
+        </tr>
+        <tr>
+          <td><strong>C. 公链哈希存证</strong></td>
+          <td>确权记录哈希写入Polygon，不可篡改但无法律效力</td>
+          <td style="color:var(--green)">极低</td>
+          <td style="color:var(--amber)">技术可验证，但无官方背书</td>
+          <td>可选（信任增强）</td>
+        </tr>
+        <tr>
+          <td><strong>D. 联盟链</strong></td>
+          <td>蚂蚁链/长安链，监管友好</td>
+          <td style="color:var(--amber)">中等</td>
+          <td style="color:var(--green)">强（国内认可）</td>
+          <td>中远期</td>
+        </tr>
+        <tr>
+          <td><strong>E. RWA代币化</strong> <span class="tag tag-risk">已禁止</span></td>
+          <td><s>收益权代币化上链交易</s></td>
+          <td colspan="2" style="color:var(--red)">42号文（2026.2.6）明确境内禁止</td>
+          <td style="color:var(--red)">不可行</td>
+        </tr>
+      </table>
+
+      <div class="highlight-box">
+        <strong>修订后策略：A → B（数据交易所），C可选</strong><br>
+        <strong>Phase 1（现在）：</strong>平台数据库做基础确权（A），可选加Polygon哈希存证（C）作为技术信任增强。<br>
+        <strong>Phase 2（A轮后）：</strong>对接国内数据交易所（上海/深圳/贵阳），获得官方数据资产登记凭证（B）。全国已有80+数据交易所，登记凭证可用于资产入表、质押融资、争议仲裁——这是Polygon哈希做不到的。<br>
+        <strong>不再规划：</strong>RWA代币化方向在境内已被42号文全面禁止。
+      </div>
+
+      <div class="chain-box">
+        <strong>⚡ 专家审核意见：</strong>原方案将Polygon公链存证作为首推方案，这在技术上可行但方向有偏差。国内已有成熟的数据资产确权基础设施（数据交易所体系），其法律效力和商业价值远超海外公链存证。Polygon存证可作为辅助手段保留，但不应作为确权体系的核心。数据交易所路径同时解决了"合规性"和"公信力"两个问题。
+      </div>
+
+      <div class="fb" data-id="e1.1">
+        <div class="fb-t">CEO 反馈</div>
+        <div class="fb-btns">
+          <button class="fb-b" onclick="sf(this,'a','e1.1')">✅ 同意</button>
+          <button class="fb-b" onclick="sf(this,'d','e1.1')">💬 需讨论</button>
+          <button class="fb-b" onclick="sf(this,'x','e1.1')">❌ 不同意</button>
+        </div>
+        <textarea class="fb-n" placeholder="备注…" onchange="sn(this,'e1.1')"></textarea>
+      </div>
+
+    </div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="tog(this)">
+      <span class="card-num purple">E.1.2</span>
+      <span class="card-name">确权回答的三个问题</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body"><div class="card-inner">
+
+      <table class="cmp">
+        <tr><th>问题</th><th>确权要记录什么</th><th>对应UI展示</th></tr>
+        <tr>
+          <td><strong>① 是什么</strong><br><span class="label">资产定义</span></td>
+          <td>资产类型（AI公司/Agent/模型）、底层技术栈、能力描述、开源协议标注</td>
+          <td>确权证书 · 资产信息区</td>
+        </tr>
+        <tr>
+          <td><strong>② 属于谁</strong><br><span class="label">权属绑定</span></td>
+          <td>确权人身份（微信OpenID）、确权时间、唯一资产编号</td>
+          <td>确权证书 · 权属信息区</td>
+        </tr>
+        <tr>
+          <td><strong>③ 怎么证明</strong><br><span class="label">存证机制</span></td>
+          <td>平台记录ID + 链上哈希 + 时间戳</td>
+          <td>确权证书 · 链上验证入口</td>
+        </tr>
+      </table>
+
+    </div></div>
+  </div>
+</div>
+
+<!-- ==================== E.2 区块链存证 ==================== -->
+<div class="section" id="blockchain">
+  <div class="section-head"><span class="num">E.2</span>区块链存证方案</div>
+  <div class="section-sub">"链上审计，链下体验"——用户操作全部在微信小程序内完成，区块链只在后台做不可篡改的存证。</div>
+
+  <div class="card">
+    <div class="card-head" onclick="tog(this)">
+      <span class="card-num chain">E.2.1</span>
+      <span class="card-name">存证流程（技术架构）</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body"><div class="card-inner">
+
+      <div class="flow">
+        <div class="flow-step">用户点击<br>「确权」</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step highlight">平台生成<br>确权记录</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step chain-hl">计算记录<br>SHA-256哈希</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step chain-hl">哈希写入<br>Polygon链</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step gold-hl">返回TxHash<br>生成证书</div>
+      </div>
+
+      <div class="chain-box">
+        <strong>关键点：</strong>资产本身不上链（体积大、成本高），上链的只是一个32字节的哈希指纹。任何人拿到这个哈希，可以在Polygon区块链浏览器上验证：这条记录确实在某个时间点存在过，且未被篡改。<br><br>
+        <strong>成本估算：</strong>Polygon链上一笔交易 ≈ $0.001-0.01，即使每天1000次确权，月成本 < $300。
+      </div>
+
+      <div class="fb" data-id="e2.1">
+        <div class="fb-t">CEO 反馈</div>
+        <div class="fb-btns">
+          <button class="fb-b" onclick="sf(this,'a','e2.1')">✅ 同意</button>
+          <button class="fb-b" onclick="sf(this,'d','e2.1')">💬 需讨论</button>
+          <button class="fb-b" onclick="sf(this,'x','e2.1')">❌ 不同意</button>
+        </div>
+        <textarea class="fb-n" placeholder="备注…" onchange="sn(this,'e2.1')"></textarea>
+      </div>
+
+    </div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="tog(this)">
+      <span class="card-num chain">E.2.2</span>
+      <span class="card-name">三阶段链上升级路径</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body"><div class="card-inner">
+
+      <table class="cmp">
+        <tr><th>阶段</th><th>技术方案</th><th>能力</th><th>时间线</th></tr>
+        <tr>
+          <td><strong>Phase 1</strong><br><span class="tag tag-chain">当前</span></td>
+          <td>Polygon公链哈希存证</td>
+          <td>不可篡改的确权时间戳 + 哈希验证<br><span class="label">注：哈希存证 ≠ 代币化，不涉及发行代币/通证，不触发42号文</span></td>
+          <td>Pre-A阶段</td>
+        </tr>
+        <tr>
+          <td><strong>Phase 2</strong></td>
+          <td>接入国内联盟链（蚂蚁链/长安链）</td>
+          <td>+ 合规背书 + 跨平台互认</td>
+          <td>A轮后</td>
+        </tr>
+        <tr>
+          <td><strong>Phase 3</strong> <span class="tag tag-risk">⚠️ 42号文</span></td>
+          <td><s>RWA代币化</s></td>
+          <td><s>份额化持有 + 链上交易 + 分红权</s></td>
+          <td style="color:var(--red)">境内已禁止</td>
+        </tr>
+      </table>
+
+      <div class="highlight-box" style="border-left-color:var(--red); background:var(--red-bg);">
+        <strong>⚠️ 重大监管变化 — 42号文（2026年2月6日）</strong><br><br>
+        央行等八部委联合发布《关于进一步防范和处置虚拟货币等相关风险的通知》（银发〔2026〕42号），<strong>明确在境内开展RWA代币化活动属于非法金融活动，严格禁止。</strong><br><br>
+        42号文对RWA的定义为："使用加密技术及分布式账本或类似技术，将资产的所有权、收益权等转化为代币（通证）并进行发行和交易的活动。"<br><br>
+        <strong>对MSC.AI的影响：</strong><br>
+        ① Phase 3的RWA代币化方向在境内不可行，需放弃或转移至境外合规地区（香港/新加坡），且境外发行需证监会备案<br>
+        ② Phase 1的哈希存证不受影响——写入链上的是数据指纹（哈希值），不涉及发行代币或通证<br>
+        ③ 所有面向用户的文案中严禁出现"代币""通证""Token""RWA"等字眼<br>
+        ④ 资产交易如果涉及"收益权转化为可交易凭证"，可能被认定为RWA活动
+      </div>
+
+      <div class="fb" data-id="e2.2">
+        <div class="fb-t">CEO 反馈</div>
+        <div class="fb-btns">
+          <button class="fb-b" onclick="sf(this,'a','e2.2')">✅ 同意</button>
+          <button class="fb-b" onclick="sf(this,'d','e2.2')">💬 需讨论</button>
+          <button class="fb-b" onclick="sf(this,'x','e2.2')">❌ 不同意</button>
+        </div>
+        <textarea class="fb-n" placeholder="备注…" onchange="sn(this,'e2.2')"></textarea>
+      </div>
+
+    </div></div>
+  </div>
+</div>
+
+<!-- ==================== E.3 权利结构 ==================== -->
+<div class="section" id="rights">
+  <div class="section-head"><span class="num">E.3</span>用户确权后拥有什么</div>
+  <div class="section-sub">精确定义权利边界，避免过度承诺（法律风险）和过度免责（杀死转化率）。</div>
+
+  <div class="card">
+    <div class="card-head" onclick="tog(this)">
+      <span class="card-num gold">E.3.1</span>
+      <span class="card-name">三层权利模型</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body"><div class="card-inner">
+
+      <p><span class="tag tag-key">专家修正</span> 原方案自创了"三层权利模型"，但中国已有法定的数据产权框架——"数据二十条"确立的<strong>三权分置</strong>制度。MSC.AI应直接对齐此框架：</p>
+
+      <table class="cmp" style="margin-top:12px">
+        <tr><th>权利</th><th>定义</th><th>对应到AI资产</th><th>归属</th></tr>
+        <tr>
+          <td><strong>数据资源持有权</strong></td>
+          <td>对数据资源的合法持有、管理和存储</td>
+          <td>AI模型/Agent的原始代码和训练数据</td>
+          <td>原始开发者 或 平台（经授权）</td>
+        </tr>
+        <tr>
+          <td><strong>数据加工使用权</strong></td>
+          <td>对数据进行加工、分析、使用的权利</td>
+          <td>用户对AI资产的配置、微调、业务化使用</td>
+          <td style="color:var(--green)"><strong>确权用户</strong></td>
+        </tr>
+        <tr>
+          <td><strong>数据产品经营权</strong></td>
+          <td>将数据加工为产品后的经营、收益、流通权</td>
+          <td>用户用AI资产产出的成果、赚取的收益</td>
+          <td style="color:var(--green)"><strong>确权用户</strong></td>
+        </tr>
+      </table>
+
+      <div class="highlight-box">
+        <strong>用户沟通类比：</strong>确权像「域名注册」——DNS系统不属于你，但这个域名在你名下，你可以使用、转让、基于它构建业务。<br><br>
+        <strong>确权证书措辞（修正）：</strong>"本证书确认您对以下AI资产的<strong>加工使用权</strong>及<strong>产品经营权</strong>"——直接使用法定术语，而非自造概念。
+      </div>
+
+      <div class="chain-box">
+        <strong>⚡ 专家审核意见：</strong>原"三层权利模型"（底层模型/平台增值层/用户定制层）作为产品内部理解是合理的，但不应出现在面向用户的法律文件和确权证书中。面向用户应使用"三权分置"的法定术语，一方面增强合规性，另一方面在未来对接数据交易所登记时可以无缝衔接。
+      </div>
+
+      <div class="fb" data-id="e3.1">
+        <div class="fb-t">CEO 反馈</div>
+        <div class="fb-btns">
+          <button class="fb-b" onclick="sf(this,'a','e3.1')">✅ 同意</button>
+          <button class="fb-b" onclick="sf(this,'d','e3.1')">💬 需讨论</button>
+          <button class="fb-b" onclick="sf(this,'x','e3.1')">❌ 不同意</button>
+        </div>
+        <textarea class="fb-n" placeholder="备注…" onchange="sn(this,'e3.1')"></textarea>
+      </div>
+
+    </div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="tog(this)">
+      <span class="card-num gold">E.3.2</span>
+      <span class="card-name">两种权益设计：收益分红权 + 配额权</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body"><div class="card-inner">
+
+      <p><span class="tag tag-biz">战略方向</span> AI资产不只是工具，而是可持有、可交易、有收益权的资产。以下是两种核心权益的定义：</p>
+
+      <table class="cmp" style="margin-top:12px">
+        <tr><th>权益</th><th>定义</th><th>举例</th><th>前提条件</th></tr>
+        <tr>
+          <td><strong>AI收益分红权</strong> <span class="tag tag-risk">法律风险</span></td>
+          <td>AI资产产出的收益，按持有比例分配给确权用户</td>
+          <td>餐厅AI资产月产出¥10,000 → 持有者按比例分红</td>
+          <td style="color:var(--red)">⚠️ 见E.7.3风险分析</td>
+        </tr>
+        <tr>
+          <td><strong>配额权</strong> <span class="tag tag-risk">法律风险</span></td>
+          <td>确权用户持有的份额比例，决定分红比例和投票权重</td>
+          <td>持有10%配额 → 获得10%分红</td>
+          <td style="color:var(--red)">⚠️ 份额化可能触发证券认定</td>
+        </tr>
+      </table>
+
+      <div class="highlight-box">
+        <strong>关键共识：</strong>金融化的前提是产出已被验证。股票存在的根本原因是企业需要融资把蛋糕做大。同理，AI资产份额化交易的合理性在于：AI Agent扩大规模需要资金投入（更多算力/API/数据），此时卖配额权换资金才有合理性。<br><br>
+        <strong>当前阶段策略：</strong>先验证AI自动化产出 → 积累真实数据 → 数据支撑定价 → 再开放份额化交易。
+      </div>
+
+      <div class="fb" data-id="e3.2">
+        <div class="fb-t">CEO 反馈</div>
+        <div class="fb-btns">
+          <button class="fb-b" onclick="sf(this,'a','e3.2')">✅ 同意</button>
+          <button class="fb-b" onclick="sf(this,'d','e3.2')">💬 需讨论</button>
+          <button class="fb-b" onclick="sf(this,'x','e3.2')">❌ 不同意</button>
+        </div>
+        <textarea class="fb-n" placeholder="备注…" onchange="sn(this,'e3.2')"></textarea>
+      </div>
+
+    </div></div>
+  </div>
+</div>
+
+<!-- ==================== E.4 确权UX流程 ==================== -->
+<div class="section" id="ux-flow">
+  <div class="section-head"><span class="num">E.4</span>App内确权体验设计</div>
+  <div class="section-sub">核心原则：确权嵌入自然使用路径，不做独立入口。用户"做着做着就确权了"。</div>
+
+  <div class="card">
+    <div class="card-head" onclick="tog(this)">
+      <span class="card-num blue">E.4.1</span>
+      <span class="card-name">确权触发时机（不设独立入口）</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body"><div class="card-inner">
+
+      <p><span class="tag tag-ux">UX原则</span> 确权不是一个"功能"，是用户成长路径中的自然节点。</p>
+
+      <table class="cmp" style="margin-top:12px">
+        <tr><th>触发场景</th><th>确权类型</th><th>用户感知</th></tr>
+        <tr>
+          <td><strong>首次发布任务</strong></td>
+          <td>自动创建白版资产（零摩擦）</td>
+          <td>只看到"任务发布成功" + 底部轻量提示</td>
+        </tr>
+        <tr>
+          <td><strong>白版资产积累产出后</strong></td>
+          <td>引导升级金版（交保证金）</td>
+          <td>看到资产已产出的价值 + 升级收益对比</td>
+        </tr>
+        <tr>
+          <td><strong>浏览AI资产市场时</strong></td>
+          <td>购买/确权他人资产</td>
+          <td>类似"购买" + 确权证书生成</td>
+        </tr>
+        <tr>
+          <td><strong>"我的"页面主动操作</strong></td>
+          <td>查看/管理已确权资产</td>
+          <td>资产仪表盘 + 链上记录</td>
+        </tr>
+      </table>
+
+      <div class="fb" data-id="e4.1">
+        <div class="fb-t">CEO 反馈</div>
+        <div class="fb-btns">
+          <button class="fb-b" onclick="sf(this,'a','e4.1')">✅ 同意</button>
+          <button class="fb-b" onclick="sf(this,'d','e4.1')">💬 需讨论</button>
+          <button class="fb-b" onclick="sf(this,'x','e4.1')">❌ 不同意</button>
+        </div>
+        <textarea class="fb-n" placeholder="备注…" onchange="sn(this,'e4.1')"></textarea>
+      </div>
+
+    </div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="tog(this)">
+      <span class="card-num blue">E.4.2</span>
+      <span class="card-name">3步确权流程（金版升级）</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body"><div class="card-inner">
+
+      <div class="flow">
+        <div class="flow-step highlight">Step 1<br>确认资产信息</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step gold-hl">Step 2<br>支付保证金</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step chain-hl">Step 3<br>链上存证<br>+ 证书生成</div>
+      </div>
+
+      <!-- Phone mockup: Step 1 -->
+      <div class="phone-wrap">
+        <div>
+          <div class="phone">
+            <div class="phone-screen">
+              <div style="font-size:15px; font-weight:700; margin-bottom:14px;">确认资产信息</div>
+
+              <div class="mock-card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                  <span style="font-size:14px; font-weight:600;">🤖 我的AI助手-涨粉</span>
+                  <span class="mock-badge" style="background:var(--green-bg); color:var(--green);">白版 → 金版</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted); line-height:1.6;">
+                  类型：抖音涨粉Agent<br>
+                  已完成任务：3个<br>
+                  累计产出：¥45.00<br>
+                  底层模型：GPT-4o Mini
+                </div>
+              </div>
+
+              <div class="mock-card" style="border-color:var(--gold); background:var(--gold-bg);">
+                <div style="font-size:13px; font-weight:600; color:var(--gold); margin-bottom:6px;">🎁 限时活动</div>
+                <div style="font-size:12px; color:var(--text-secondary); line-height:1.6;">
+                  交¥100保证金，平台<strong style="color:var(--gold);">额外赠送¥100</strong>任务基金<br>
+                  <span style="color:var(--text-muted);">相当于免费获得100元任务额度</span>
+                </div>
+              </div>
+
+              <div class="mock-btn mock-btn-gold" style="margin-top:14px;">下一步：支付保证金 →</div>
+            </div>
+          </div>
+          <div class="phone-label">Step 1：确认资产信息</div>
+        </div>
+      </div>
+
+      <!-- Phone mockup: Step 3 -->
+      <div class="phone-wrap">
+        <div>
+          <div class="phone">
+            <div class="phone-screen">
+              <div style="text-align:center; padding-top:10px;">
+                <div style="font-size:40px; margin-bottom:8px;">🎉</div>
+                <div style="font-size:16px; font-weight:700; margin-bottom:4px;">确权成功</div>
+                <div style="font-size:12px; color:var(--text-muted); margin-bottom:16px;">您的AI资产已完成链上存证</div>
+              </div>
+
+              <div class="mock-card" style="border-color:var(--chain); background:var(--chain-bg);">
+                <div style="font-size:12px; color:var(--chain); margin-bottom:6px; font-weight:600;">🔗 链上记录</div>
+                <div style="font-size:11px; color:var(--text-secondary); line-height:1.6; word-break:break-all;">
+                  TxHash: 0x7a3f...b82e<br>
+                  链：Polygon · 区块 #58291047<br>
+                  时间：2026-04-08 14:32:05 UTC
+                </div>
+                <div style="font-size:11px; color:var(--chain); margin-top:6px; text-decoration:underline; cursor:pointer;">
+                  在区块链浏览器中验证 →
+                </div>
+              </div>
+
+              <div class="mock-card">
+                <div style="font-size:12px; color:var(--text-muted); margin-bottom:4px;">资产编号</div>
+                <div style="font-size:14px; font-weight:700; font-family:monospace;">MSC-2026-00001</div>
+                <div class="mock-divider"></div>
+                <div style="font-size:12px; color:var(--text-muted); margin-bottom:4px;">权益</div>
+                <div style="font-size:12px; color:var(--text-secondary);">✅ 专属使用权 · ✅ 收益权 · ✅ 转让权</div>
+              </div>
+
+              <div class="mock-btn mock-btn-primary">查看我的AI资产</div>
+              <div class="mock-btn mock-btn-ghost">分享确权证书到朋友圈</div>
+            </div>
+          </div>
+          <div class="phone-label">Step 3：确权成功 + 链上存证</div>
+        </div>
+      </div>
+
+      <div class="fb" data-id="e4.2">
+        <div class="fb-t">CEO 反馈</div>
+        <div class="fb-btns">
+          <button class="fb-b" onclick="sf(this,'a','e4.2')">✅ 同意</button>
+          <button class="fb-b" onclick="sf(this,'d','e4.2')">💬 需讨论</button>
+          <button class="fb-b" onclick="sf(this,'x','e4.2')">❌ 不同意</button>
+        </div>
+        <textarea class="fb-n" placeholder="备注…" onchange="sn(this,'e4.2')"></textarea>
+      </div>
+
+    </div></div>
+  </div>
+</div>
+
+<!-- ==================== E.5 白版→金版 ==================== -->
+<div class="section" id="white-gold">
+  <div class="section-head"><span class="num">E.5</span>白版 → 金版渐进升级设计</div>
+  <div class="section-sub">设计原则："先给再收"，确权要"丝滑无负担"。利用禀赋效应让用户先拥有再付费。</div>
+
+  <div class="card">
+    <div class="card-head" onclick="tog(this)">
+      <span class="card-num green">E.5.1</span>
+      <span class="card-name">白版（零摩擦）自动确权</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body"><div class="card-inner">
+
+      <p><span class="tag tag-ux">触发时机</span> 用户发布第一个任务时，后台自动创建白版AI资产。<span class="tag tag-key">UX修正</span> 不应"完全无感"——确权是平台核心价值，用户需要明确知道自己获得了什么。</p>
+
+      <div class="chain-box">
+        <strong>⚡ 专家审核意见：</strong>原设计追求"零摩擦"导致了另一个问题：如果用户不知道自己拥有AI资产，后续金版升级的转化率会很低——升级的"对象"在用户心智中不存在。<br><br>
+        <strong>修正方案：</strong>保持低摩擦（不需要额外操作），但任务发布成功页的<strong>主视觉就是资产生成</strong>，而非角落里的小提示。3-5秒的确权动画时刻（资产卡片生成+编号分配），让用户明确感知"我拥有了一个AI资产"。这个感知是后续所有商业价值（升级/交易/留存）的心理基础。
+      </div>
+
+      <div class="phone-wrap">
+        <div>
+          <div class="phone">
+            <div class="phone-screen">
+              <div style="text-align:center; padding-top:12px;">
+                <div style="font-size:36px; margin-bottom:6px;">🤖</div>
+                <div style="font-size:16px; font-weight:700;">你的第一个AI资产已生成！</div>
+                <div style="font-size:12px; color:var(--text-muted); margin:4px 0 14px;">任务发布成功 · 编号 MSC-2026-00042</div>
+              </div>
+
+              <div class="mock-card" style="border-color:var(--accent); background:rgba(108,92,231,0.08);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                  <span style="font-size:13px; font-weight:600;">涨粉Agent · 白版</span>
+                  <span class="mock-badge" style="background:var(--green-bg); color:var(--green);">已确权</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-secondary); line-height:1.6;">
+                  类型：抖音涨粉 · 自动执行中<br>
+                  预计收益：¥15/次 · 3位接单者已响应
+                </div>
+              </div>
+
+              <div class="mock-btn mock-btn-primary">查看我的AI资产</div>
+              <div class="mock-btn mock-btn-ghost" style="margin-top:4px;">查看任务进度</div>
+
+              <div style="font-size:11px; color:var(--text-muted); text-align:center; margin-top:12px; line-height:1.5;">
+                💡 升级为金版可解锁更高收益<br>金版用户平均月收入是白版的2.3倍
+              </div>
+            </div>
+          </div>
+          <div class="phone-label">任务发布成功 + 白版资产自动生成提示</div>
+        </div>
+      </div>
+
+      <div class="highlight-box">
+        <span class="tag tag-ux">禀赋效应</span> 先给用户一个"免费的AI资产"，让他感觉已经拥有了。心理学研究表明，人对已拥有事物的估值远高于未拥有的。后续升级金版时，用户不是在"购买"，而是在"保护自己已有的东西"。
+      </div>
+
+      <div class="fb" data-id="e5.1">
+        <div class="fb-t">CEO 反馈</div>
+        <div class="fb-btns">
+          <button class="fb-b" onclick="sf(this,'a','e5.1')">✅ 同意</button>
+          <button class="fb-b" onclick="sf(this,'d','e5.1')">💬 需讨论</button>
+          <button class="fb-b" onclick="sf(this,'x','e5.1')">❌ 不同意</button>
+        </div>
+        <textarea class="fb-n" placeholder="备注…" onchange="sn(this,'e5.1')"></textarea>
+      </div>
+
+    </div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="tog(this)">
+      <span class="card-num green">E.5.2</span>
+      <span class="card-name">金版升级引导（阶梯触发）</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body"><div class="card-inner">
+
+      <p><span class="tag tag-ux">渐进承诺</span> 不在白版阶段就推销金版。等用户积累了产出数据后，用数据说话。</p>
+
+      <table class="cmp">
+        <tr><th>触发条件</th><th>引导方式</th><th>强度</th></tr>
+        <tr>
+          <td>白版完成 1 个任务</td>
+          <td>无引导，仅在"我的AI资产"页显示白版状态</td>
+          <td style="color:var(--text-muted)">无感</td>
+        </tr>
+        <tr>
+          <td>白版完成 3 个任务</td>
+          <td>「我的」页面出现升级提示卡片："已赚¥45，升级解锁更高收益"</td>
+          <td style="color:var(--amber)">轻量</td>
+        </tr>
+        <tr>
+          <td>白版产出 > ¥100</td>
+          <td>推送微信服务通知 + 「我的」页面金版对比卡片（白版 vs 金版权益）</td>
+          <td style="color:var(--green)">中等</td>
+        </tr>
+        <tr>
+          <td>用户主动点击"升级"</td>
+          <td>进入3步确权流程（E.4.2）</td>
+          <td style="color:var(--green)">用户主动</td>
+        </tr>
+      </table>
+
+      <div class="fb" data-id="e5.2">
+        <div class="fb-t">CEO 反馈</div>
+        <div class="fb-btns">
+          <button class="fb-b" onclick="sf(this,'a','e5.2')">✅ 同意</button>
+          <button class="fb-b" onclick="sf(this,'d','e5.2')">💬 需讨论</button>
+          <button class="fb-b" onclick="sf(this,'x','e5.2')">❌ 不同意</button>
+        </div>
+        <textarea class="fb-n" placeholder="备注…" onchange="sn(this,'e5.2')"></textarea>
+      </div>
+
+    </div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="tog(this)">
+      <span class="card-num green">E.5.3</span>
+      <span class="card-name">白版 vs 金版权益对比</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body"><div class="card-inner">
+
+      <table class="cmp">
+        <tr><th>功能</th><th>白版（免费）</th><th>金版（保证金）</th></tr>
+        <tr><td>AI自动执行任务</td><td>✅ 基础</td><td>✅ 优先 + 高价任务</td></tr>
+        <tr><td>收益提现</td><td>✅ 每周1次</td><td>✅ 随时提现</td></tr>
+        <tr><td>确权证书</td><td>❌</td><td>✅ 含链上存证</td></tr>
+        <tr><td>资产转让/交易</td><td>❌</td><td>✅</td></tr>
+        <tr><td>收益分红权</td><td>❌</td><td>✅</td></tr>
+        <tr><td>排行榜/可见度</td><td>❌</td><td>✅ 优先展示</td></tr>
+        <tr><td>1:1任务基金匹配</td><td>❌</td><td>✅ 交¥100得¥200额度</td></tr>
+      </table>
+
+      <div class="fb" data-id="e5.3">
+        <div class="fb-t">CEO 反馈</div>
+        <div class="fb-btns">
+          <button class="fb-b" onclick="sf(this,'a','e5.3')">✅ 同意</button>
+          <button class="fb-b" onclick="sf(this,'d','e5.3')">💬 需讨论</button>
+          <button class="fb-b" onclick="sf(this,'x','e5.3')">❌ 不同意</button>
+        </div>
+        <textarea class="fb-n" placeholder="备注…" onchange="sn(this,'e5.3')"></textarea>
+      </div>
+
+    </div></div>
+  </div>
+</div>
+
+<!-- ==================== E.6 确权证书 ==================== -->
+<div class="section" id="certificate">
+  <div class="section-head"><span class="num">E.6</span>确权证书设计</div>
+  <div class="section-sub">证书既是法律凭证，也是传播素材（可分享到朋友圈/微信群）。</div>
+
+  <div class="card">
+    <div class="card-head" onclick="tog(this)">
+      <span class="card-num gold">E.6.1</span>
+      <span class="card-name">证书信息字段</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body"><div class="card-inner">
+
+      <table class="cmp">
+        <tr><th>字段</th><th>内容</th><th>来源</th></tr>
+        <tr><td>资产编号</td><td>MSC-YYYY-NNNNN</td><td>平台生成</td></tr>
+        <tr><td>资产名称</td><td>用户自定义 / 系统默认</td><td>用户+系统</td></tr>
+        <tr><td>资产类型</td><td>AI公司 / Agent / 模型 / 数据集</td><td>系统分类</td></tr>
+        <tr><td>底层技术</td><td>GPT-4o / Llama 3 / 自研模型</td><td>系统标注</td></tr>
+        <tr><td>开源协议</td><td><span class="tag tag-chain">MIT</span> / <span class="tag" style="background:var(--amber-bg);color:var(--amber);">GPL</span> / <span class="tag tag-risk">AGPL</span></td><td>合规审查</td></tr>
+        <tr><td>确权人</td><td>微信昵称 + 脱敏ID</td><td>微信授权</td></tr>
+        <tr><td>确权时间</td><td>2026-04-08 14:32:05 UTC</td><td>系统时间戳</td></tr>
+        <tr><td>权利范围</td><td>专属使用权 · 收益权 · 转让权</td><td>平台协议</td></tr>
+        <tr><td>链上哈希</td><td>0x7a3f...b82e（可点击验证）</td><td>Polygon链</td></tr>
+        <tr><td>资产版本</td><td>白版 / 金版</td><td>系统状态</td></tr>
+      </table>
+
+      <div class="fb" data-id="e6.1">
+        <div class="fb-t">CEO 反馈</div>
+        <div class="fb-btns">
+          <button class="fb-b" onclick="sf(this,'a','e6.1')">✅ 同意</button>
+          <button class="fb-b" onclick="sf(this,'d','e6.1')">💬 需讨论</button>
+          <button class="fb-b" onclick="sf(this,'x','e6.1')">❌ 不同意</button>
+        </div>
+        <textarea class="fb-n" placeholder="备注…" onchange="sn(this,'e6.1')"></textarea>
+      </div>
+
+    </div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="tog(this)">
+      <span class="card-num gold">E.6.2</span>
+      <span class="card-name">分享卡片（朋友圈/微信群传播）</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body"><div class="card-inner">
+
+      <p><span class="tag tag-ux">裂变设计</span> 确权成功页的"分享"按钮生成一张精美卡片。<span class="tag tag-key">UX修正</span> 原设计只有品牌展示，缺少给被分享者的行动理由。修正后加入"扫码即获白版AI资产"的利益钩子，把分享从"炫耀"变成"邀请"。</p>
+
+      <div class="phone-wrap">
+        <div>
+          <div class="phone">
+            <div class="phone-screen" style="background:linear-gradient(135deg, #1a1a2e, #16213e); text-align:center; padding:20px 14px;">
+              <div style="font-size:10px; color:var(--text-muted); letter-spacing:2px; margin-bottom:12px;">MSC.AI · AI资产确权证书</div>
+              <div style="font-size:16px; font-weight:700; margin-bottom:4px;">🤖 涨粉Agent Pro</div>
+              <div style="font-size:11px; color:var(--gold); margin-bottom:16px;">金版 · 已链上存证</div>
+
+              <div style="width:80px; height:80px; background:#fff; border-radius:8px; margin:0 auto 12px; display:flex; align-items:center; justify-content:center; font-size:10px; color:#333;">
+                [二维码]
+              </div>
+
+              <div style="font-size:11px; color:var(--text-secondary); margin-bottom:6px;">资产编号 MSC-2026-00001</div>
+              <div style="font-size:10px; color:var(--chain); font-family:monospace;">已通过平台确权认证 ✓</div>
+
+              <div class="mock-divider" style="margin:14px 0;"></div>
+
+              <div style="background:rgba(108,92,231,0.15); border-radius:6px; padding:8px; margin-bottom:8px;">
+                <div style="font-size:12px; color:var(--accent-light); font-weight:600; text-align:center;">🎁 扫码立即获得你的白版AI资产</div>
+              </div>
+              <div style="font-size:10px; color:var(--text-muted); text-align:center;">首个AI资产免费 · 自动帮你赚收益</div>
+            </div>
+          </div>
+          <div class="phone-label">分享卡片 · 可转发到朋友圈/微信群</div>
+        </div>
+      </div>
+
+      <div class="fb" data-id="e6.2">
+        <div class="fb-t">CEO 反馈</div>
+        <div class="fb-btns">
+          <button class="fb-b" onclick="sf(this,'a','e6.2')">✅ 同意</button>
+          <button class="fb-b" onclick="sf(this,'d','e6.2')">💬 需讨论</button>
+          <button class="fb-b" onclick="sf(this,'x','e6.2')">❌ 不同意</button>
+        </div>
+        <textarea class="fb-n" placeholder="备注…" onchange="sn(this,'e6.2')"></textarea>
+      </div>
+
+    </div></div>
+  </div>
+</div>
+
+<!-- ==================== E.7 合规与风控 ==================== -->
+<div class="section" id="compliance">
+  <div class="section-head"><span class="num">E.7</span>合规与风控</div>
+  <div class="section-sub">确权涉及开源协议、知识产权、金融监管三条线，需要在产品设计阶段就埋好合规基础。</div>
+
+  <div class="card">
+    <div class="card-head" onclick="tog(this)">
+      <span class="card-num red">E.7.1</span>
+      <span class="card-name">开源协议合规分级</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body"><div class="card-inner">
+
+      <table class="cmp">
+        <tr><th>分级</th><th>协议</th><th>平台可做什么</th><th>确权时标注</th></tr>
+        <tr>
+          <td><span style="color:var(--green); font-weight:700;">🟢 绿标</span></td>
+          <td>MIT / Apache 2.0 / BSD</td>
+          <td>自由打包、商用、确权</td>
+          <td>"可商用 · 无限制"</td>
+        </tr>
+        <tr>
+          <td><span style="color:var(--amber); font-weight:700;">🟡 黄标</span></td>
+          <td>GPL / LGPL / CC-BY-SA</td>
+          <td>可用但衍生作品需开源</td>
+          <td>"有开源义务 · 详见协议"</td>
+        </tr>
+        <tr>
+          <td><span style="color:var(--red); font-weight:700;">🔴 红标</span></td>
+          <td>AGPL / CC-NC / 专有</td>
+          <td>需单独取得商业授权</td>
+          <td>"需额外授权 · 暂不可确权"</td>
+        </tr>
+      </table>
+
+      <div class="highlight-box">
+        <strong>产品影响：</strong>红标资产不进入确权流程。黄标资产确权时需用户勾选"我已了解开源协议义务"。绿标资产无额外步骤。
+      </div>
+
+      <div class="fb" data-id="e7.1">
+        <div class="fb-t">CEO 反馈</div>
+        <div class="fb-btns">
+          <button class="fb-b" onclick="sf(this,'a','e7.1')">✅ 同意</button>
+          <button class="fb-b" onclick="sf(this,'d','e7.1')">💬 需讨论</button>
+          <button class="fb-b" onclick="sf(this,'x','e7.1')">❌ 不同意</button>
+        </div>
+        <textarea class="fb-n" placeholder="备注…" onchange="sn(this,'e7.1')"></textarea>
+      </div>
+
+    </div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="tog(this)">
+      <span class="card-num red">E.7.2</span>
+      <span class="card-name">文案红线（避免金融属性措辞）</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body"><div class="card-inner">
+
+      <table class="cmp">
+        <tr><th>❌ 不要说</th><th>✅ 应该说</th><th>原因</th></tr>
+        <tr><td>"投资AI资产"</td><td>"确权AI资产"</td><td>避免被认定为金融产品</td></tr>
+        <tr><td>"保证增值"</td><td>"资产产出可能增长"</td><td>不承诺收益</td></tr>
+        <tr><td>"购买股份"</td><td>"获得使用权和收益权"</td><td>避免证券属性</td></tr>
+        <tr><td>"分红"</td><td>"产出收益分配"</td><td>降低金融联想</td></tr>
+        <tr><td>"所有权"</td><td>"专属使用权"</td><td>底层模型不属于用户</td></tr>
+        <tr><td>"押金"（面向用户）</td><td>"确权保证金" / "资产激活金"</td><td>更专业，降低负面联想</td></tr>
+        <tr style="background:var(--red-bg)"><td>"代币" / "通证" / "Token"</td><td>完全不使用</td><td><strong>42号文明确禁止</strong>，使用即触发监管</td></tr>
+        <tr style="background:var(--red-bg)"><td>"RWA" / "资产代币化"</td><td>完全不使用</td><td><strong>42号文明确禁止</strong>境内RWA活动</td></tr>
+        <tr style="background:var(--red-bg)"><td>"上链交易" / "链上交易"</td><td>"链上存证"（仅存证，不交易）</td><td>交易 = 代币化活动；存证 = 数据备份</td></tr>
+      </table>
+
+      <div class="fb" data-id="e7.2">
+        <div class="fb-t">CEO 反馈</div>
+        <div class="fb-btns">
+          <button class="fb-b" onclick="sf(this,'a','e7.2')">✅ 同意</button>
+          <button class="fb-b" onclick="sf(this,'d','e7.2')">💬 需讨论</button>
+          <button class="fb-b" onclick="sf(this,'x','e7.2')">❌ 不同意</button>
+        </div>
+        <textarea class="fb-n" placeholder="备注…" onchange="sn(this,'e7.2')"></textarea>
+      </div>
+
+    </div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="tog(this)">
+      <span class="card-num red">E.7.3</span>
+      <span class="card-name">⚠️ 非法集资风险审视</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body"><div class="card-inner">
+
+      <div class="highlight-box" style="border-left-color:var(--red); background:var(--red-bg);">
+        <strong>核心风险：</strong>"AI收益分红权"如果设计不当，可能满足非法集资的四个认定要件（"四性"），触发刑事红线。<br><br>
+        <strong>新增法规依据：</strong>2026年2月6日八部委42号文明确，将资产的"所有权、收益权等转化为代币（通证）并进行发行和交易"属于RWA代币化活动，在境内属非法金融活动。如果MSC.AI的"配额权+收益分红权+可交易"模式被认定为事实上的RWA活动，将直接触发该条。
+      </div>
+
+      <table class="cmp">
+        <tr><th>认定要件</th><th>法律定义</th><th>当前设计是否触发</th><th>风险等级</th></tr>
+        <tr>
+          <td><strong>非法性</strong></td>
+          <td>未经监管部门批准吸收资金</td>
+          <td>保证金 + 分红权 = 未经批准的类证券行为</td>
+          <td style="color:var(--red)">⚠️ 高</td>
+        </tr>
+        <tr>
+          <td><strong>公开性</strong></td>
+          <td>向社会不特定公众公开宣传</td>
+          <td>微信小程序面向公众开放</td>
+          <td style="color:var(--red)">⚠️ 高（天然满足）</td>
+        </tr>
+        <tr>
+          <td><strong>利诱性</strong></td>
+          <td>承诺还本付息或收益回报</td>
+          <td>"分红权""资产增值"等表述隐含收益承诺</td>
+          <td style="color:var(--red)">⚠️ 高</td>
+        </tr>
+        <tr>
+          <td><strong>社会性</strong></td>
+          <td>向不特定社会公众吸收资金</td>
+          <td>保证金面向所有用户收取</td>
+          <td style="color:var(--red)">⚠️ 高（天然满足）</td>
+        </tr>
+      </table>
+
+      <div class="highlight-box" style="border-left-color:var(--amber); background:var(--amber-bg);">
+        <strong>关键区分：「自有资产产出」vs「资金池分红」</strong><br><br>
+        <strong>✅ 合规模式（推荐）：</strong>用户确权后，<em>自己的</em>AI Agent执行任务产生收入，收入归用户自己。这是"使用工具赚钱"，类似买了一台机器自己经营。<br><br>
+        <strong>❌ 高危模式（当前"分红权"方向）：</strong>用户交钱持有份额，从<em>他人经营的</em>AI资产产出中按比例分红。这是"投资收益"，本质上构成证券/基金行为。
+      </div>
+
+      <p style="margin:14px 0; font-weight:600; color:var(--text);">合规调整建议：</p>
+
+      <table class="cmp">
+        <tr><th>原设计</th><th>合规替代方案</th><th>法律差异</th></tr>
+        <tr>
+          <td style="color:var(--red)">AI收益分红权<br><span class="label">从资金池按比例分配</span></td>
+          <td style="color:var(--green)">AI资产产出收益权<br><span class="label">用户自有AI的产出归自己</span></td>
+          <td>从"被动投资收益"变为"主动经营所得"，不构成证券</td>
+        </tr>
+        <tr>
+          <td style="color:var(--red)">配额权（份额化持有）<br><span class="label">多人持有同一资产的不同份额</span></td>
+          <td style="color:var(--green)">独占使用权<br><span class="label">一个资产一个持有者</span></td>
+          <td>避免"份额化"触发证券认定；份额化交易推迟到监管明确后</td>
+        </tr>
+        <tr>
+          <td style="color:var(--red)">保证金不可退<br><span class="label">类似投资本金</span></td>
+          <td style="color:var(--green)">保证金可退（满条件后）<br><span class="label">服务保证金性质</span></td>
+          <td>可退还 = 保证金；不可退还 = 更接近投资款</td>
+        </tr>
+      </table>
+
+      <div class="chain-box">
+        <strong>阶段性策略建议：</strong><br>
+        <strong>当前阶段（Pre-A）：</strong>只做"自有AI资产产出收益"模式，不做份额化分红。保证金可退还。措辞全面排查（参考E.7.2文案红线表）。<br>
+        <strong>中期（A轮后）：</strong>如需引入资产交易，定性为"平台内使用权转让"（类似游戏道具交易），避免触及"收益权代币化"定义。需咨询持牌律师。<br>
+        <strong>远期（RWA）：</strong><span style="color:var(--red)">42号文已明确境内RWA代币化属非法金融活动。</span>如仍有此方向，只能在香港/新加坡等合规地区设立实体运营，且境内资产境外发行需经证监会备案。建议暂时搁置此方向。
+      </div>
+
+      <div class="fb" data-id="e7.3">
+        <div class="fb-t">CEO 反馈</div>
+        <div class="fb-btns">
+          <button class="fb-b" onclick="sf(this,'a','e7.3')">✅ 同意</button>
+          <button class="fb-b" onclick="sf(this,'d','e7.3')">💬 需讨论</button>
+          <button class="fb-b" onclick="sf(this,'x','e7.3')">❌ 不同意</button>
+        </div>
+        <textarea class="fb-n" placeholder="备注…" onchange="sn(this,'e7.3')"></textarea>
+      </div>
+
+    </div></div>
+  </div>
+</div>
+
+<!-- ==================== E.8 押金设计 ==================== -->
+<div class="section" id="deposit">
+  <div class="section-head"><span class="num">E.8</span>保证金机制设计</div>
+  <div class="section-sub">保证金的法律定性、金额设计、退还机制，直接影响转化率和合规性。</div>
+
+  <div class="card">
+    <div class="card-head" onclick="tog(this)">
+      <span class="card-num gold">E.8.1</span>
+      <span class="card-name">保证金定性与退还机制</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body"><div class="card-inner">
+
+      <div class="highlight-box">
+        <strong>法律定性建议：服务保证金</strong>（非投资、非预付款）<br>
+        用户交付保证金获得高级服务权限（金版资产），保证金在满足条件后可退还。需在用户协议中明确退还条件和时间。
+      </div>
+
+      <table class="cmp">
+        <tr><th>金额档位</th><th>匹配活动</th><th>定位</th></tr>
+        <tr>
+          <td>¥99</td>
+          <td>+¥99任务基金</td>
+          <td>入门试水，低决策门槛</td>
+        </tr>
+        <tr>
+          <td>¥299</td>
+          <td>+¥399任务基金 <span class="tag tag-key">推荐</span></td>
+          <td>主推档位（诱饵效应：获赠>保证金）</td>
+        </tr>
+        <tr>
+          <td>¥999</td>
+          <td>+¥1,499任务基金 + 专属客服</td>
+          <td>高价值用户</td>
+        </tr>
+      </table>
+
+      <p style="margin-top:12px"><strong>退还条件：</strong>保证金在确权满12个月后可申请退还（扣除已使用的任务基金）。提前退还 = 资产降级为白版。</p>
+
+      <div class="fb" data-id="e8.1">
+        <div class="fb-t">CEO 反馈</div>
+        <div class="fb-btns">
+          <button class="fb-b" onclick="sf(this,'a','e8.1')">✅ 同意</button>
+          <button class="fb-b" onclick="sf(this,'d','e8.1')">💬 需讨论</button>
+          <button class="fb-b" onclick="sf(this,'x','e8.1')">❌ 不同意</button>
+        </div>
+        <textarea class="fb-n" placeholder="备注…" onchange="sn(this,'e8.1')"></textarea>
+      </div>
+
+    </div></div>
+  </div>
+</div>
+
+<!-- ==================== E.9 资产仪表盘 ==================== -->
+<div class="section" id="dashboard">
+  <div class="section-head"><span class="num">E.9</span>确权后：AI资产仪表盘 <span class="tag tag-new">新增</span></div>
+  <div class="section-sub">确权流程结束不是终点——用户在"我的"页面需要持续感知资产价值。缺少这个环节，确权就变成了"一次性仪式"，无法驱动留存。</div>
+
+  <div class="card">
+    <div class="card-head" onclick="tog(this)">
+      <span class="card-num blue">E.9.1</span>
+      <span class="card-name">资产仪表盘设计（"我的"页面核心模块）</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body"><div class="card-inner">
+
+      <div class="phone-wrap">
+        <div>
+          <div class="phone">
+            <div class="phone-screen">
+              <div style="font-size:14px; font-weight:700; margin-bottom:12px;">我的AI资产</div>
+
+              <div class="mock-card" style="background:linear-gradient(135deg, rgba(108,92,231,0.15), rgba(0,206,201,0.1));">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <div>
+                    <div style="font-size:11px; color:var(--text-muted);">总资产产出</div>
+                    <div style="font-size:24px; font-weight:700; color:var(--green);">¥1,247</div>
+                  </div>
+                  <div style="text-align:right;">
+                    <div style="font-size:11px; color:var(--text-muted);">本月</div>
+                    <div style="font-size:14px; font-weight:600; color:var(--green);">+¥380 ↑23%</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mock-card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                  <span style="font-size:13px; font-weight:600;">🤖 涨粉Agent Pro</span>
+                  <span class="mock-badge" style="background:var(--gold-bg); color:var(--gold);">金版</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted); margin-bottom:6px;">
+                  <span>今日产出 ¥12.5</span>
+                  <span>健康度 98%</span>
+                </div>
+                <div style="height:4px; background:var(--bg-input); border-radius:2px; overflow:hidden;">
+                  <div style="width:98%; height:100%; background:var(--green); border-radius:2px;"></div>
+                </div>
+                <div style="font-size:10px; color:var(--text-muted); margin-top:6px;">确权编号 MSC-2026-00042 · 已运行 28天</div>
+              </div>
+
+              <div class="mock-card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                  <span style="font-size:13px; font-weight:600;">📝 内容Agent</span>
+                  <span class="mock-badge" style="background:var(--bg-input); color:var(--text-muted);">白版</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted);">
+                  <span>今日产出 ¥3.2</span>
+                  <span style="color:var(--amber);">升级可提升2.3x ↑</span>
+                </div>
+              </div>
+
+              <div class="mock-btn mock-btn-ghost" style="font-size:12px;">+ 获取新的AI资产</div>
+            </div>
+          </div>
+          <div class="phone-label">AI资产仪表盘 ·「我的」页面</div>
+        </div>
+      </div>
+
+      <div class="highlight-box">
+        <strong>设计原则：</strong><br>
+        ① <strong>收益可视化</strong>——总产出大字展示+月度趋势，让用户看到"资产在工作"<br>
+        ② <strong>健康度指标</strong>——任务成功率/在线时间/产出趋势合成一个百分比，给用户管理感<br>
+        ③ <strong>白版升级引导</strong>——白版资产卡片上直接展示"升级可提升2.3x"，利用对比锚定<br>
+        ④ <strong>获取新资产入口</strong>——底部"+"按钮，承接AI资产市场/交易的入口
+      </div>
+
+      <div class="fb" data-id="e9.1">
+        <div class="fb-t">CEO 反馈</div>
+        <div class="fb-btns">
+          <button class="fb-b" onclick="sf(this,'a','e9.1')">✅ 同意</button>
+          <button class="fb-b" onclick="sf(this,'d','e9.1')">💬 需讨论</button>
+          <button class="fb-b" onclick="sf(this,'x','e9.1')">❌ 不同意</button>
+        </div>
+        <textarea class="fb-n" placeholder="备注…" onchange="sn(this,'e9.1')"></textarea>
+      </div>
+
+    </div></div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<!-- Summary bar -->
+<div class="summary-bar">
+  <div class="summary-inner">
+    <span>✅ 同意 <strong id="ca">0</strong></span>
+    <span>💬 讨论 <strong id="cd">0</strong></span>
+    <span>❌ 不同意 <strong id="cx">0</strong></span>
+  </div>
+</div>
+
+<script src="/sync.js"></script>
+<script>
+const SK='msc_e_fb';
+SYNC.init('chatE',SK);
+
+function tog(el){el.classList.toggle('open');el.nextElementSibling.classList.toggle('show')}
+function toggleAll(open){document.querySelectorAll('.card-head').forEach(h=>{const b=h.nextElementSibling;if(open){h.classList.add('open');b.classList.add('show')}else{h.classList.remove('open');b.classList.remove('show')}})}
+
+function ld(){try{return JSON.parse(localStorage.getItem(SK))||{}}catch{return{}}}
+function sv(d){localStorage.setItem(SK,JSON.stringify(d))}
+function sf(btn,c,id){
+  const d=ld();const w=btn.closest('.fb');
+  w.querySelectorAll('.fb-b').forEach(b=>b.className='fb-b');
+  btn.classList.add(c==='a'?'s-a':c==='d'?'s-d':'s-x');
+  d[id]={...d[id],c};sv(d);up();
+  SYNC.push(id,c);
+}
+function sn(ta,id){const d=ld();d[id]={...d[id],n:ta.value};sv(d);SYNC.push(id,undefined,ta.value)}
+function up(){const d=ld();let a=0,dd=0,x=0;Object.values(d).forEach(v=>{if(v.c==='a')a++;if(v.c==='d')dd++;if(v.c==='x')x++});document.getElementById('ca').textContent=a;document.getElementById('cd').textContent=dd;document.getElementById('cx').textContent=x}
+document.querySelectorAll('.nav a').forEach(a=>{a.addEventListener('click',function(){document.querySelectorAll('.nav a').forEach(n=>n.classList.remove('active'));this.classList.add('active')})});
+document.addEventListener('DOMContentLoaded',async()=>{
+  await SYNC.pull();
+  const d=ld();
+  Object.entries(d).forEach(([id,v])=>{const w=document.querySelector(`.fb[data-id="${id}"]`);if(!w)return;if(v.c){const bs=w.querySelectorAll('.fb-b');const cls=v.c==='a'?'s-a':v.c==='d'?'s-d':'s-x';const idx=v.c==='a'?0:v.c==='d'?1:2;if(bs[idx])bs[idx].classList.add(cls)}if(v.n){const ta=w.querySelector('.fb-n');if(ta)ta.value=v.n}});
+  up();
+});
+</script>
+</body>
+</html>

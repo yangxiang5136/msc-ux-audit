@@ -71,7 +71,9 @@ app.get('/api/export', (req, res) => {
     chatD: '维度6+7+8-确认留存异常',
     architecture: '界面架构方案投票',
     'product-spec': '产品规格文档',
-    chatE: 'AI资产确权·法律合规',
+    chatE: 'AI资产确权',
+    chatF: '裂变增长·任务体系',
+    chatE: 'AI资产确权',
     chatF: '裂变增长·任务体系·用户成长'
   };
   let txt = 'MSC.AI CEO反馈汇总\n导出时间：' + new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }) + '\n';
