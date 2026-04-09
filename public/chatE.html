@@ -39,14 +39,17 @@
 body { background:var(--bg); color:var(--text); font-family:'PingFang SC','Microsoft YaHei','Helvetica Neue',sans-serif; line-height:1.7; -webkit-font-smoothing:antialiased; }
 
 /* Header */
-.header { position:sticky; top:0; z-index:100; background:rgba(13,15,20,0.92); backdrop-filter:blur(16px); border-bottom:1px solid var(--border); padding:16px 24px; }
-.header-inner { max-width:900px; margin:0 auto; }
-.header h1 { font-size:18px; font-weight:700; margin-bottom:4px; }
-.header h1 span { color:var(--accent-light); }
-.header p { font-size:13px; color:var(--text-muted); }
-.nav { display:flex; gap:6px; margin-top:12px; flex-wrap:wrap; }
-.nav a { font-size:12px; padding:4px 10px; border-radius:20px; background:var(--bg-card); color:var(--text-secondary); text-decoration:none; border:1px solid var(--border); transition:all .2s; white-space:nowrap; }
-.nav a:hover, .nav a.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+.header { position:sticky; top:0; z-index:100; background:rgba(13,15,20,0.92); backdrop-filter:blur(16px); border-bottom:1px solid var(--border); padding:14px 20px; display:flex; align-items:center; justify-content:space-between; }
+.header h1 { font-size:15px; font-weight:700; display:flex; align-items:center; gap:8px; }
+.header .badge { font-size:11px; padding:3px 10px; background:rgba(108,92,231,0.12); color:var(--accent-light); border:1px solid rgba(108,92,231,0.25); border-radius:20px; }
+.header .stats { display:flex; gap:12px; font-size:11px; color:var(--text-secondary); }
+.header .stats span { display:flex; align-items:center; gap:3px; }
+.header .stats .s-a { color:var(--green); } .header .stats .s-d { color:var(--amber); } .header .stats .s-x { color:var(--red); }
+.nav { position:sticky; top:48px; z-index:90; background:rgba(13,15,20,0.95); backdrop-filter:blur(16px); border-bottom:1px solid var(--border); padding:8px 20px; overflow-x:auto; display:flex; gap:6px; scrollbar-width:none; }
+.nav::-webkit-scrollbar { display:none; }
+.nav a { display:inline-block; padding:5px 14px; font-size:12px; font-weight:500; color:var(--text-secondary); text-decoration:none; border-radius:6px; border:1px solid transparent; transition:all .2s; white-space:nowrap; }
+.nav a:hover { color:var(--text); background:var(--bg-card); }
+.nav a.active { color:var(--accent-light); border-color:rgba(108,92,231,0.3); background:rgba(108,92,231,0.08); }
 
 /* Main */
 .main { max-width:900px; margin:0 auto; padding:24px 16px 80px; }
@@ -155,21 +158,24 @@ strong { color:var(--text); font-weight:600; }
 <body>
 
 <div class="header">
-  <div class="header-inner">
-    <h1>MSC.AI · <span>维度E：AI资产确权</span></h1>
-    <p>机制设计 + 区块链存证 + 用户体验流程 | Chat E 交付物</p>
-    <div class="nav">
-      <a href="#mechanism" class="active">E.1 确权是什么</a>
-      <a href="#blockchain">E.2 区块链存证</a>
-      <a href="#rights">E.3 确权后拥有什么</a>
-      <a href="#ux-flow">E.4 确权体验设计</a>
-      <a href="#white-gold">E.5 白版→金版</a>
-      <a href="#certificate">E.6 确权证书</a>
-      <a href="#compliance">E.7 合规与风控</a>
-      <a href="#deposit">E.8 保证金机制</a>
-      <a href="#dashboard">E.9 资产仪表盘</a>
-    </div>
+  <h1>MSC-E <span class="badge">AI资产确权</span></h1>
+  <div class="stats">
+    <span class="s-a">✓ <b id="ca">0</b></span>
+    <span class="s-d">💬 <b id="cd">0</b></span>
+    <span class="s-x">✗ <b id="cx">0</b></span>
   </div>
+</div>
+
+<div class="nav">
+  <a href="#mechanism" class="active">E.1 确权机制</a>
+  <a href="#blockchain">E.2 区块链存证</a>
+  <a href="#rights">E.3 权利结构</a>
+  <a href="#ux-flow">E.4 确权体验</a>
+  <a href="#white-gold">E.5 白版→金版</a>
+  <a href="#certificate">E.6 确权证书</a>
+  <a href="#compliance">E.7 合规风控</a>
+  <a href="#deposit">E.8 保证金</a>
+  <a href="#dashboard">E.9 仪表盘</a>
 </div>
 
 <div class="main">

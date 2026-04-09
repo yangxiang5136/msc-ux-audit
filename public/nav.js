@@ -86,10 +86,8 @@ style.textContent = `
   }
   /* Hide old inline top nav when sidebar is present */
   body > div[style*="position:sticky"][style*="z-index:9999"]{display:none !important}
-  /* Adjust E/F page headers - keep title, hide redundant nav */
-  @media(min-width:769px){
-    .header .nav{display:none !important}
-  }
+  /* Fix gap: old header was top:36px to account for old nav, now reset to 0 */
+  .header{top:0 !important}
 `;
 document.head.appendChild(style);
 
@@ -125,5 +123,16 @@ overlay.onclick = function(){
   this.classList.remove('show');
 };
 document.body.appendChild(overlay);
+
+// Move feedback blocks outside card-body so they're always visible
+document.querySelectorAll('.card-body .fb').forEach(fb => {
+  const cardBody = fb.closest('.card-body');
+  const card = cardBody?.parentElement;
+  if (card && card.classList.contains('card')) {
+    card.appendChild(fb);
+    fb.style.padding = '12px 18px 14px';
+    fb.style.borderTop = '1px solid rgba(255,255,255,.06)';
+  }
+});
 
 })();
