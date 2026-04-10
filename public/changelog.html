@@ -55,7 +55,7 @@
 <div class="main">
 
 <!-- V5 -->
-<div class="ver">
+<div class="ver" id="v5">
   <div class="ver-head open" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')">
     <span class="ver-tag latest">v5</span>
     <span class="ver-title">chatF全面重写 + chatE确权交互修正</span>
@@ -99,7 +99,7 @@
 </div>
 
 <!-- V4 -->
-<div class="ver">
+<div class="ver" id="v4">
   <div class="ver-head" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')">
     <span class="ver-tag prev">v4</span>
     <span class="ver-title">CEO反馈驱动修改</span>
@@ -129,7 +129,7 @@
 </div>
 
 <!-- V3 -->
-<div class="ver">
+<div class="ver" id="v3">
   <div class="ver-head" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')">
     <span class="ver-tag prev">v3</span>
     <span class="ver-title">统一导航 + 反馈外置</span>
@@ -148,7 +148,7 @@
 </div>
 
 <!-- V2 -->
-<div class="ver">
+<div class="ver" id="v2">
   <div class="ver-head" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')">
     <span class="ver-tag prev">v2</span>
     <span class="ver-title">新增E/F模块 + 首页重构</span>
@@ -176,7 +176,7 @@
 </div>
 
 <!-- V1 -->
-<div class="ver">
+<div class="ver" id="v1">
   <div class="ver-head" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')">
     <span class="ver-tag prev">v1</span>
     <span class="ver-title">初版上线</span>
@@ -197,5 +197,23 @@
 </div>
 
 <script src="/nav.js"></script>
+<script>
+// Auto-expand and scroll to version from anchor
+document.addEventListener('DOMContentLoaded', () => {
+  const hash = location.hash.replace('#','');
+  if (hash) {
+    const target = document.getElementById(hash);
+    if (target) {
+      const head = target.querySelector('.ver-head');
+      const body = target.querySelector('.ver-body');
+      if (head && body) {
+        head.classList.add('open');
+        body.classList.add('show');
+      }
+      setTimeout(() => target.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+    }
+  }
+});
+</script>
 </body>
 </html>

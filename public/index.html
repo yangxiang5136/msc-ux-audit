@@ -60,7 +60,13 @@
   </div></div>
   <div class="nc"><div class="nc-h" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')"><span class="ci">📐</span>工程交付<span class="ca">▶</span></div><div class="nc-items">
     <a class="ni" href="product-spec.html">📦 产品规格文档</a>
-    <a class="ni" href="changelog.html">📋 更新记录<span class="nb" style="background:var(--green-d);color:var(--green)">v5</span></a>
+  </div></div>
+  <div class="nc"><div class="nc-h" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')"><span class="ci">📋</span>更新记录<span class="ca">▶</span></div><div class="nc-items">
+    <a class="ni" href="changelog.html#v5">v5 · chatF重写<span class="nb" style="background:var(--green-d);color:var(--green)">最新</span></a>
+    <a class="ni" href="changelog.html#v4">v4 · CEO反馈</a>
+    <a class="ni" href="changelog.html#v3">v3 · 统一导航</a>
+    <a class="ni" href="changelog.html#v2">v2 · 新增E/F</a>
+    <a class="ni" href="changelog.html#v1">v1 · 初版</a>
   </div></div>
 </nav>
 <div class="main">
@@ -82,7 +88,9 @@
   </div></div>
   <div class="cs" id="sec-eng"><div class="cl">📐 工程交付 — 开发前必读</div><div class="cards">
     <a class="card" href="product-spec.html"><div class="c-left"><div class="c-ico" style="background:rgba(232,146,61,.1)">📦</div><div class="c-sev" style="background:rgba(232,146,61,.1);color:#e8923d">工程</div></div><div class="c-right"><h3>产品规格文档</h3><p>页面地图·5模块字段表·状态机·资金流·数据关系·查询场景</p><div class="c-meta"><span class="c-tag" style="background:rgba(232,146,61,.1);color:#e8923d">5模块</span><span id="ps-fb"></span></div></div><div class="c-arr">→</div></a>
-    <a class="card" href="changelog.html"><div class="c-left"><div class="c-ico" style="background:rgba(108,92,231,.1)">📋</div><div class="c-sev" style="background:var(--green-d);color:var(--green)">v5</div></div><div class="c-right"><h3>更新记录</h3><p>v1→v5完整修改历史·含跳转链接·可直达具体修改位置</p><div class="c-meta"><span class="c-tag" style="background:var(--green-d);color:var(--green)">5个版本</span></div></div><div class="c-arr">→</div></a>
+  </div></div>
+  <div class="cs" id="sec-log"><div class="cl">📋 更新记录</div><div class="cards">
+    <a class="card" href="changelog.html"><div class="c-left"><div class="c-ico" style="background:rgba(108,92,231,.1)">📋</div><div class="c-sev" style="background:var(--green-d);color:var(--green)">v5</div></div><div class="c-right"><h3>更新记录</h3><p>v1→v5完整修改历史·每条含跳转链接·可直达修改位置</p><div class="c-meta"><span class="c-tag" style="background:var(--green-d);color:var(--green)">5个版本</span></div></div><div class="c-arr">→</div></a>
   </div></div>
 </div>
 </div>
@@ -90,6 +98,7 @@
   <button class="mt active" onclick="sc('sec-ux',this)"><span class="mt-i">📋</span>产品体验</button>
   <button class="mt" onclick="sc('sec-biz',this)"><span class="mt-i">🔐</span>商业机制</button>
   <button class="mt" onclick="sc('sec-eng',this)"><span class="mt-i">📐</span>工程交付</button>
+  <button class="mt" onclick="sc('sec-log',this)"><span class="mt-i">📋</span>更新记录</button>
 </div></div>
 <script>
 function sc(id,b){document.getElementById(id).scrollIntoView({behavior:'smooth'});document.querySelectorAll('.mt').forEach(t=>t.classList.remove('active'));b.classList.add('active')}

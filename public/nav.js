@@ -17,7 +17,13 @@ const PAGES = [
   ]},
   { cat: '工程交付', icon: '📐', items: [
     { href: 'product-spec.html', label: '📦 产品规格文档' },
-    { href: 'changelog.html', label: '📋 更新记录', badge: 'v5', badgeColor: '#34d399' },
+  ]},
+  { cat: '更新记录', icon: '📋', items: [
+    { href: 'changelog.html#v5', label: 'v5 · chatF重写+确权交互', badge: '最新', badgeColor: '#34d399' },
+    { href: 'changelog.html#v4', label: 'v4 · CEO反馈修改' },
+    { href: 'changelog.html#v3', label: 'v3 · 统一导航' },
+    { href: 'changelog.html#v2', label: 'v2 · 新增E/F模块' },
+    { href: 'changelog.html#v1', label: 'v1 · 初版上线' },
   ]},
 ];
 
@@ -136,27 +142,128 @@ document.querySelectorAll('.card-body .fb').forEach(fb => {
   }
 });
 
-// Modification indicators — shows what changed based on CEO feedback
-const MODS = {
-  'e8.1': '已修改：三档定价→¥699+分期¥19.9/月；12个月退还→15天冷静期',
-  'e3.2': '已修改：标注为全球化交易所功能，境内当前不涉及',
-  'e4.3': '新增：三阶段确权触发时机mockup（发布任务/AI助手/提现）',
-  'e5.3': '已修改：提现即时到账权益 + 确权入口嵌入',
-};
-const modStyle = document.createElement('style');
-modStyle.textContent = `
-  .mod-tag{display:flex;align-items:center;gap:6px;padding:8px 18px;font-size:11px;color:#fbbf24;background:rgba(251,191,36,.06);border-top:1px solid rgba(251,191,36,.15)}
-  .mod-tag::before{content:'⚡';font-size:13px}
-`;
-document.head.appendChild(modStyle);
+// ═══ Feedback Versioning System ═══
+// When content is updated based on feedback:
+// - Old feedback archived (collapsed, read-only)
+// - Section gets "已更新" badge
+// - Fresh feedback buttons for new round
 
-Object.entries(MODS).forEach(([id, desc]) => {
-  const fb = document.querySelector(`.fb[data-id="${id}"]`);
-  if (!fb) return;
-  const tag = document.createElement('div');
-  tag.className = 'mod-tag';
-  tag.textContent = desc;
-  fb.parentElement.insertBefore(tag, fb);
-});
+const MODS = {
+  'e8.1': { desc: '三档定价→¥699+分期；退还12月→15天', date: '2026-04-09T10:00:00Z', ver: 'v4' },
+  'e3.2': { desc: '标注为全球化交易所功能', date: '2026-04-09T10:00:00Z', ver: 'v4' },
+  'e4.3': { desc: '新增三阶段确权触发mockup', date: '2026-04-09T10:00:00Z', ver: 'v4' },
+  'e5.3': { desc: '提现即时到账+确权入口', date: '2026-04-09T10:00:00Z', ver: 'v4' },
+  'f2.1': { desc: '增长目标5k→10k/月', date: '2026-04-09T14:00:00Z', ver: 'v5' },
+  'f3.1': { desc: '视频互动任务重新设计', date: '2026-04-09T14:00:00Z', ver: 'v5' },
+  'f4.1': { desc: '每日习惯循环（新增）', date: '2026-04-09T14:00:00Z', ver: 'v5' },
+  'f5.1': { desc: '裂变重构为任务传播经验值', date: '2026-04-09T14:00:00Z', ver: 'v5' },
+  'f6.1': { desc: '成长阶梯重写+Lv4限时', date: '2026-04-09T14:00:00Z', ver: 'v5' },
+};
+
+const verStyle = document.createElement('style');
+verStyle.textContent = `
+  .mod-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:2px 8px;border-radius:4px;background:rgba(0,184,148,.1);color:#34d399;font-weight:600;margin-left:8px;border:1px solid rgba(0,184,148,.2)}
+  .mod-desc{padding:8px 18px;font-size:11px;color:#fbbf24;background:rgba(251,191,36,.05);border-top:1px solid rgba(251,191,36,.1);display:flex;align-items:center;gap:6px}
+  .mod-desc::before{content:'✏️';font-size:12px}
+  .hist-wrap{border-top:1px solid rgba(255,255,255,.04);margin-top:0}
+  .hist-toggle{display:flex;align-items:center;gap:6px;padding:8px 18px;font-size:11px;color:#5a6478;cursor:pointer;user-select:none;transition:color .15s}
+  .hist-toggle:hover{color:#8b95a8}
+  .hist-toggle .ht-arrow{font-size:9px;transition:transform .2s}
+  .hist-toggle.open .ht-arrow{transform:rotate(90deg)}
+  .hist-content{display:none;padding:6px 18px 10px;font-size:11px;color:#5a6478;line-height:1.6;background:rgba(255,255,255,.01)}
+  .hist-content.show{display:block}
+  .hist-choice{display:inline-block;font-size:10px;padding:1px 6px;border-radius:3px;font-weight:600;margin-right:4px}
+  .hist-choice.ha{background:rgba(52,211,153,.1);color:#34d399}
+  .hist-choice.hd{background:rgba(251,191,36,.1);color:#fbbf24}
+  .hist-choice.hx{background:rgba(248,113,113,.1);color:#f87171}
+`;
+document.head.appendChild(verStyle);
+
+// Apply versioning after page loads and feedback syncs
+setTimeout(async () => {
+  // Fetch server feedback for current page
+  let serverFb = {};
+  try {
+    const pageName = 'chat' + (location.pathname.match(/chat([A-Z])\.html/)?.[1] || '');
+    if (pageName !== 'chat') {
+      const res = await fetch('/api/feedback/' + pageName);
+      if (res.ok) serverFb = await res.json();
+    }
+  } catch(e) {}
+
+  // Also check localStorage
+  const localKeys = ['msc_e_fb', 'msc_f_fb', 'msc_ceo_feedback', 'msc_a_fb', 'msc_b_fb', 'msc_c_fb', 'msc_d_fb'];
+  let localFb = {};
+  localKeys.forEach(k => {
+    try { Object.assign(localFb, JSON.parse(localStorage.getItem(k) || '{}')); } catch(e) {}
+  });
+
+  const allFb = { ...localFb, ...serverFb };
+
+  Object.entries(MODS).forEach(([id, mod]) => {
+    const fb = document.querySelector(`.fb[data-id="${id}"]`);
+    if (!fb) return;
+
+    const card = fb.closest('.card');
+    const cardHead = card?.querySelector('.card-head');
+    const existing = allFb[id];
+
+    // 1. Add "已更新" badge to card title
+    if (cardHead) {
+      const nameEl = cardHead.querySelector('.cm, .card-name');
+      if (nameEl && !nameEl.querySelector('.mod-badge')) {
+        const badge = document.createElement('span');
+        badge.className = 'mod-badge';
+        badge.textContent = mod.ver + ' 已更新';
+        nameEl.appendChild(badge);
+      }
+    }
+
+    // 2. Add modification description above feedback
+    const descEl = document.createElement('div');
+    descEl.className = 'mod-desc';
+    descEl.textContent = mod.desc;
+    fb.parentElement.insertBefore(descEl, fb);
+
+    // 3. If there's old feedback (before mod date), archive it
+    if (existing && existing.t && existing.t < mod.date) {
+      const choiceLabel = existing.c === 'a' ? '同意' : existing.c === 'd' ? '需讨论' : existing.c === 'x' ? '不同意' : '';
+      const choiceClass = existing.c === 'a' ? 'ha' : existing.c === 'd' ? 'hd' : 'hx';
+      const noteText = existing.n ? existing.n : '';
+      const timeText = existing.t ? new Date(existing.t).toLocaleString('zh-CN', {timeZone:'Asia/Shanghai'}) : '';
+
+      // Create archive block
+      const histWrap = document.createElement('div');
+      histWrap.className = 'hist-wrap';
+      histWrap.innerHTML = `
+        <div class="hist-toggle" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')">
+          <span class="ht-arrow">▶</span> 历史反馈 (${mod.ver}更新前)
+          ${choiceLabel ? `<span class="hist-choice ${choiceClass}">${choiceLabel}</span>` : ''}
+        </div>
+        <div class="hist-content">
+          ${choiceLabel ? `<div style="margin-bottom:4px"><span class="hist-choice ${choiceClass}">${choiceLabel}</span> ${timeText}</div>` : ''}
+          ${noteText ? `<div style="padding:6px 8px;background:rgba(255,255,255,.03);border-radius:4px;margin-top:4px">${noteText.replace(/\n/g,'<br>')}</div>` : '<div style="color:#3a3f50">无留言</div>'}
+        </div>
+      `;
+      fb.parentElement.insertBefore(histWrap, fb);
+
+      // Clear the current feedback buttons (reset for new round)
+      fb.querySelectorAll('.fb-b').forEach(b => b.className = 'fb-b');
+      const ta = fb.querySelector('.fb-n');
+      if (ta) ta.value = '';
+
+      // Clear localStorage for this item so it starts fresh
+      localKeys.forEach(k => {
+        try {
+          const d = JSON.parse(localStorage.getItem(k) || '{}');
+          if (d[id] && d[id].t < mod.date) {
+            delete d[id];
+            localStorage.setItem(k, JSON.stringify(d));
+          }
+        } catch(e) {}
+      });
+    }
+  });
+}, 500);
 
 })();
