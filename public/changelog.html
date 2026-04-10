@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>MSC.AI · 更新记录</title>
+<style>
+:root{--bg:#0D0F14;--bg2:#161922;--bg3:#1C1F2B;--bg4:#1E2130;--brd:#2A2D3A;--text:#E8E9ED;--text2:#9CA0B0;--text3:#6B7084;--accent:#6C5CE7;--accent-l:#A29BFE;--green:#00B894;--green-bg:rgba(0,184,148,.12);--amber:#FDCB6E;--amber-bg:rgba(253,203,110,.12);--red:#FF6B6B;--red-bg:rgba(255,107,107,.12);--blue:#74B9FF;--blue-bg:rgba(116,185,255,.12);--gold:#F9CA24;--gold-bg:rgba(249,202,36,.12);--chain:#00CEC9;--chain-bg:rgba(0,206,201,.10)}
+*{margin:0;padding:0;box-sizing:border-box}body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased}
+.header{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--brd);padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+.header h1{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}.header .badge{font-size:11px;padding:3px 10px;background:rgba(108,92,231,.12);color:var(--accent-l);border:1px solid rgba(108,92,231,.25);border-radius:20px}
+.main{max-width:900px;margin:0 auto;padding:24px 16px 80px}
+
+/* Version blocks */
+.ver{margin-bottom:36px;border:1px solid var(--brd);border-radius:12px;overflow:hidden}
+.ver-head{padding:16px 20px;background:var(--bg2);display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none}
+.ver-head:hover{background:var(--bg3)}
+.ver-tag{font-size:12px;padding:3px 12px;border-radius:6px;font-weight:700}
+.ver-tag.latest{background:var(--green-bg);color:var(--green)}
+.ver-tag.prev{background:var(--bg4);color:var(--text3)}
+.ver-title{font-size:15px;font-weight:700;margin-left:12px;flex:1}
+.ver-date{font-size:11px;color:var(--text3)}
+.ver-arrow{color:var(--text3);font-size:12px;transition:transform .2s;margin-left:8px}
+.ver-head.open .ver-arrow{transform:rotate(180deg)}
+.ver-body{display:none;padding:0 20px 20px;background:var(--bg2)}
+.ver-body.show{display:block}
+
+/* Change items */
+.ch-section{margin-top:16px}
+.ch-section-title{font-size:13px;font-weight:700;color:var(--accent-l);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid rgba(108,92,231,.15)}
+.ch-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.03)}
+.ch-item:last-child{border-bottom:none}
+.ch-type{font-size:10px;padding:2px 7px;border-radius:4px;font-weight:600;flex-shrink:0;margin-top:2px}
+.ch-type.new{background:var(--green-bg);color:var(--green)}
+.ch-type.mod{background:var(--amber-bg);color:var(--amber)}
+.ch-type.del{background:var(--red-bg);color:var(--red)}
+.ch-type.fix{background:var(--blue-bg);color:var(--blue)}
+.ch-content{flex:1;font-size:13px;color:var(--text2);line-height:1.6}
+.ch-content strong{color:var(--text)}
+.ch-link{display:inline-flex;align-items:center;gap:3px;font-size:11px;color:var(--blue);text-decoration:none;margin-left:6px;padding:1px 6px;border-radius:3px;background:var(--blue-bg);transition:all .15s;white-space:nowrap}
+.ch-link:hover{filter:brightness(1.3)}
+
+/* Summary stats */
+.summary{display:flex;gap:16px;margin:12px 0;flex-wrap:wrap}
+.summary-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2)}
+.summary-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📋 更新记录 <span class="badge">v1 → v5</span></h1>
+</div>
+
+<div class="main">
+
+<!-- V5 -->
+<div class="ver">
+  <div class="ver-head open" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')">
+    <span class="ver-tag latest">v5</span>
+    <span class="ver-title">chatF全面重写 + chatE确权交互修正</span>
+    <span class="ver-date">2026-04-09</span>
+    <span class="ver-arrow">▼</span>
+  </div>
+  <div class="ver-body show">
+    <div class="summary">
+      <div class="summary-item"><div class="summary-dot" style="background:var(--green)"></div>8项新增</div>
+      <div class="summary-item"><div class="summary-dot" style="background:var(--amber)"></div>1项修改</div>
+      <div class="summary-item"><div class="summary-dot" style="background:var(--red)"></div>2项删除</div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">MSC-F · 增长·任务·成长（全面重写）</div>
+
+      <div class="ch-item"><span class="ch-type mod">改</span><div class="ch-content"><strong>增长目标从5,000调至10,000/月</strong>，含四周增长路径表<a class="ch-link" href="chatF.html#target">→ F.2</a></div></div>
+
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>早期任务重新设计</strong>：视频互动任务（含预设话题mockup）+ App体验录屏测试<a class="ch-link" href="chatF.html#tasks">→ F.3</a></div></div>
+
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>每日习惯循环</strong>（参考支付宝种树），任务池稀缺感设计<a class="ch-link" href="chatF.html#habit">→ F.4</a></div></div>
+
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>裂变完全重构</strong>：从"邀请好友得¥5"改为"任务传播经验值系统"——用户分享任务帮自己升级，裂变是副产品<a class="ch-link" href="chatF.html#viral">→ F.5</a></div></div>
+
+      <div class="ch-item"><span class="ch-type mod">改</span><div class="ch-content">成长阶梯Lv.1-4细化，<strong>Lv.4 AI自动赚从永久改为每月3天限时</strong><a class="ch-link" href="chatF.html#growth">→ F.6</a></div></div>
+
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>学习体系</strong>：嵌入式课程+能力雷达图，参考Grow with Google/Coursera。奖励为<strong>平台资源</strong>（不给现金）<a class="ch-link" href="chatF.html#learning">→ F.7</a></div></div>
+
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>防刷四道防线</strong>：设备指纹/行为检测/早鸟递减/有效注册从严<a class="ch-link" href="chatF.html#antifraud">→ F.8</a></div></div>
+
+      <div class="ch-item"><span class="ch-type del">删</span><div class="ch-content">砍掉内容种草任务（违背用户发社交媒体的自然意愿）</div></div>
+
+      <div class="ch-item"><span class="ch-type del">删</span><div class="ch-content">砍掉旧版冷启动社群渗透策略（运营痕迹太重）</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">MSC-E · AI资产确权</div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>确权交互双模式</strong>：首次触发用黄色引导卡（仪式感），后续触发用轻量✓按钮（不打扰）<a class="ch-link" href="chatE.html#ux-flow">→ E.4.3</a></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- V4 -->
+<div class="ver">
+  <div class="ver-head" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')">
+    <span class="ver-tag prev">v4</span>
+    <span class="ver-title">CEO反馈驱动修改</span>
+    <span class="ver-date">2026-04-09</span>
+    <span class="ver-arrow">▼</span>
+  </div>
+  <div class="ver-body">
+    <div class="ch-section">
+      <div class="ch-section-title">MSC-E · AI资产确权</div>
+
+      <div class="ch-item"><span class="ch-type mod">改</span><div class="ch-content"><strong>三档定价→¥699+分期¥19.9/月</strong>，旧方案(¥99/299/999)全部作废<a class="ch-link" href="chatE.html#deposit">→ E.8.1</a></div></div>
+
+      <div class="ch-item"><span class="ch-type mod">改</span><div class="ch-content"><strong>退还周期从12个月→15天冷静期</strong><a class="ch-link" href="chatE.html#deposit">→ E.8.1</a></div></div>
+
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>三阶段确权触发mockup</strong>：发布任务/AI助手解锁/提现各一个流程图+手机mockup<a class="ch-link" href="chatE.html#ux-flow">→ E.4.3</a></div></div>
+
+      <div class="ch-item"><span class="ch-type mod">改</span><div class="ch-content">收益分红权/配额权标注为<strong>全球化交易所功能</strong>，境内当前不涉及<a class="ch-link" href="chatE.html#rights">→ E.3.2</a></div></div>
+
+      <div class="ch-item"><span class="ch-type mod">改</span><div class="ch-content">提现权益更新：白版T+3到账 → 金版<strong>即时到账</strong><a class="ch-link" href="chatE.html#white-gold">→ E.5.3</a></div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">基础设施</div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>修改指示器</strong>：被修改的板块在反馈区上方显示⚡标签</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- V3 -->
+<div class="ver">
+  <div class="ver-head" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')">
+    <span class="ver-tag prev">v3</span>
+    <span class="ver-title">统一导航 + 反馈外置</span>
+    <span class="ver-date">2026-04-09</span>
+    <span class="ver-arrow">▼</span>
+  </div>
+  <div class="ver-body">
+    <div class="ch-section">
+      <div class="ch-section-title">基础设施</div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>nav.js共享侧边栏</strong>：所有子页面自动注入统一导航，PC端左侧固定，移动端hamburger</div></div>
+      <div class="ch-item"><span class="ch-type mod">改</span><div class="ch-content">chatE/chatF头部改为<strong>chatB风格</strong>（标题+badge+sticky子导航tabs）</div></div>
+      <div class="ch-item"><span class="ch-type fix">修</span><div class="ch-content">反馈块从折叠区域<strong>移至卡片底部</strong>，不展开也可标注</div></div>
+      <div class="ch-item"><span class="ch-type fix">修</span><div class="ch-content">旧页面顶部36px空隙修复</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- V2 -->
+<div class="ver">
+  <div class="ver-head" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')">
+    <span class="ver-tag prev">v2</span>
+    <span class="ver-title">新增E/F模块 + 首页重构</span>
+    <span class="ver-date">2026-04-09</span>
+    <span class="ver-arrow">▼</span>
+  </div>
+  <div class="ver-body">
+    <div class="ch-section">
+      <div class="ch-section-title">新增模块</div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>chatE.html</strong>（AI资产确权）：确权机制、区块链存证、三权分置、白版→金版、42号文合规、非法集资风险审视、资产仪表盘<a class="ch-link" href="chatE.html">→ MSC-E</a></div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>chatF.html</strong>（裂变增长）：飞轮模型、冷启动、任务品类、用户画像、成长阶梯、B2B<a class="ch-link" href="chatF.html">→ MSC-F</a></div></div>
+      <div class="ch-item"><span class="ch-type mod">改</span><div class="ch-content">首页重构为<strong>三大类导航</strong>（产品体验/商业机制/工程交付）</div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content">CEO反馈数据预置（36条）</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">MSC-E 专业审核（10项修正）</div>
+      <div class="ch-item"><span class="ch-type mod">改</span><div class="ch-content">确权路径从Polygon公链改为<strong>国内数据交易所</strong><a class="ch-link" href="chatE.html#mechanism">→ E.1.1</a></div></div>
+      <div class="ch-item"><span class="ch-type mod">改</span><div class="ch-content">权利框架改为法定<strong>"三权分置"</strong>制度<a class="ch-link" href="chatE.html#rights">→ E.3.1</a></div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>42号文</strong>（2026.2.6）合规分析：境内RWA代币化已禁止<a class="ch-link" href="chatE.html#blockchain">→ E.2.2</a></div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>非法集资风险审视</strong>（四性分析）<a class="ch-link" href="chatE.html#compliance">→ E.7.3</a></div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content">确权后<strong>AI资产仪表盘</strong>设计<a class="ch-link" href="chatE.html#dashboard">→ E.9</a></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- V1 -->
+<div class="ver">
+  <div class="ver-head" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')">
+    <span class="ver-tag prev">v1</span>
+    <span class="ver-title">初版上线</span>
+    <span class="ver-date">2026-03-29</span>
+    <span class="ver-arrow">▼</span>
+  </div>
+  <div class="ver-body">
+    <div class="ch-section">
+      <div class="ch-section-title">首次交付</div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>chatA-D</strong>：UX 8维度审计（信任安全/空状态反馈/卡片金额/确认留存异常）<a class="ch-link" href="chatA.html">→ A</a> <a class="ch-link" href="chatB.html">→ B</a> <a class="ch-link" href="chatC.html">→ C</a> <a class="ch-link" href="chatD.html">→ D</a></div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>architecture.html</strong>：3种Tab架构方案对比+团队投票<a class="ch-link" href="architecture.html">→ 架构</a></div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>product-spec.html</strong>：产品规格文档（5模块字段表+状态机+资金流）<a class="ch-link" href="product-spec.html">→ 规格</a></div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content">服务端反馈持久化 + 双端同步（localStorage + server JSON）</div></div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script src="/nav.js"></script>
+</body>
+</html>

@@ -17,6 +17,7 @@ const PAGES = [
   ]},
   { cat: '工程交付', icon: '📐', items: [
     { href: 'product-spec.html', label: '📦 产品规格文档' },
+    { href: 'changelog.html', label: '📋 更新记录', badge: 'v5', badgeColor: '#34d399' },
   ]},
 ];
 
