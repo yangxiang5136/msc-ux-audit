@@ -175,7 +175,7 @@ strong { color:var(--text); font-weight:600; }
   <a href="#white-gold">E.5 白版→金版</a>
   <a href="#certificate">E.6 确权证书</a>
   <a href="#compliance">E.7 合规风控</a>
-  <a href="#deposit">E.8 保证金</a>
+  <a href="#deposit">E.8 确权定价</a>
   <a href="#dashboard">E.9 仪表盘</a>
 </div>
 
@@ -725,7 +725,7 @@ strong { color:var(--text); font-weight:600; }
                   · 优先匹配高质量接单者<br>
                   · 任务数据纳入资产产出记录
                 </div>
-                <div class="mock-btn mock-btn-gold" style="margin-top:10px;font-size:12px;">¥699确权 或 ¥19.9/月分期</div>
+                <div class="mock-btn mock-btn-gold" style="margin-top:10px;font-size:12px;">¥99/周租赁 · ¥349/月租赁 · ¥699一次性确权</div>
                 <div style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:6px;cursor:pointer;">暂不确权，以白版身份发布 →</div>
               </div>
             </div>
@@ -765,8 +765,8 @@ strong { color:var(--text); font-weight:600; }
                   <span>日均自动接单</span><span>4.2个</span>
                 </div>
               </div>
-              <div class="mock-btn mock-btn-gold">¥699 解锁 · 含¥699任务基金</div>
-              <div style="text-align:center;font-size:11px;color:var(--text-muted);margin-top:4px;">或 ¥19.9/月分期开通</div>
+              <div class="mock-btn mock-btn-gold">¥699 一次性确权 · 含¥699任务基金</div>
+              <div style="text-align:center;font-size:11px;color:var(--text-muted);margin-top:4px;">或 ¥99/周 · ¥349/月 租赁</div>
             </div>
           </div>
           <div class="phone-label">场景B：AI助手解锁时的确权引导</div>
@@ -806,7 +806,7 @@ strong { color:var(--text); font-weight:600; }
                   当前预计到账：T+3工作日<br>
                   确权用户到账：<strong style="color:var(--green);">即时到账</strong>
                 </div>
-                <div class="mock-btn mock-btn-gold" style="margin-top:8px;font-size:12px;padding:8px;">确权并立即提现 · ¥19.9/月起</div>
+                <div class="mock-btn mock-btn-gold" style="margin-top:8px;font-size:12px;padding:8px;">确权并立即提现 · ¥99/周起</div>
               </div>
 
               <div class="mock-btn mock-btn-ghost" style="font-size:12px;">暂不确权 · 等待T+3到账</div>
@@ -954,7 +954,7 @@ strong { color:var(--text); font-weight:600; }
     <div class="card-body"><div class="card-inner">
 
       <table class="cmp">
-        <tr><th>功能</th><th>白版（免费）</th><th>金版（保证金）</th></tr>
+        <tr><th>功能</th><th>免费（首个资产）</th><th>租赁（¥99/周·¥349/月）</th><th>一次性确权（¥699押金）</th></tr>
         <tr><td>AI自动执行任务</td><td>✅ 基础</td><td>✅ 优先 + 高价任务</td></tr>
         <tr><td>收益提现</td><td>✅ 每周1次 · T+3到账</td><td>✅ 即时到账</td></tr>
         <tr><td>确权证书</td><td>❌</td><td>✅ 含链上存证</td></tr>
@@ -1246,8 +1246,8 @@ strong { color:var(--text); font-weight:600; }
 
 <!-- ==================== E.8 押金设计 ==================== -->
 <div class="section" id="deposit">
-  <div class="section-head"><span class="num">E.8</span>保证金机制设计</div>
-  <div class="section-sub">保证金的法律定性、金额设计、退还机制，直接影响转化率和合规性。</div>
+  <div class="section-head"><span class="num">E.8</span>确权定价（三级架构）</div>
+  <div class="section-sub">三种方式：周租赁(¥99)、月租赁(¥349)、一次性确权(¥699押金可退)。首个AI资产免费。</div>
 
   <div class="card">
     <div class="card-head" onclick="tog(this)">
@@ -1263,7 +1263,7 @@ strong { color:var(--text); font-weight:600; }
       </div>
 
       <div class="highlight-box" style="border-left-color:var(--amber);background:var(--amber-bg);">
-        <strong>⚡ 已根据CEO反馈修改</strong>：三档定价(¥99/299/999)已作废，改为¥699单一档位+分期方案。退还周期从12个月改为15天冷静期。
+        <strong>⚡ v6更新（2026-04-15）</strong>：已改为三级架构——¥99/周租赁（不可退）、¥349/月租赁（不可退）、¥699一次性押金（可退+送¥699基金）。首个AI资产免费。Break-even约7周。
       </div>
 
       <table class="cmp">

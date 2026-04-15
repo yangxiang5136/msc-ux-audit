@@ -1,25 +1,27 @@
 /*
- * MSC.AI Shared Navigation
+ * MSC.AI Shared Navigation v6
  * Add <script src="/nav.js"></script> to any page — sidebar auto-injects
+ * v6: A-F prefixes on all pages, unified naming
  */
 (function(){
 const PAGES = [
   { cat: '产品体验', icon: '📋', items: [
-    { href: 'chatA.html', label: '🔒 信任与安全感', badge: '关键', badgeColor: '#f87171' },
-    { href: 'chatB.html', label: '📭 空状态+反馈', badge: '关键', badgeColor: '#f87171' },
-    { href: 'chatC.html', label: '💰 卡片+金额感知' },
-    { href: 'chatD.html', label: '🛡️ 确认+留存+异常' },
-    { href: 'architecture.html', label: '🏗️ 界面架构方案' },
+    { href: 'chatA.html', label: 'A · 信任与安全感', badge: '关键', badgeColor: '#f87171' },
+    { href: 'chatB.html', label: 'B · 空状态+反馈闭环', badge: '关键', badgeColor: '#f87171' },
+    { href: 'chatC.html', label: 'C · 卡片+金额感知' },
+    { href: 'chatD.html', label: 'D · 确认+留存+异常' },
+    { href: 'architecture.html', label: '🏗️ 界面架构方案', badge: '已定', badgeColor: '#34d399' },
   ]},
   { cat: '商业机制', icon: '🔐', items: [
-    { href: 'chatE.html', label: '📜 AI资产确权', badge: '新', badgeColor: '#2dd4bf' },
-    { href: 'chatF.html', label: '🚀 增长·任务·成长', badge: '新', badgeColor: '#2dd4bf' },
+    { href: 'chatE.html', label: 'E · AI资产确权', badge: '已更新', badgeColor: '#fbbf24' },
+    { href: 'chatF.html', label: 'F · 裂变增长·任务体系', badge: '已更新', badgeColor: '#fbbf24' },
   ]},
   { cat: '工程交付', icon: '📐', items: [
     { href: 'product-spec.html', label: '📦 产品规格文档' },
   ]},
   { cat: '更新记录', icon: '📋', items: [
-    { href: 'changelog.html#v5', label: 'v5 · chatF重写+确权交互', badge: '最新', badgeColor: '#34d399' },
+    { href: 'changelog.html#v6', label: 'v6 · 三级定价+CEO反馈整合', badge: '最新', badgeColor: '#34d399' },
+    { href: 'changelog.html#v5', label: 'v5 · chatF重写+确权交互' },
     { href: 'changelog.html#v4', label: 'v4 · CEO反馈修改' },
     { href: 'changelog.html#v3', label: 'v3 · 统一导航' },
     { href: 'changelog.html#v2', label: 'v2 · 新增E/F模块' },
@@ -37,7 +39,7 @@ if (isHome) return;
 let currentCat = -1;
 PAGES.forEach((cat, ci) => {
   cat.items.forEach(item => {
-    if (item.href === currentPage) currentCat = ci;
+    if (item.href === currentPage || currentPage.startsWith(item.href.split('#')[0])) currentCat = ci;
   });
 });
 
@@ -47,7 +49,7 @@ PAGES.forEach((cat, ci) => {
   const isOpen = ci === currentCat;
   let itemsHTML = '';
   cat.items.forEach(item => {
-    const isCurrent = item.href === currentPage;
+    const isCurrent = item.href.split('#')[0] === currentPage;
     const badge = item.badge ? `<span style="margin-left:auto;font-size:9px;padding:1px 5px;border-radius:3px;font-weight:600;background:${item.badgeColor}22;color:${item.badgeColor}">${item.badge}</span>` : '';
     itemsHTML += `<a class="msn-item${isCurrent?' msn-current':''}" href="/${item.href}">${item.label}${badge}</a>`;
   });
@@ -143,21 +145,17 @@ document.querySelectorAll('.card-body .fb').forEach(fb => {
 });
 
 // ═══ Feedback Versioning System ═══
-// When content is updated based on feedback:
-// - Old feedback archived (collapsed, read-only)
-// - Section gets "已更新" badge
-// - Fresh feedback buttons for new round
-
 const MODS = {
-  'e8.1': { desc: '三档定价→¥699+分期；退还12月→15天', date: '2026-04-09T10:00:00Z', ver: 'v4' },
-  'e3.2': { desc: '标注为全球化交易所功能', date: '2026-04-09T10:00:00Z', ver: 'v4' },
-  'e4.3': { desc: '新增三阶段确权触发mockup', date: '2026-04-09T10:00:00Z', ver: 'v4' },
-  'e5.3': { desc: '提现即时到账+确权入口', date: '2026-04-09T10:00:00Z', ver: 'v4' },
-  'f2.1': { desc: '增长目标5k→10k/月', date: '2026-04-09T14:00:00Z', ver: 'v5' },
-  'f3.1': { desc: '视频互动任务重新设计', date: '2026-04-09T14:00:00Z', ver: 'v5' },
-  'f4.1': { desc: '每日习惯循环（新增）', date: '2026-04-09T14:00:00Z', ver: 'v5' },
-  'f5.1': { desc: '裂变重构为任务传播经验值', date: '2026-04-09T14:00:00Z', ver: 'v5' },
-  'f6.1': { desc: '成长阶梯重写+Lv4限时', date: '2026-04-09T14:00:00Z', ver: 'v5' },
+  'e8.1': { desc: '三级定价：¥99/周、¥349/月、¥699押金', date: '2026-04-15T10:00:00Z', ver: 'v6' },
+  'e5.1': { desc: '白版/金版→租赁/一次性确权', date: '2026-04-15T10:00:00Z', ver: 'v6' },
+  'e5.3': { desc: '权益对比更新为租赁vs一次性', date: '2026-04-15T10:00:00Z', ver: 'v6' },
+  'e4.3': { desc: '确权触发mockup定价更新', date: '2026-04-15T10:00:00Z', ver: 'v6' },
+  'f5.1': { desc: '经验值裂变→直接给钱裂变', date: '2026-04-15T10:00:00Z', ver: 'v6' },
+  'f6.1': { desc: '成长阶梯删除，暂缓', date: '2026-04-15T10:00:00Z', ver: 'v6' },
+  'f7.1': { desc: '学习体系删除', date: '2026-04-15T10:00:00Z', ver: 'v6' },
+  'f3.1': { desc: '任务品类更新：删除涨粉任务', date: '2026-04-15T10:00:00Z', ver: 'v6' },
+  'f4.1': { desc: '每日习惯→每日活动基金', date: '2026-04-15T10:00:00Z', ver: 'v6' },
+  'f8.1': { desc: '防刷四道→五道（+手机号）', date: '2026-04-15T10:00:00Z', ver: 'v6' },
 };
 
 const verStyle = document.createElement('style');
@@ -179,89 +177,19 @@ verStyle.textContent = `
 `;
 document.head.appendChild(verStyle);
 
-// Apply versioning after page loads and feedback syncs
-setTimeout(async () => {
-  // Fetch server feedback for current page
-  let serverFb = {};
-  try {
-    const pageName = 'chat' + (location.pathname.match(/chat([A-Z])\.html/)?.[1] || '');
-    if (pageName !== 'chat') {
-      const res = await fetch('/api/feedback/' + pageName);
-      if (res.ok) serverFb = await res.json();
-    }
-  } catch(e) {}
-
-  // Also check localStorage
-  const localKeys = ['msc_e_fb', 'msc_f_fb', 'msc_ceo_feedback', 'msc_a_fb', 'msc_b_fb', 'msc_c_fb', 'msc_d_fb'];
-  let localFb = {};
-  localKeys.forEach(k => {
-    try { Object.assign(localFb, JSON.parse(localStorage.getItem(k) || '{}')); } catch(e) {}
-  });
-
-  const allFb = { ...localFb, ...serverFb };
-
-  Object.entries(MODS).forEach(([id, mod]) => {
-    const fb = document.querySelector(`.fb[data-id="${id}"]`);
-    if (!fb) return;
-
-    const card = fb.closest('.card');
-    const cardHead = card?.querySelector('.card-head');
-    const existing = allFb[id];
-
-    // 1. Add "已更新" badge to card title
-    if (cardHead) {
-      const nameEl = cardHead.querySelector('.cm, .card-name');
-      if (nameEl && !nameEl.querySelector('.mod-badge')) {
+// Apply mod badges to sections
+setTimeout(() => {
+  Object.entries(MODS).forEach(([key, mod]) => {
+    // Try to find section by data-mod attribute or by ID
+    const section = document.querySelector(`[data-mod="${key}"]`);
+    if (section) {
+      const header = section.querySelector('h2, h3, .card-header');
+      if (header && !header.querySelector('.mod-badge')) {
         const badge = document.createElement('span');
         badge.className = 'mod-badge';
-        badge.textContent = mod.ver + ' 已更新';
-        nameEl.appendChild(badge);
+        badge.textContent = `⚡ ${mod.ver}更新`;
+        header.appendChild(badge);
       }
-    }
-
-    // 2. Add modification description above feedback
-    const descEl = document.createElement('div');
-    descEl.className = 'mod-desc';
-    descEl.textContent = mod.desc;
-    fb.parentElement.insertBefore(descEl, fb);
-
-    // 3. If there's old feedback (before mod date), archive it
-    if (existing && existing.t && existing.t < mod.date) {
-      const choiceLabel = existing.c === 'a' ? '同意' : existing.c === 'd' ? '需讨论' : existing.c === 'x' ? '不同意' : '';
-      const choiceClass = existing.c === 'a' ? 'ha' : existing.c === 'd' ? 'hd' : 'hx';
-      const noteText = existing.n ? existing.n : '';
-      const timeText = existing.t ? new Date(existing.t).toLocaleString('zh-CN', {timeZone:'Asia/Shanghai'}) : '';
-
-      // Create archive block
-      const histWrap = document.createElement('div');
-      histWrap.className = 'hist-wrap';
-      histWrap.innerHTML = `
-        <div class="hist-toggle" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')">
-          <span class="ht-arrow">▶</span> 历史反馈 (${mod.ver}更新前)
-          ${choiceLabel ? `<span class="hist-choice ${choiceClass}">${choiceLabel}</span>` : ''}
-        </div>
-        <div class="hist-content">
-          ${choiceLabel ? `<div style="margin-bottom:4px"><span class="hist-choice ${choiceClass}">${choiceLabel}</span> ${timeText}</div>` : ''}
-          ${noteText ? `<div style="padding:6px 8px;background:rgba(255,255,255,.03);border-radius:4px;margin-top:4px">${noteText.replace(/\n/g,'<br>')}</div>` : '<div style="color:#3a3f50">无留言</div>'}
-        </div>
-      `;
-      fb.parentElement.insertBefore(histWrap, fb);
-
-      // Clear the current feedback buttons (reset for new round)
-      fb.querySelectorAll('.fb-b').forEach(b => b.className = 'fb-b');
-      const ta = fb.querySelector('.fb-n');
-      if (ta) ta.value = '';
-
-      // Clear localStorage for this item so it starts fresh
-      localKeys.forEach(k => {
-        try {
-          const d = JSON.parse(localStorage.getItem(k) || '{}');
-          if (d[id] && d[id].t < mod.date) {
-            delete d[id];
-            localStorage.setItem(k, JSON.stringify(d));
-          }
-        } catch(e) {}
-      });
     }
   });
 }, 500);
