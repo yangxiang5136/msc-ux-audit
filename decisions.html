@@ -81,7 +81,12 @@
 
 <div class="header">
   <h1>⭐ 决策面板 <span class="badge">自动聚合</span></h1>
-  <button class="refresh-btn" onclick="loadAll()">↻ 刷新</button>
+  <div style="margin-left:auto;display:flex;gap:6px;align-items:center">
+    <button class="refresh-btn" onclick="exportFeedback()" title="导出所有反馈为JSON文件">⬇ 导出</button>
+    <button class="refresh-btn" onclick="importFeedback()" title="从JSON文件导入反馈">⬆ 导入</button>
+    <button class="refresh-btn" onclick="loadAll()" title="重新加载">↻ 刷新</button>
+    <button class="refresh-btn" onclick="clearAllFeedback()" title="清空所有反馈" style="color:#f87171">🗑 清空</button>
+  </div>
 </div>
 
 <div class="main">
@@ -102,6 +107,11 @@
   <div class="stat-card"><div class="stat-n r" id="s-x">—</div><div class="stat-l">✗ 已否决方案</div></div>
   <div class="stat-card"><div class="stat-n p" id="s-p">—</div><div class="stat-l">⬜ 待反馈板块</div></div>
 </div>
+
+<details style="margin-bottom:20px">
+  <summary style="cursor:pointer;font-size:12px;color:var(--text3);padding:8px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--brd);user-select:none">🔍 数据源诊断（点击查看 localStorage 原始数据）</summary>
+  <div id="diag-panel" style="margin-top:10px;padding:12px 14px;background:var(--bg2);border-radius:8px;border:1px solid var(--brd);font-size:11px;font-family:monospace;color:var(--text2);max-height:300px;overflow:auto"></div>
+</details>
 
 <div class="tabs">
   <button class="tab t-a active" data-tab="a" onclick="showTab('a',this)"><span>已确认</span><span class="tn" id="tn-a">0</span></button>
@@ -159,8 +169,47 @@ async function loadAll() {
     return 0;
   }
   
+  // Lazy migration: convert old flat format to new nested format
+  function migrateKey(key) {
+    var raw;
+    try { raw = localStorage.getItem(key); } catch(e) { return {}; }
+    if (!raw) return {};
+    var data;
+    try { data = JSON.parse(raw); } catch(e) { return {}; }
+    if (!data || typeof data !== 'object') return {};
+    if (data._v === 2) return data;
+    
+    var migrated = { _v: 2 };
+    Object.keys(data).forEach(function(k) {
+      if (k === '_v') return;
+      var val = data[k];
+      if (!val || typeof val !== 'object') return;
+      
+      // Check if already nested (version keys as children)
+      var keys = Object.keys(val);
+      var looksNew = keys.length > 0 && keys.every(function(vk){
+        return /^\d+(\.\d+)*$/.test(vk) && val[vk] && typeof val[vk] === 'object';
+      });
+      if (looksNew) { migrated[k] = val; return; }
+      
+      // Old format: extract id and version from key
+      var m = k.match(/^(.+)\.v(\d+(?:\.\d+)*)$/);
+      var id, ver;
+      if (m) { id = m[1]; ver = m[2]; }
+      else   { id = k; ver = '1'; }
+      if (!migrated[id]) migrated[id] = {};
+      migrated[id][ver] = {
+        c: val.c || null,
+        n: val.n || '',
+        t: val.t || new Date().toISOString()
+      };
+    });
+    try { localStorage.setItem(key, JSON.stringify(migrated)); } catch(e){}
+    return migrated;
+  }
+  
   try {
-    // Load feedback data from localStorage (new nested format)
+    // Load feedback data from localStorage with lazy migration
     const feedbackData = {};
     PAGES.forEach(page => {
       const letter = page.letter.toLowerCase();
@@ -168,12 +217,7 @@ async function loadAll() {
                       : page.key === 'product-spec' ? 'msc_ps_fb'
                       : page.key === 'chatA' ? 'msc_ceo_feedback'
                       : `msc_${letter}_fb`;
-      try {
-        const raw = localStorage.getItem(storageKey);
-        feedbackData[page.key] = raw ? JSON.parse(raw) : {};
-      } catch(e) {
-        feedbackData[page.key] = {};
-      }
+      feedbackData[page.key] = migrateKey(storageKey);
     });
     
     for (const page of PAGES) {
@@ -221,7 +265,7 @@ async function loadAll() {
           // Determine status: current version's choice, or 'p' if pending
           const status = currentFb.c || 'p';
           
-          // Check if there are older versions with feedback (for "content updated" indicator)
+          // Check if there are older versions with feedback
           const allVersions = Object.keys(versionsData).filter(v => {
             return versionsData[v] && (versionsData[v].c || versionsData[v].n);
           });
@@ -253,10 +297,104 @@ async function loadAll() {
     updateStats();
     buildPageFilter();
     render();
+    updateDiagnostic();
   } catch(err) {
     document.getElementById('content').innerHTML = '<div class="empty"><h3>加载失败</h3><p>无法读取反馈数据。请刷新页面重试。</p></div>';
     console.error(err);
   }
+}
+
+function updateDiagnostic() {
+  const diag = document.getElementById('diag-panel');
+  if (!diag) return;
+  const keys = ['msc_ceo_feedback','msc_a_fb','msc_b_fb','msc_c_fb','msc_d_fb','msc_e_fb','msc_f_fb','msc_g_fb','msc_h_fb','msc_arch_fb','msc_ps_fb'];
+  let html = '';
+  let totalEntries = 0;
+  keys.forEach(k => {
+    const raw = localStorage.getItem(k);
+    if (!raw) {
+      html += `<div style="opacity:.4">${k}: <em>empty</em></div>`;
+      return;
+    }
+    try {
+      const data = JSON.parse(raw);
+      const entries = Object.keys(data).filter(x => x !== '_v').length;
+      totalEntries += entries;
+      const isV2 = data._v === 2;
+      html += `<div><strong style="color:${isV2 ? 'var(--green)' : '#fbbf24'}">${k}</strong> · ${entries} 条 · 格式: ${isV2 ? 'v2 (nested)' : 'v1 (flat, will migrate)'}</div>`;
+    } catch(e) {
+      html += `<div style="color:#f87171">${k}: JSON 解析失败</div>`;
+    }
+  });
+  html = `<div style="margin-bottom:8px;color:var(--text);font-weight:600">总计 ${totalEntries} 条反馈跨 ${keys.filter(k=>localStorage.getItem(k)).length} 个页面</div>` + html;
+  diag.innerHTML = html;
+}
+
+// Export all feedback data as JSON file download
+function exportFeedback() {
+  const pages = [
+    ['chatA','msc_ceo_feedback'],['chatB','msc_b_fb'],['chatC','msc_c_fb'],
+    ['chatD','msc_d_fb'],['chatE','msc_e_fb'],['chatF','msc_f_fb'],
+    ['chatG','msc_g_fb'],['chatH','msc_h_fb'],
+    ['architecture','msc_arch_fb'],['product-spec','msc_ps_fb']
+  ];
+  const all = { _exported: new Date().toISOString(), pages: {} };
+  pages.forEach(([p, key]) => {
+    try {
+      const raw = localStorage.getItem(key);
+      if (raw) all.pages[p] = JSON.parse(raw);
+    } catch(e) {}
+  });
+  const blob = new Blob([JSON.stringify(all, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `msc-feedback-${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+}
+
+// Import feedback from a JSON file (merges into localStorage)
+function importFeedback() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'application/json';
+  input.onchange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      if (!data.pages) throw new Error('格式不对：缺少 pages 字段');
+      const pageKeys = {
+        chatA: 'msc_ceo_feedback', chatB: 'msc_b_fb', chatC: 'msc_c_fb',
+        chatD: 'msc_d_fb', chatE: 'msc_e_fb', chatF: 'msc_f_fb',
+        chatG: 'msc_g_fb', chatH: 'msc_h_fb',
+        architecture: 'msc_arch_fb', 'product-spec': 'msc_ps_fb'
+      };
+      let merged = 0;
+      Object.keys(data.pages).forEach(p => {
+        const key = pageKeys[p];
+        if (!key) return;
+        localStorage.setItem(key, JSON.stringify(data.pages[p]));
+        merged++;
+      });
+      alert(`✓ 已导入 ${merged} 个页面的反馈数据。正在刷新...`);
+      location.reload();
+    } catch(err) {
+      alert('❌ 导入失败：' + err.message);
+    }
+  };
+  input.click();
+}
+
+// Clear all feedback (with confirmation)
+function clearAllFeedback() {
+  if (!confirm('确认清空所有反馈？此操作不可撤销。建议先导出备份。')) return;
+  const keys = ['msc_ceo_feedback','msc_b_fb','msc_c_fb','msc_d_fb','msc_e_fb','msc_f_fb','msc_g_fb','msc_h_fb','msc_arch_fb','msc_ps_fb'];
+  keys.forEach(k => localStorage.removeItem(k));
+  location.reload();
 }
 
 function updateStats() {

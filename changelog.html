@@ -55,9 +55,35 @@
 <div class="main">
 
 <!-- V5 -->
+<div class="ver" id="v7.1">
+  <div class="ver-head open" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')">
+    <span class="ver-tag latest">v7.1</span>
+    <span class="ver-title">决策面板惰性迁移 + 导入导出 + 诊断面板</span>
+    <span class="ver-date">2026-04-16</span>
+    <span class="ver-arrow">▼</span>
+  </div>
+  <div class="ver-body show">
+    <div class="ch-stats"><span class="ch-stat fix-stat">2项修复</span><span class="ch-stat new-stat">3项新增</span></div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">决策面板修复</div>
+      <div class="ch-item"><span class="ch-type fix">修</span><div class="ch-content"><strong>惰性迁移</strong>：决策面板不依赖fb.js运行顺序，自己在读localStorage前迁移老格式数据。解决"已确认0条"但实际有反馈的问题<a class="ch-link" href="/decisions.html">→ 决策面板</a></div></div>
+      <div class="ch-item"><span class="ch-type fix">修</span><div class="ch-content">首页失效的"导出反馈"按钮（指向/api/export），改为"⭐ 决策面板"入口</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">新功能</div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>⬇ 导出反馈</strong>：一键下载所有页面反馈为JSON文件。文件名带日期，方便备份/归档</div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>⬆ 导入反馈</strong>：上传之前导出的JSON覆盖localStorage。支持跨设备手动同步、恢复备份</div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>🔍 数据源诊断面板</strong>：展开可看到每个localStorage key的状态（条数、v1/v2格式）。排查问题专用</div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>🗑 清空反馈</strong>：带确认弹窗的完全重置按钮</div></div>
+    </div>
+  </div>
+</div>
+
 <div class="ver" id="v7">
   <div class="ver-head open" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')">
-    <span class="ver-tag latest">v7</span>
+    <span class="ver-tag prev">v7</span>
     <span class="ver-title">决策面板 + 首页侧栏修复 + 反馈版本化</span>
     <span class="ver-date">2026-04-15</span>
     <span class="ver-arrow">▼</span>
