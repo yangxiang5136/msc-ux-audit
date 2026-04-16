@@ -23,7 +23,8 @@ const PAGES = [
     { href: 'product-spec.html', label: '📦 产品规格文档' },
   ]},
   { cat: '更新记录', icon: '📋', items: [
-    { href: 'changelog.html#v7.4.7', label: 'v7.4.7 · E nav + 孤儿防御', badge: '最新', badgeColor: '#34d399' },
+    { href: 'changelog.html#v7.4.8', label: 'v7.4.8 · architecture 折叠修复', badge: '最新', badgeColor: '#34d399' },
+    { href: 'changelog.html#v7.4.7', label: 'v7.4.7 · E nav + 孤儿防御' },
     { href: 'changelog.html#v7.4.6', label: 'v7.4.6 · nav 统一风格' },
     { href: 'changelog.html#v7.4.5', label: 'v7.4.5 · A/B/G/H 布局统一' },
     { href: 'changelog.html#v7.4.4', label: 'v7.4.4 · E/F 遮挡紧急修复' },

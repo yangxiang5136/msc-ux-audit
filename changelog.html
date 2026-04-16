@@ -54,10 +54,44 @@
 
 <div class="main">
 
+<!-- V7.4.8 -->
+<div class="ver" id="v7.4.8">
+  <div class="ver-head open" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')">
+    <span class="ver-tag latest">v7.4.8</span>
+    <span class="ver-title">architecture.html 折叠修复（第三种 CSS 模式）</span>
+    <span class="ver-date">2026-04-16</span>
+    <span class="ver-arrow">▼</span>
+  </div>
+  <div class="ver-body show">
+    <div class="ch-stats"><span class="ch-stat fix-stat">1项修复</span></div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">Bug 现象</div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content"><strong>Sean 反馈</strong>：界面架构方案页面（architecture.html）的 tab 展开/关闭失效。自 v7.4.2 起一直是坏的，现在才注意到</div></div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content"><strong>根因</strong>：architecture.html 用的是第三种折叠 CSS 模式 — <code>.cflow.open</code>（不是 chatB/C/D 的 <code>.card.open</code>，也不是 chatE/F/G/H 的 <code>.card-body.show</code>）。它自己 inline <code>&lt;script&gt;</code> 里定义了 <code>tog()</code> 处理 <code>.cflow</code>，但 fb.js（在 inline script 之后加载）的通用 <code>tog()</code> 覆盖了它，而通用版只支持 <code>.card</code>。所以 architecture 的 tog 调用被"劫持"成了 no-op</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">修复</div>
+      <div class="ch-item"><span class="ch-type fix">修</span><div class="ch-content"><strong>fb.js 的 <code>_setCardState</code> 和 <code>_isCardOpen</code> 增加 <code>.cflow</code> 兼容</strong>：<code>head.closest('.card') || head.closest('.cflow')</code>。现在通用 tog 能同时处理三种模式</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">测试</div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content">jsdom 验证 architecture 的 12 个 <code>.cflow</code> 元素：点击关闭的展开 ✓，再点击收起 ✓。其他 7 个页面（B-H）折叠无回归</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">product-spec 用不同机制，不受影响</div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content">product-spec.html 用 <code>.mod</code> + <code>modToggle()</code>、<code>treeToggle()</code>，函数名独立于 <code>tog</code>，不会被 fb.js 覆盖</div></div>
+    </div>
+  </div>
+</div>
+
 <!-- V7.4.7 -->
 <div class="ver" id="v7.4.7">
   <div class="ver-head open" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')">
-    <span class="ver-tag latest">v7.4.7</span>
+    <span class="ver-tag prev">v7.4.7</span>
     <span class="ver-title">E nav 顺序修正 + 孤儿 link 防御</span>
     <span class="ver-date">2026-04-16</span>
     <span class="ver-arrow">▼</span>

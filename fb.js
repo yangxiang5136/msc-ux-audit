@@ -18,27 +18,31 @@
 // Strategy: detect current "is open" state from ANY of the three indicators,
 // then set ALL three consistently (fully open or fully closed). This works
 // regardless of which pattern the page uses and heals inconsistent initial HTML.
+// v7.4.8: Added support for a third pattern — .cflow (architecture.html) which
+// uses `.cflow.open` as the container toggle (similar to Pattern B but with
+// different class name).
 function _setCardState(head, isOpen) {
   if (!head) return;
   var body = head.nextElementSibling;
-  var card = head.closest('.card');
+  // container could be .card (Pattern B) or .cflow (architecture)
+  var container = head.closest('.card') || head.closest('.cflow');
   if (isOpen) {
     head.classList.add('open');
     if (body) body.classList.add('show');
-    if (card && card !== head) card.classList.add('open');
+    if (container && container !== head) container.classList.add('open');
   } else {
     head.classList.remove('open');
     if (body) body.classList.remove('show');
-    if (card && card !== head) card.classList.remove('open');
+    if (container && container !== head) container.classList.remove('open');
   }
 }
 function _isCardOpen(head) {
   if (!head) return false;
   var body = head.nextElementSibling;
-  var card = head.closest('.card');
+  var container = head.closest('.card') || head.closest('.cflow');
   return head.classList.contains('open') ||
          (body && body.classList.contains('show')) ||
-         (card && card !== head && card.classList.contains('open'));
+         (container && container !== head && container.classList.contains('open'));
 }
 
 function tog(el) {
