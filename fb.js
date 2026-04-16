@@ -1,6 +1,59 @@
 /*
  * MSC.AI Feedback System v2 — Version-aware
- * Data model:
+ *
+ * Also includes shared UI utility functions (tog, toggle, toggleAll, etc.)
+ * that were previously inline in each page's <script> block.
+ */
+
+// ═══ Shared UI Utilities ═══
+// Card expand/collapse (chatD, E, F, G, H)
+function tog(el) {
+  el.classList.toggle('open');
+  var body = el.nextElementSibling;
+  if (body) body.classList.toggle('show');
+}
+
+// Card expand/collapse (chatB, C — same logic, different name)
+function toggle(el) {
+  el.classList.toggle('open');
+  var body = el.nextElementSibling;
+  if (body) body.classList.toggle('show');
+}
+
+// Expand/collapse ALL cards on page (chatE, F)
+function toggleAll(expand) {
+  document.querySelectorAll('.card-head').forEach(function(h) {
+    var body = h.nextElementSibling;
+    if (!body) return;
+    if (expand) {
+      h.classList.add('open');
+      body.classList.add('show');
+    } else {
+      h.classList.remove('open');
+      body.classList.remove('show');
+    }
+  });
+}
+
+// CEO section toggle (chatA)
+function toggleCeo(el) {
+  el.classList.toggle('open');
+  var body = el.nextElementSibling;
+  if (body) body.classList.toggle('show');
+}
+
+// Nav item active state (chatA)
+function setActive(el) {
+  var parent = el.closest('.nav-bar, .nav');
+  if (parent) {
+    parent.querySelectorAll('.nav-item, a').forEach(function(a) {
+      a.classList.remove('active');
+    });
+  }
+  el.classList.add('active');
+}
+
+/*
  *   localStorage[FB_KEY] = {
  *     "e8.1": {
  *       "6":   { c: "a", n: "note", t: "2026-04-09T10:00:00Z" },

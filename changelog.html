@@ -76,6 +76,11 @@
       <div class="ch-section-title">已验证</div>
       <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content">Supabase 数据库层面无重复（composite unique constraint 生效，59 行 0 重复）。之前看到的"很多重复"纯粹是 UI 渲染 bug</div></div>
     </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">所有页面展开/折叠修复</div>
+      <div class="ch-item"><span class="ch-type fix">修</span><div class="ch-content"><strong>tog/toggle/toggleAll/toggleCeo/setActive 函数全部丢失</strong>：fb.js 迁移时把这些函数连同旧 <code>&lt;script&gt;</code> 块一起删了。所有页面的折叠卡片点不开。现在全部加回 fb.js</div></div>
+    </div>
   </div>
 </div>
 
