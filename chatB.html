@@ -28,7 +28,7 @@ html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',system-ui,sans-serif;font-size:15px;line-height:1.75;-webkit-font-smoothing:antialiased}
 
 /* ─ header ─ */
-.header{position:sticky;top:36px;z-index:100;background:rgba(10,10,18,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+.header{position:sticky;top:36px;z-index:100;background:#0D0F14;border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
 .header h1{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}
 .header .badge{font-size:11px;padding:3px 10px;background:rgba(74,144,217,.12);color:var(--blue);border:1px solid rgba(74,144,217,.25);border-radius:20px}
 .header .stats{display:flex;gap:12px;font-size:11px;color:var(--text2)}
@@ -36,7 +36,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',system-ui
 .header .stats .s-a{color:var(--green)}.header .stats .s-d{color:var(--amber)}.header .stats .s-x{color:var(--red)}
 
 /* ─ nav ─ */
-.nav{position:sticky;top:88px;z-index:90;background:rgba(10,10,18,.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:8px 20px;overflow-x:auto;display:flex;gap:6px;scrollbar-width:none}
+.nav{position:sticky;top:88px;z-index:90;background:#0D0F14;border-bottom:1px solid var(--border);padding:8px 20px;overflow-x:auto;display:flex;gap:6px;scrollbar-width:none}
 .nav::-webkit-scrollbar{display:none}
 .nav a{display:inline-block;padding:5px 14px;font-size:12px;font-weight:500;color:var(--text2);text-decoration:none;border-radius:6px;border:1px solid transparent;transition:all .2s;white-space:nowrap}
 .nav a:hover{color:var(--text);background:var(--bg-el)}
@@ -932,55 +932,8 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',system-ui
 
 </div>
 
-<script src="/sync.js"></script>
-<script>
-function toggle(el){el.closest('.card').classList.toggle('open')}
-const SK='msc_b_fb';
-SYNC.init('chatB',SK);
-function ld(){try{return JSON.parse(localStorage.getItem(SK)||'{}')}catch(e){return{}}}
-function sv(d){try{localStorage.setItem(SK,JSON.stringify(d))}catch(e){}}
-function sel(btn,id,c){
-  const cls=c==='a'?'s-a':c==='d'?'s-d':'s-x';
-  const wasSelected=btn.classList.contains(cls);
-  const row=btn.parentElement;
-  row.querySelectorAll('.fb-b').forEach(b=>{b.classList.remove('s-a','s-d','s-x')});
-  const d=ld();
-  if(wasSelected){if(!d[id])d[id]={};delete d[id].c;sv(d);up();SYNC.push(id,'');}
-  else{btn.classList.add(cls);d[id]={...(d[id]||{}),c};sv(d);up();SYNC.push(id,c);}
-}
-function sn(ta,id){const d=ld();d[id]={...d[id],n:ta.value};sv(d);SYNC.push(id,undefined,ta.value)}
-function up(){
-  const d=ld();let a=0,dd=0,x=0;
-  Object.values(d).forEach(v=>{if(v.c==='a')a++;if(v.c==='d')dd++;if(v.c==='x')x++});
-  document.getElementById('ca').textContent=a;
-  document.getElementById('cd').textContent=dd;
-  document.getElementById('cx').textContent=x;
-}
-function render(d){
-  Object.entries(d).forEach(([id,v])=>{
-    const w=document.querySelector(`.fb[data-id="${id}"]`);
-    if(!w)return;
-    if(v.c){const bs=w.querySelectorAll('.fb-b');bs.forEach(b=>b.classList.remove('s-a','s-d','s-x'));const idx=v.c==='a'?0:v.c==='d'?1:2;if(bs[idx])bs[idx].classList.add(v.c==='a'?'s-a':v.c==='d'?'s-d':'s-x')}
-    if(v.n){const ta=w.querySelector('.fb-n');if(ta)ta.value=v.n}
-  });
-  up();
-}
-document.addEventListener('DOMContentLoaded',async()=>{
-  const remote=await SYNC.pull();
-  render(ld());
-});
-const obs=new IntersectionObserver(es=>{
-  es.forEach(e=>{
-    if(e.isIntersecting){
-      const id=e.target.id;
-      document.querySelectorAll('.nav a').forEach(a=>{
-        a.classList.toggle('active',a.getAttribute('href')==='#'+id)
-      })
-    }
-  })
-},{rootMargin:'-120px 0px -60% 0px'});
-document.querySelectorAll('.sec[id]').forEach(s=>obs.observe(s));
-</script>
+<script>window.FB_KEY='msc_b_fb';window.FB_PAGE='chatB'</script>
+<script src="/fb.js"></script>
 <script src="/nav.js"></script>
 </body>
 </html>

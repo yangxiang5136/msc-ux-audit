@@ -16,10 +16,10 @@
 html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',sans-serif;font-size:15px;line-height:1.75;-webkit-font-smoothing:antialiased}
 
-.header{position:sticky;top:36px;z-index:100;background:rgba(10,10,18,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--brd);padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+.header{position:sticky;top:36px;z-index:100;background:#0D0F14;border-bottom:1px solid var(--brd);padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
 .header-title{font-size:15px;font-weight:700}
 .header-badge{font-size:11px;padding:3px 10px;background:rgba(155,109,255,.12);color:var(--purple);border:1px solid rgba(155,109,255,.25);border-radius:20px}
-.nav{position:sticky;top:88px;z-index:90;background:rgba(10,10,18,.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--brd);padding:8px 20px;overflow-x:auto;display:flex;gap:6px;scrollbar-width:none}
+.nav{position:sticky;top:88px;z-index:90;background:#0D0F14;border-bottom:1px solid var(--brd);padding:8px 20px;overflow-x:auto;display:flex;gap:6px;scrollbar-width:none}
 .nav::-webkit-scrollbar{display:none}
 .nav a{display:inline-block;padding:5px 14px;font-size:12px;font-weight:500;color:var(--t2);text-decoration:none;border-radius:6px;border:1px solid transparent;transition:all .2s;white-space:nowrap}
 .nav a:hover{color:var(--text);background:var(--bg4)}
@@ -751,108 +751,8 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',sans-seri
   <span class="si"><span class="sd" style="background:var(--red)"></span>不同意 <strong id="cx">0</strong></span>
 </div>
 
-<script src="/sync.js"></script>
-<script>
-const K='msc_d_fb';
-SYNC.init('chatD',K);
-function ld(){try{return JSON.parse(localStorage.getItem(K))||{}}catch{return{}}}
-function sv(d){localStorage.setItem(K,JSON.stringify(d));up()}
-function tog(h){h.closest('.card').classList.toggle('open')}
-function sf(b,t,id){const cls=t==='a'?'s-a':t==='d'?'s-d':'s-x';const was=b.classList.contains(cls);const bs=b.parentElement.querySelectorAll('.fb-b');bs.forEach(x=>x.className='fb-b');const d=ld();if(was){if(!d[id])d[id]={};delete d[id].c;sv(d);SYNC.push(id,'')}else{b.classList.add(cls);d[id]={...(d[id]||{}),c:t};sv(d);SYNC.push(id,t)}}
-function sn(ta,id){const d=ld();d[id]={...d[id],n:ta.value};sv(d);SYNC.push(id,undefined,ta.value)}
-function up(){const d=ld();let a=0,dd=0,x=0;Object.values(d).forEach(v=>{if(v.c==='a')a++;if(v.c==='d')dd++;if(v.c==='x')x++});document.getElementById('ca').textContent=a;document.getElementById('cd').textContent=dd;document.getElementById('cx').textContent=x}
-
-// Slide to confirm
-function startSlide(e,id){
-  const track=document.getElementById(id);
-  const thumb=document.getElementById(id+'-thumb');
-  if(track.classList.contains('done'))return;
-  const rect=track.getBoundingClientRect();
-  const maxX=rect.width-48;
-  function onMove(ev){
-    const clientX=(ev.touches?ev.touches[0]:ev).clientX;
-    let x=Math.max(4,Math.min(clientX-rect.left-20,maxX));
-    thumb.style.left=x+'px';
-    if(x>=maxX-4){
-      track.classList.add('done');
-      document.getElementById(id+'-label').textContent='✅ 已接取 · 请在24h内完成';
-      thumb.textContent='✅';
-      const before=document.getElementById(id+'-before');
-      const after=document.getElementById(id+'-after');
-      if(before)before.style.display='none';
-      if(after)after.style.display='block';
-      cleanup();
-    }
-  }
-  function onEnd(){
-    if(!track.classList.contains('done'))thumb.style.left='4px';
-    cleanup();
-  }
-  function cleanup(){
-    document.removeEventListener('mousemove',onMove);
-    document.removeEventListener('mouseup',onEnd);
-    document.removeEventListener('touchmove',onMove);
-    document.removeEventListener('touchend',onEnd);
-  }
-  document.addEventListener('mousemove',onMove);
-  document.addEventListener('mouseup',onEnd);
-  document.addEventListener('touchmove',onMove,{passive:false});
-  document.addEventListener('touchend',onEnd);
-  e.preventDefault();
-}
-function resetSlide(id){
-  const track=document.getElementById(id);
-  const thumb=document.getElementById(id+'-thumb');
-  track.classList.remove('done');
-  thumb.style.left='4px';
-  thumb.textContent='➜';
-  document.getElementById(id+'-label').textContent='➜ 滑动确认接取';
-  const before=document.getElementById(id+'-before');
-  const after=document.getElementById(id+'-after');
-  if(before)before.style.display='';
-  if(after)after.style.display='none';
-}
-
-// Countdown button
-function startCountdown(){
-  const btn=document.getElementById('withdraw-btn');
-  if(btn.dataset.ready==='1'){btn.textContent='✅ 提现成功！';btn.className='m-btn m-btn-green';btn.style.flex='2';document.getElementById('withdraw-hint').textContent='已提交提现申请';return}
-  let s=3;
-  btn.textContent='确认提现（'+s+'s）';
-  const iv=setInterval(()=>{s--;if(s>0){btn.textContent='确认提现（'+s+'s）'}else{clearInterval(iv);btn.textContent='确认提现';btn.className='m-btn m-btn-red';btn.style.flex='2';btn.dataset.ready='1';document.getElementById('withdraw-hint').textContent='现在可以点击确认'}},1000);
-}
-
-// Red packet
-function openRedPkt(){
-  const el=document.getElementById('redpkt');
-  if(el.dataset.opened)return;
-  el.dataset.opened='1';
-  const amounts=[1,1.5,2,2.5,3,3.5,4,5];
-  const amt=amounts[Math.floor(Math.random()*amounts.length)].toFixed(2);
-  document.getElementById('rp-emoji').style.display='none';
-  document.getElementById('rp-text').style.display='none';
-  const amtEl=document.getElementById('rp-amount');
-  amtEl.style.display='block';
-  amtEl.textContent='¥'+amt;
-  amtEl.classList.add('pop');
-  el.classList.add('shake');
-}
-
-// Init
-function render(d){
-  Object.entries(d).forEach(([id,v])=>{
-    const w=document.querySelector(`.fb[data-id="${id}"]`);
-    if(!w)return;
-    if(v.c){const bs=w.querySelectorAll('.fb-b');bs.forEach(x=>x.className='fb-b');const idx=v.c==='a'?0:v.c==='d'?1:2;if(bs[idx])bs[idx].classList.add(v.c==='a'?'s-a':v.c==='d'?'s-d':'s-x')}
-    if(v.n){const ta=w.querySelector('.fb-n');if(ta)ta.value=v.n}
-  });
-  up();
-}
-document.addEventListener('DOMContentLoaded',async()=>{
-  await SYNC.pull();
-  render(ld());
-});
-</script>
+<script>window.FB_KEY='msc_d_fb';window.FB_PAGE='chatD'</script>
+<script src="/fb.js"></script>
 <script src="/nav.js"></script>
 </body>
 </html>

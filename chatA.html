@@ -768,66 +768,8 @@
 
 </main>
 
-<script src="/sync.js"></script>
-<script>
-const SK='msc_ceo_feedback';
-SYNC.init('chatA',SK);
-function ld(){try{return JSON.parse(localStorage.getItem(SK)||'{}')}catch(e){return{}}}
-function sv(d){try{localStorage.setItem(SK,JSON.stringify(d))}catch(e){}}
-function setActive(el) {
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  el.classList.add('active');
-}
-function toggleCeo(btn) {
-  const sec = btn.closest('.ceo-section');
-  const id = sec.dataset.id;
-  const val = btn.textContent.trim();
-  const c = val.includes('同意') && !val.includes('不') ? 'a' : val.includes('讨论') ? 'd' : 'x';
-  const cls = c==='a'?'s-a':c==='d'?'s-d':'s-x';
-  const wasSelected = btn.classList.contains(cls);
-  const siblings = btn.parentElement.querySelectorAll('.ceo-btn');
-  siblings.forEach(b => b.classList.remove('s-a','s-d','s-x'));
-  const d = ld();
-  if (wasSelected) {
-    if(!d[id]) d[id]={};
-    delete d[id].c;
-    sv(d);
-    SYNC.push(id, '');
-  } else {
-    btn.classList.add(cls);
-    d[id] = {...(d[id]||{}), c};
-    sv(d);
-    SYNC.push(id, c);
-  }
-}
-function saveCeoNote(ta) {
-  const sec = ta.closest('.ceo-section');
-  const id = sec.dataset.id;
-  const d = ld(); d[id] = {...(d[id]||{}), n: ta.value}; sv(d);
-  SYNC.push(id, undefined, ta.value);
-}
-document.addEventListener('DOMContentLoaded', async () => {
-  await SYNC.pull();
-  const d = ld();
-  document.querySelectorAll('.ceo-section').forEach(sec => {
-    const id = sec.dataset.id;
-    if (!id || !d[id]) return;
-    if (d[id].c) {
-      const btns = sec.querySelectorAll('.ceo-btn');
-      const idx = d[id].c === 'a' ? 0 : d[id].c === 'd' ? 1 : 2;
-      if (btns[idx]) btns[idx].classList.add(d[id].c==='a'?'s-a':d[id].c==='d'?'s-d':'s-x');
-    }
-    if (d[id].n) {
-      const ta = sec.querySelector('.ceo-note');
-      if (ta) ta.value = d[id].n;
-    }
-  });
-});
-const obs = new IntersectionObserver(entries => {
-  entries.forEach(e => { if(e.isIntersecting) { const id=e.target.id; document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active',n.getAttribute('href')==='#'+id)); }});
-}, {rootMargin:'-120px 0px -60% 0px'});
-document.querySelectorAll('.section[id]').forEach(s => obs.observe(s));
-</script>
+<script>window.FB_KEY='msc_ceo_feedback';window.FB_PAGE='chatA'</script>
+<script src="/fb.js"></script>
 <script src="/nav.js"></script>
 </body>
 </html>

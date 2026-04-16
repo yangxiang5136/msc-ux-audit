@@ -7,9 +7,9 @@
 <style>
 :root{--bg:#0D0F14;--bg-card:#161922;--bg-card-hover:#1C1F2B;--bg-input:#1E2130;--border:#2A2D3A;--text:#E8E9ED;--text2:#9CA0B0;--text3:#6B7084;--accent:#6C5CE7;--accent-l:#A29BFE;--green:#00B894;--green-bg:rgba(0,184,148,.12);--amber:#FDCB6E;--amber-bg:rgba(253,203,110,.12);--red:#FF6B6B;--red-bg:rgba(255,107,107,.12);--blue:#74B9FF;--blue-bg:rgba(116,185,255,.12);--gold:#F9CA24;--gold-bg:rgba(249,202,36,.12);--chain:#00CEC9;--chain-bg:rgba(0,206,201,.10);--r:12px;--rs:8px}
 *{margin:0;padding:0;box-sizing:border-box}body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased}
-.header{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+.header{position:sticky;top:0;z-index:100;background:#0D0F14;border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
 .header h1{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}.header .badge{font-size:11px;padding:3px 10px;background:var(--green-bg);color:var(--green);border:1px solid rgba(0,184,148,.25);border-radius:20px}.header .stats{display:flex;gap:12px;font-size:11px;color:var(--text2)}.header .stats span{display:flex;align-items:center;gap:3px}.header .stats .s-a{color:var(--green)}.header .stats .s-d{color:var(--amber)}.header .stats .s-x{color:var(--red)}
-.nav{position:sticky;top:48px;z-index:90;background:rgba(13,15,20,.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:8px 20px;overflow-x:auto;display:flex;gap:6px;scrollbar-width:none}.nav::-webkit-scrollbar{display:none}.nav a{display:inline-block;padding:5px 14px;font-size:12px;font-weight:500;color:var(--text2);text-decoration:none;border-radius:6px;border:1px solid transparent;transition:all .2s;white-space:nowrap}.nav a:hover{color:var(--text);background:var(--bg-card)}.nav a.active{color:var(--green);border-color:rgba(0,184,148,.3);background:var(--green-bg)}
+.nav{position:sticky;top:48px;z-index:90;background:#0D0F14;border-bottom:1px solid var(--border);padding:8px 20px;overflow-x:auto;display:flex;gap:6px;scrollbar-width:none}.nav::-webkit-scrollbar{display:none}.nav a{display:inline-block;padding:5px 14px;font-size:12px;font-weight:500;color:var(--text2);text-decoration:none;border-radius:6px;border:1px solid transparent;transition:all .2s;white-space:nowrap}.nav a:hover{color:var(--text);background:var(--bg-card)}.nav a.active{color:var(--green);border-color:rgba(0,184,148,.3);background:var(--green-bg)}
 .main{max-width:900px;margin:0 auto;padding:24px 16px 80px}
 .section{margin-bottom:40px}.section-head{font-size:20px;font-weight:700;margin-bottom:6px;padding-top:20px}.section-head .n{color:var(--accent-l);margin-right:8px}.section-sub{font-size:14px;color:var(--text2);margin-bottom:20px;line-height:1.6}
 .card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r);margin-bottom:14px;overflow:hidden}
@@ -25,7 +25,7 @@
 .phone-wrap{display:flex;justify-content:center;margin:18px 0}.phone{width:280px;background:#000;border-radius:28px;padding:12px;border:2px solid #333}.phone-screen{background:var(--bg);border-radius:20px;overflow:hidden;padding:16px;min-height:340px}.phone-label{text-align:center;font-size:12px;color:var(--text3);margin-top:8px}
 .mock-card{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px}.mock-btn{display:block;text-align:center;padding:10px;border-radius:8px;font-size:13px;font-weight:600;margin:6px 0;cursor:default}.mock-btn-primary{background:var(--accent);color:#fff}.mock-btn-gold{background:linear-gradient(135deg,var(--gold),#E17055);color:#fff}.mock-btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text2)}.mock-badge{display:inline-block;font-size:10px;padding:2px 6px;border-radius:4px;font-weight:600}.mock-divider{height:1px;background:var(--border);margin:10px 0}
 .fb{margin-top:16px;padding:14px;background:rgba(108,92,231,.06);border:1px solid rgba(108,92,231,.15);border-radius:var(--rs)}.fb-t{font-size:12px;color:var(--accent-l);font-weight:600;margin-bottom:8px}.fb-btns{display:flex;gap:8px;margin-bottom:8px}.fb-b{font-size:12px;padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:var(--bg-card);color:var(--text2);cursor:pointer;transition:all .15s}.fb-b:hover{border-color:var(--text3)}.fb-b.s-a{background:var(--green-bg);color:var(--green);border-color:var(--green)}.fb-b.s-d{background:var(--amber-bg);color:var(--amber);border-color:var(--amber)}.fb-b.s-x{background:var(--red-bg);color:var(--red);border-color:var(--red)}.fb-n{width:100%;background:var(--bg-input);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text);font-size:12px;resize:vertical;min-height:36px;font-family:inherit}.fb-n::placeholder{color:var(--text3)}
-.summary-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(13,15,20,.95);backdrop-filter:blur(12px);border-top:1px solid var(--border);padding:10px 24px;z-index:100}.summary-inner{max-width:900px;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:20px;font-size:13px}.summary-inner span{display:flex;align-items:center;gap:4px}
+.summary-bar{position:fixed;bottom:0;left:0;right:0;background:#161922;border-top:1px solid var(--border);padding:10px 24px;z-index:100}.summary-inner{max-width:900px;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:20px;font-size:13px}.summary-inner span{display:flex;align-items:center;gap:4px}
 .controls{display:flex;gap:8px;margin-bottom:16px}.ctrl-btn{font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:var(--bg-card);color:var(--text2);cursor:pointer}.ctrl-btn:hover{border-color:var(--accent);color:var(--accent-l)}
 strong{color:var(--text);font-weight:600}
 .gp-row{display:flex;align-items:stretch;margin-bottom:2px}.gp-lv{width:90px;padding:12px 8px;text-align:center;font-size:11px;font-weight:700;border:1px solid var(--border);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px}.gp-ct{flex:1;padding:12px 16px;border:1px solid var(--border);border-left:none;font-size:12px;line-height:1.7;color:var(--text2)}
@@ -105,7 +105,8 @@ strong{color:var(--text);font-weight:600}
     <div class="tip" style="margin-top:12px"><strong>成本控制机制：</strong>平台每日发布固定额度的任务，做完为止。用户可以无限接单，但平台出资的任务池有每日上限。</div>
     <div class="tip" style="margin-top:8px"><strong>增长目标：</strong>第一个月10,000用户。</div>
   </div></div>
-  <div class="mod-desc">v6更新：任务品类重写：删除"视频互动涨粉"改为"App体验测试" + 每日固定额度成本控制</div><div class="fb" data-id="f3.1.v6"><div class="fb-l">👤 CEO快速反馈</div><div class="fb-d">App体验测试任务 + 每日固定额度成本控制</div><div class="fb-row"><button class="fb-b" onclick="sf(this,'a','f3.1.v6')">✓ 同意</button><button class="fb-b" onclick="sf(this,'d','f3.1.v6')">💬 需讨论</button><button class="fb-b" onclick="sf(this,'x','f3.1.v6')">✗ 不同意</button></div><textarea class="fb-n" placeholder="备注..." onblur="sn(this,'f3.1.v6')"></textarea></div>
+  
+<div class="fb" data-id="f3.1" data-ver="6" data-changelog="任务品类重写：删除"视频互动涨粉"改为"App体验测试" + 每日固定额度成本控制"><div class="fb-l">👤 CEO快速反馈</div><div class="fb-d">App体验测试任务 + 每日固定额度成本控制</div><div class="fb-row"><button class="fb-b" onclick="sf(this,'a','f3.1')">✓ 同意</button><button class="fb-b" onclick="sf(this,'d','f3.1')">💬 需讨论</button><button class="fb-b" onclick="sf(this,'x','f3.1')">✗ 不同意</button></div><textarea class="fb-n" placeholder="备注..." onblur="sn(this,'f3.1')"></textarea></div>
   </div>
 
   <div class="card"><div class="card-head" onclick="tog(this)"><span class="cn r">F.3.2</span><span class="cm">❌ 已否决的任务类型</span><span class="ca">▼</span></div><div class="card-body"><div class="ci">
@@ -133,7 +134,8 @@ strong{color:var(--text);font-weight:600}
     <div class="tip" style="margin-top:12px"><strong>粘性逻辑：</strong>从"限制→稀缺感"转为"赠送→每日回访"。用户每天来领免费基金 → 用基金发任务 → 体验发布者角色 → 产生对平台的依赖。</div>
     <div class="tip" style="margin-top:8px;border-left-color:#f87171;background:rgba(248,113,113,.06)"><strong>❌ 原"每日任务池+稀缺感"设计已否决：</strong>CEO明确不限制用户接单数量，"限制接单=限制赚钱=用户流失"。</div>
   </div></div>
-  <div class="mod-desc">v6更新：每日任务池（含上限）改为每日活动基金（可累积，仅发任务用）</div><div class="fb" data-id="f4.1.v6"><div class="fb-l">👤 CEO快速反馈</div><div class="fb-d">每日活动基金规则：可累积、仅发任务用</div><div class="fb-row"><button class="fb-b" onclick="sf(this,'a','f4.1.v6')">✓ 同意</button><button class="fb-b" onclick="sf(this,'d','f4.1.v6')">💬 需讨论</button><button class="fb-b" onclick="sf(this,'x','f4.1.v6')">✗ 不同意</button></div><textarea class="fb-n" placeholder="备注..." onblur="sn(this,'f4.1.v6')"></textarea></div>
+  
+<div class="fb" data-id="f4.1" data-ver="6" data-changelog="每日任务池（含上限）改为每日活动基金（可累积，仅发任务用）"><div class="fb-l">👤 CEO快速反馈</div><div class="fb-d">每日活动基金规则：可累积、仅发任务用</div><div class="fb-row"><button class="fb-b" onclick="sf(this,'a','f4.1')">✓ 同意</button><button class="fb-b" onclick="sf(this,'d','f4.1')">💬 需讨论</button><button class="fb-b" onclick="sf(this,'x','f4.1')">✗ 不同意</button></div><textarea class="fb-n" placeholder="备注..." onblur="sn(this,'f4.1')"></textarea></div>
   </div>
 </div>
 
@@ -154,7 +156,8 @@ strong{color:var(--text);font-weight:600}
     • 前期裂变<strong>仅针对新用户</strong>，建议设邀请上限<br>
     • 需手机号绑定账户</div>
   </div></div>
-  <div class="mod-desc">v6更新：经验值裂变系统改为直接给钱裂变 + 经济参数（全链路≤¥50, 获客¥0.3-0.5）</div><div class="fb" data-id="f5.1.v6"><div class="fb-l">👤 CEO快速反馈</div><div class="fb-d">直接给钱裂变 + 全链路≤¥50 + 获客¥0.3-0.5</div><div class="fb-row"><button class="fb-b" onclick="sf(this,'a','f5.1.v6')">✓ 同意</button><button class="fb-b" onclick="sf(this,'d','f5.1.v6')">💬 需讨论</button><button class="fb-b" onclick="sf(this,'x','f5.1.v6')">✗ 不同意</button></div><textarea class="fb-n" placeholder="备注..." onblur="sn(this,'f5.1.v6')"></textarea></div>
+  
+<div class="fb" data-id="f5.1" data-ver="6" data-changelog="经验值裂变系统改为直接给钱裂变 + 经济参数（全链路≤¥50, 获客¥0.3-0.5）"><div class="fb-l">👤 CEO快速反馈</div><div class="fb-d">直接给钱裂变 + 全链路≤¥50 + 获客¥0.3-0.5</div><div class="fb-row"><button class="fb-b" onclick="sf(this,'a','f5.1')">✓ 同意</button><button class="fb-b" onclick="sf(this,'d','f5.1')">💬 需讨论</button><button class="fb-b" onclick="sf(this,'x','f5.1')">✗ 不同意</button></div><textarea class="fb-n" placeholder="备注..." onblur="sn(this,'f5.1')"></textarea></div>
   </div>
 
   <div class="card"><div class="card-head" onclick="tog(this)"><span class="cn g">F.5.2</span><span class="cm">膨胀红包机制</span><span class="ca">▼</span></div><div class="card-body"><div class="ci">
@@ -168,7 +171,8 @@ strong{color:var(--text);font-weight:600}
       <div class="fs" style="background:rgba(251,191,36,.1)">24h内涨到<br><strong>¥10可提现</strong></div>
     </div>
   </div></div>
-  <div class="mod-desc">v6更新：升级奖励改为膨胀红包（参考拼多多模式）</div><div class="fb" data-id="f5.2.v6"><div class="fb-l">👤 CEO快速反馈</div><div class="fb-d">膨胀红包：完成任务→分享→涨到¥10可提现</div><div class="fb-row"><button class="fb-b" onclick="sf(this,'a','f5.2.v6')">✓ 同意</button><button class="fb-b" onclick="sf(this,'d','f5.2.v6')">💬 需讨论</button><button class="fb-b" onclick="sf(this,'x','f5.2.v6')">✗ 不同意</button></div><textarea class="fb-n" placeholder="备注..." onblur="sn(this,'f5.2.v6')"></textarea></div>
+  
+<div class="fb" data-id="f5.2" data-ver="6" data-changelog="升级奖励改为膨胀红包（参考拼多多模式）"><div class="fb-l">👤 CEO快速反馈</div><div class="fb-d">膨胀红包：完成任务→分享→涨到¥10可提现</div><div class="fb-row"><button class="fb-b" onclick="sf(this,'a','f5.2')">✓ 同意</button><button class="fb-b" onclick="sf(this,'d','f5.2')">💬 需讨论</button><button class="fb-b" onclick="sf(this,'x','f5.2')">✗ 不同意</button></div><textarea class="fb-n" placeholder="备注..." onblur="sn(this,'f5.2')"></textarea></div>
   </div>
 
   <div class="card"><div class="card-head" onclick="tog(this)"><span class="cn r">F.5.3</span><span class="cm">❌ 已否决的裂变/成长设计</span><span class="ca">▼</span></div><div class="card-body"><div class="ci">
@@ -197,7 +201,8 @@ strong{color:var(--text);font-weight:600}
       <tr><td><strong>④ 有效注册从严</strong></td><td>裂变计数条件：新用户注册+完成首个任务，纯注册不算</td><td>合理门槛</td></tr>
     </table>
     <div class="hb"><strong>极端情况：</strong>如出现大规模刷单迹象，启用手机号验证作为临时措施。常态下尽量只要微信授权，降低注册摩擦。</div>
-    <div class="mod-desc">v6更新：防刷机制从四道防线升级为五道防线（+手机号绑定）</div><div class="fb" data-id="f6.1.v6"><div class="fb-t">CEO 反馈</div><div class="fb-btns"><button class="fb-b" onclick="sf(this,'a','f6.1.v6')">✅ 同意</button><button class="fb-b" onclick="sf(this,'d','f6.1.v6')">💬 需讨论</button><button class="fb-b" onclick="sf(this,'x','f6.1.v6')">❌ 不同意</button></div><textarea class="fb-n" placeholder="备注…" onchange="sn(this,'f6.1.v6')"></textarea></div>
+    
+<div class="fb" data-id="f6.1" data-ver="6" data-changelog="防刷机制从四道防线升级为五道防线（+手机号绑定）"><div class="fb-t">CEO 反馈</div><div class="fb-btns"><button class="fb-b" onclick="sf(this,'a','f6.1')">✅ 同意</button><button class="fb-b" onclick="sf(this,'d','f6.1')">💬 需讨论</button><button class="fb-b" onclick="sf(this,'x','f6.1')">❌ 不同意</button></div><textarea class="fb-n" placeholder="备注…" onchange="sn(this,'f6.1')"></textarea></div>
   </div></div></div>
 
   <div class="card"><div class="card-head" onclick="tog(this)"><span class="cn r">F.6.2</span><span class="cm">合规红线</span><span class="ca">▼</span></div><div class="card-body"><div class="ci">
@@ -223,7 +228,8 @@ strong{color:var(--text);font-weight:600}
       <tr><td>弹性</td><td>扩缩容慢</td><td style="color:var(--green)">按需发任务，弹性调度</td></tr>
     </table>
     <div class="cb"><strong>商业逻辑：</strong>C端任务市场=获客+训练入口（低利润），B2B企业级服务=利润中心（高毛利）。</div>
-    <div class="mod-desc">v6更新：B2B远期方向（从F.9.1重新编号为F.7.1）</div><div class="fb" data-id="f7.1.v6"><div class="fb-t">CEO 反馈</div><div class="fb-btns"><button class="fb-b" onclick="sf(this,'a','f7.1.v6')">✅ 同意</button><button class="fb-b" onclick="sf(this,'d','f7.1.v6')">💬 需讨论</button><button class="fb-b" onclick="sf(this,'x','f7.1.v6')">❌ 不同意</button></div><textarea class="fb-n" placeholder="备注…" onchange="sn(this,'f7.1.v6')"></textarea></div>
+    
+<div class="fb" data-id="f7.1" data-ver="6" data-changelog="B2B远期方向（从F.9.1重新编号为F.7.1）"><div class="fb-t">CEO 反馈</div><div class="fb-btns"><button class="fb-b" onclick="sf(this,'a','f7.1')">✅ 同意</button><button class="fb-b" onclick="sf(this,'d','f7.1')">💬 需讨论</button><button class="fb-b" onclick="sf(this,'x','f7.1')">❌ 不同意</button></div><textarea class="fb-n" placeholder="备注…" onchange="sn(this,'f7.1')"></textarea></div>
   </div></div></div>
 </div>
 
@@ -237,20 +243,8 @@ strong{color:var(--text);font-weight:600}
   </div>
 </div>
 
-<script src="/sync.js"></script>
-<script>
-function tog(el){el.classList.toggle('open');el.nextElementSibling.classList.toggle('show')}
-function toggleAll(open){document.querySelectorAll('.card-head').forEach(h=>{const b=h.nextElementSibling;if(open){h.classList.add('open');b.classList.add('show')}else{h.classList.remove('open');b.classList.remove('show')}})}
-const SK='msc_f_fb';
-SYNC.init('chatF',SK);
-function ld(){try{return JSON.parse(localStorage.getItem(SK))||{}}catch{return{}}}
-function sv(d){localStorage.setItem(SK,JSON.stringify(d))}
-function sf(btn,c,id){const d=ld();btn.closest('.fb').querySelectorAll('.fb-b').forEach(b=>b.className='fb-b');btn.classList.add(c==='a'?'s-a':c==='d'?'s-d':'s-x');d[id]={...d[id],c};sv(d);up();SYNC.push(id,c)}
-function sn(ta,id){const d=ld();d[id]={...d[id],n:ta.value};sv(d);SYNC.push(id,undefined,ta.value)}
-function up(){const d=ld();let a=0,dd=0,x=0;Object.values(d).forEach(v=>{if(v.c==='a')a++;if(v.c==='d')dd++;if(v.c==='x')x++});document.getElementById('ca').textContent=a;document.getElementById('cd').textContent=dd;document.getElementById('cx').textContent=x;document.getElementById('ca2').textContent=a;document.getElementById('cd2').textContent=dd;document.getElementById('cx2').textContent=x}
-document.querySelectorAll('.nav a').forEach(a=>{a.addEventListener('click',function(){document.querySelectorAll('.nav a').forEach(n=>n.classList.remove('active'));this.classList.add('active')})});
-document.addEventListener('DOMContentLoaded',async()=>{await SYNC.pull();const d=ld();Object.entries(d).forEach(([id,v])=>{const w=document.querySelector(`.fb[data-id="${id}"]`);if(!w)return;if(v.c){const bs=w.querySelectorAll('.fb-b');const cls=v.c==='a'?'s-a':v.c==='d'?'s-d':'s-x';const idx=v.c==='a'?0:v.c==='d'?1:2;if(bs[idx])bs[idx].classList.add(cls)}if(v.n){const ta=w.querySelector('.fb-n');if(ta)ta.value=v.n}});up()})
-</script>
+<script>window.FB_KEY='msc_f_fb';window.FB_PAGE='chatF'</script>
+<script src="/fb.js"></script>
 <script src="/nav.js"></script>
 </body>
 </html>

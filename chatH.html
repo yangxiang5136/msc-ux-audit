@@ -7,15 +7,15 @@
 <style>
 :root{--bg:#0D0F14;--bg2:#161922;--bg3:#1C1F2B;--bg4:#1E2130;--brd:#2A2D3A;--text:#E8E9ED;--text2:#9CA0B0;--text3:#6B7084;--accent:#6C5CE7;--accent-l:#A29BFE;--green:#00B894;--green-bg:rgba(0,184,148,.12);--amber:#FDCB6E;--amber-bg:rgba(253,203,110,.12);--red:#FF6B6B;--red-bg:rgba(255,107,107,.12);--blue:#74B9FF;--blue-bg:rgba(116,185,255,.12);--gold:#F9CA24}
 *{margin:0;padding:0;box-sizing:border-box}body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased}
-.header{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--brd);padding:14px 20px;display:flex;align-items:center;gap:12px}
+.header{position:sticky;top:0;z-index:100;background:#0D0F14;border-bottom:1px solid var(--brd);padding:14px 20px;display:flex;align-items:center;gap:12px}
 .header h1{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}
 .header .badge{font-size:11px;padding:3px 10px;background:rgba(108,92,231,.12);color:var(--accent-l);border:1px solid rgba(108,92,231,.25);border-radius:20px}
-.summary-bar{position:sticky;top:49px;z-index:90;background:rgba(22,25,34,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--brd);padding:8px 20px;display:flex;align-items:center;gap:16px}
+.summary-bar{position:sticky;top:49px;z-index:90;background:#161922;border-bottom:1px solid var(--brd);padding:8px 20px;display:flex;align-items:center;gap:16px}
 .sb-item{font-size:12px;color:var(--text3);display:flex;align-items:center;gap:4px}
 .sb-n{font-weight:700;font-size:14px}
 .sb-n.g{color:var(--green)}.sb-n.a{color:var(--amber)}.sb-n.r{color:var(--red)}
 .main{max-width:960px;margin:0 auto;padding:24px 16px 80px}
-.nav{display:flex;gap:0;overflow-x:auto;border-bottom:1px solid var(--brd);margin-bottom:24px;position:sticky;top:82px;z-index:80;background:var(--bg);padding-top:8px}
+.nav{display:flex;gap:0;overflow-x:auto;border-bottom:1px solid var(--brd);margin-bottom:24px;}
 .nav a{padding:8px 14px;font-size:12px;color:var(--text3);text-decoration:none;white-space:nowrap;border-bottom:2px solid transparent;transition:all .15s}
 .nav a:hover{color:var(--text)}
 .nav a.active{color:var(--green);border-bottom-color:var(--green)}
@@ -133,8 +133,6 @@
   <div class="sb-item"><span class="sb-n r" id="cx2">0</span> 不同意</div>
 </div>
 
-<div class="main">
-
 <div class="nav">
   <a href="#problem" class="active">H.1 问题</a>
   <a href="#pipeline">H.2 AI流水线</a>
@@ -143,6 +141,8 @@
   <a href="#economics">H.5 经济效益</a>
   <a href="#roadmap">H.6 实施路线</a>
 </div>
+
+<div class="main">
 
 <!-- ===== H.1 ===== -->
 <div class="section" id="problem">
@@ -443,19 +443,8 @@
 
 </div>
 
-<script src="/sync.js"></script>
-<script>
-function tog(el){el.classList.toggle('open');el.nextElementSibling.classList.toggle('show')}
-const SK='msc_h_fb';
-SYNC.init('chatH',SK);
-function ld(){try{return JSON.parse(localStorage.getItem(SK))||{}}catch{return{}}}
-function sv(d){localStorage.setItem(SK,JSON.stringify(d))}
-function sf(btn,c,id){const d=ld();btn.closest('.fb').querySelectorAll('.fb-b').forEach(b=>b.className='fb-b');btn.classList.add(c==='a'?'s-a':c==='d'?'s-d':'s-x');d[id]={...d[id],c};sv(d);up();SYNC.push(id,c)}
-function sn(ta,id){const d=ld();d[id]={...d[id],n:ta.value};sv(d);SYNC.push(id,undefined,ta.value)}
-function up(){const d=ld();let a=0,dd=0,x=0;Object.values(d).forEach(v=>{if(v.c==='a')a++;if(v.c==='d')dd++;if(v.c==='x')x++});document.getElementById('ca2').textContent=a;document.getElementById('cd2').textContent=dd;document.getElementById('cx2').textContent=x}
-document.querySelectorAll('.nav a').forEach(a=>{a.addEventListener('click',function(){document.querySelectorAll('.nav a').forEach(n=>n.classList.remove('active'));this.classList.add('active')})});
-document.addEventListener('DOMContentLoaded',async()=>{await SYNC.pull();const d=ld();Object.entries(d).forEach(([id,v])=>{const w=document.querySelector(`.fb[data-id="${id}"]`);if(!w)return;if(v.c){const bs=w.querySelectorAll('.fb-b');const cls=v.c==='a'?'s-a':v.c==='d'?'s-d':'s-x';const idx=v.c==='a'?0:v.c==='d'?1:2;if(bs[idx])bs[idx].classList.add(cls)}if(v.n){const ta=w.querySelector('.fb-n');if(ta)ta.value=v.n}});up()})
-</script>
+<script>window.FB_KEY='msc_h_fb';window.FB_PAGE='chatH'</script>
+<script src="/fb.js"></script>
 <script src="/nav.js"></script>
 </body>
 </html>

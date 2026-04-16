@@ -396,10 +396,9 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',sans-seri
 </div>
 <div class="vote-bar"><span class="vi"><span class="vd" style="background:var(--green)"></span>A票 <strong id="ca">0</strong></span><span class="vi"><span class="vd" style="background:var(--blue)"></span>B票 <strong id="cd">0</strong></span><span class="vi"><span class="vd" style="background:var(--purple)"></span>C票 <strong id="cx">0</strong></span></div>
 
-<script src="/sync.js"></script>
 <script>
 const K='msc_arch_fb';
-SYNC.init('architecture',K);
+
 function ld(){try{return JSON.parse(localStorage.getItem(K))||{}}catch{return{}}}
 function sv(d){localStorage.setItem(K,JSON.stringify(d));up()}
 function tog(h){h.closest('.cflow').classList.toggle('open')}
@@ -437,5 +436,7 @@ document.querySelectorAll('.ref').forEach(ref=>{
 });
 </script>
 <script src="/nav.js"></script>
+<script>window.FB_KEY='msc_arch_fb';window.FB_PAGE='architecture'</script>
+<script src="/fb.js"></script>
 </body>
 </html>

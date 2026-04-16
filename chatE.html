@@ -816,14 +816,15 @@ strong { color:var(--text); font-weight:600; }
         </div>
       </div>
 
-      <div class="mod-desc">v6更新：确权触发mockup的定价按钮文案更新为三级架构（¥99/周·¥349/月·¥699一次性）</div><div class="fb" data-id="e4.3.v6">
+      
+<div class="fb" data-id="e4.3" data-ver="6" data-changelog="确权触发mockup的定价按钮文案更新为三级架构（¥99/周·¥349/月·¥699一次性）">
         <div class="fb-t">CEO 反馈</div>
         <div class="fb-btns">
-          <button class="fb-b" onclick="sf(this,'a','e4.3.v6')">✅ 同意</button>
-          <button class="fb-b" onclick="sf(this,'d','e4.3.v6')">💬 需讨论</button>
-          <button class="fb-b" onclick="sf(this,'x','e4.3.v6')">❌ 不同意</button>
+          <button class="fb-b" onclick="sf(this,'a','e4.3')">✅ 同意</button>
+          <button class="fb-b" onclick="sf(this,'d','e4.3')">💬 需讨论</button>
+          <button class="fb-b" onclick="sf(this,'x','e4.3')">❌ 不同意</button>
         </div>
-        <textarea class="fb-n" placeholder="备注…" onchange="sn(this,'e4.3.v6')"></textarea>
+        <textarea class="fb-n" placeholder="备注…" onchange="sn(this,'e4.3')"></textarea>
       </div>
 
     </div></div>
@@ -967,14 +968,15 @@ strong { color:var(--text); font-weight:600; }
         <tr><td>1:1任务基金匹配</td><td>❌</td><td>✅ 交¥699得¥1,398额度</td></tr>
       </table>
 
-      <div class="mod-desc">v6更新：权益对比表头从"白版/金版"改为"免费/租赁/一次性确权"</div><div class="fb" data-id="e5.3.v6">
+      
+<div class="fb" data-id="e5.3" data-ver="6" data-changelog="权益对比表头从"白版/金版"改为"免费/租赁/一次性确权"">
         <div class="fb-t">CEO 反馈</div>
         <div class="fb-btns">
-          <button class="fb-b" onclick="sf(this,'a','e5.3.v6')">✅ 同意</button>
-          <button class="fb-b" onclick="sf(this,'d','e5.3.v6')">💬 需讨论</button>
-          <button class="fb-b" onclick="sf(this,'x','e5.3.v6')">❌ 不同意</button>
+          <button class="fb-b" onclick="sf(this,'a','e5.3')">✅ 同意</button>
+          <button class="fb-b" onclick="sf(this,'d','e5.3')">💬 需讨论</button>
+          <button class="fb-b" onclick="sf(this,'x','e5.3')">❌ 不同意</button>
         </div>
-        <textarea class="fb-n" placeholder="备注…" onchange="sn(this,'e5.3.v6')"></textarea>
+        <textarea class="fb-n" placeholder="备注…" onchange="sn(this,'e5.3')"></textarea>
       </div>
 
     </div></div>
@@ -1357,14 +1359,15 @@ strong { color:var(--text); font-weight:600; }
       • <strong>月租赁（¥349/月）</strong>：不可退，无押金。停止续费后权益到期失效<br>
       • <strong>周租赁（¥99/周）</strong>：不可退，无押金。停止续费后权益到期失效</p>
 
-      <div class="mod-desc">v6更新：定价改为三级架构：¥99/周租赁、¥349/月租赁、¥699一次性押金（可退+送¥699基金）；首个AI资产免费</div><div class="fb" data-id="e8.1.v6">
+      
+<div class="fb" data-id="e8.1" data-ver="6" data-changelog="定价改为三级架构：¥99/周租赁、¥349/月租赁、¥699一次性押金（可退+送¥699基金）；首个AI资产免费">
         <div class="fb-t">CEO 反馈</div>
         <div class="fb-btns">
-          <button class="fb-b" onclick="sf(this,'a','e8.1.v6')">✅ 同意</button>
-          <button class="fb-b" onclick="sf(this,'d','e8.1.v6')">💬 需讨论</button>
-          <button class="fb-b" onclick="sf(this,'x','e8.1.v6')">❌ 不同意</button>
+          <button class="fb-b" onclick="sf(this,'a','e8.1')">✅ 同意</button>
+          <button class="fb-b" onclick="sf(this,'d','e8.1')">💬 需讨论</button>
+          <button class="fb-b" onclick="sf(this,'x','e8.1')">❌ 不同意</button>
         </div>
-        <textarea class="fb-n" placeholder="备注…" onchange="sn(this,'e8.1.v6')"></textarea>
+        <textarea class="fb-n" placeholder="备注…" onchange="sn(this,'e8.1')"></textarea>
       </div>
 
     </div></div>
@@ -1469,33 +1472,8 @@ strong { color:var(--text); font-weight:600; }
   </div>
 </div>
 
-<script src="/sync.js"></script>
-<script>
-const SK='msc_e_fb';
-SYNC.init('chatE',SK);
-
-function tog(el){el.classList.toggle('open');el.nextElementSibling.classList.toggle('show')}
-function toggleAll(open){document.querySelectorAll('.card-head').forEach(h=>{const b=h.nextElementSibling;if(open){h.classList.add('open');b.classList.add('show')}else{h.classList.remove('open');b.classList.remove('show')}})}
-
-function ld(){try{return JSON.parse(localStorage.getItem(SK))||{}}catch{return{}}}
-function sv(d){localStorage.setItem(SK,JSON.stringify(d))}
-function sf(btn,c,id){
-  const d=ld();const w=btn.closest('.fb');
-  w.querySelectorAll('.fb-b').forEach(b=>b.className='fb-b');
-  btn.classList.add(c==='a'?'s-a':c==='d'?'s-d':'s-x');
-  d[id]={...d[id],c};sv(d);up();
-  SYNC.push(id,c);
-}
-function sn(ta,id){const d=ld();d[id]={...d[id],n:ta.value};sv(d);SYNC.push(id,undefined,ta.value)}
-function up(){const d=ld();let a=0,dd=0,x=0;Object.values(d).forEach(v=>{if(v.c==='a')a++;if(v.c==='d')dd++;if(v.c==='x')x++});document.getElementById('ca').textContent=a;document.getElementById('cd').textContent=dd;document.getElementById('cx').textContent=x}
-document.querySelectorAll('.nav a').forEach(a=>{a.addEventListener('click',function(){document.querySelectorAll('.nav a').forEach(n=>n.classList.remove('active'));this.classList.add('active')})});
-document.addEventListener('DOMContentLoaded',async()=>{
-  await SYNC.pull();
-  const d=ld();
-  Object.entries(d).forEach(([id,v])=>{const w=document.querySelector(`.fb[data-id="${id}"]`);if(!w)return;if(v.c){const bs=w.querySelectorAll('.fb-b');const cls=v.c==='a'?'s-a':v.c==='d'?'s-d':'s-x';const idx=v.c==='a'?0:v.c==='d'?1:2;if(bs[idx])bs[idx].classList.add(cls)}if(v.n){const ta=w.querySelector('.fb-n');if(ta)ta.value=v.n}});
-  up();
-});
-</script>
+<script>window.FB_KEY='msc_e_fb';window.FB_PAGE='chatE'</script>
+<script src="/fb.js"></script>
 <script src="/nav.js"></script>
 </body>
 </html>

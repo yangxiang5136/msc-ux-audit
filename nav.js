@@ -19,7 +19,6 @@ const PAGES = [
     { href: 'chatH.html', label: 'H · AI自动审核流程', badge: '提案', badgeColor: '#A29BFE' },
   ]},
   { cat: '工程交付', icon: '📐', items: [
-    { href: 'decisions.html', label: '⭐ 决策面板', badge: '推荐', badgeColor: '#34d399' },
     { href: 'product-spec.html', label: '📦 产品规格文档' },
   ]},
   { cat: '更新记录', icon: '📋', items: [
@@ -73,6 +72,14 @@ style.textContent = `
   .msn-home{display:flex;align-items:center;gap:8px;padding:16px;border-bottom:1px solid rgba(255,255,255,.06);text-decoration:none;color:#f0f2f5;font-size:13px;font-weight:600;transition:background .15s}
   .msn-home:hover{background:rgba(255,255,255,.04)}
   .msn-home-icon{width:30px;height:30px;background:linear-gradient(135deg,#34d399,#60a5fa);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:#000;flex-shrink:0}
+  .msn-pinned{display:flex;align-items:center;gap:10px;margin:10px 12px;padding:12px 14px;background:linear-gradient(135deg,rgba(52,211,153,.12),rgba(96,165,250,.08));border:1px solid rgba(52,211,153,.25);border-radius:10px;text-decoration:none;color:#f0f2f5;transition:all .2s;position:relative}
+  .msn-pinned:hover{background:linear-gradient(135deg,rgba(52,211,153,.18),rgba(96,165,250,.12));border-color:rgba(52,211,153,.5);transform:translateX(1px)}
+  .msn-pinned-current{background:linear-gradient(135deg,rgba(52,211,153,.22),rgba(96,165,250,.14)) !important;border-color:rgba(52,211,153,.6) !important;box-shadow:0 0 0 1px rgba(52,211,153,.3)}
+  .msn-pinned-icon{width:28px;height:28px;border-radius:8px;background:rgba(52,211,153,.2);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+  .msn-pinned-body{flex:1;min-width:0}
+  .msn-pinned-title{font-size:13px;font-weight:700;color:#34d399;line-height:1.3}
+  .msn-pinned-sub{font-size:10px;color:#8b95a8;font-weight:400;margin-top:1px;line-height:1.3}
+  .msn-pinned-arr{font-size:12px;color:#34d399;flex-shrink:0;font-weight:700}
   .msn-cat{border-bottom:1px solid rgba(255,255,255,.06)}
   .msn-cat-h{display:flex;align-items:center;gap:8px;padding:11px 16px;cursor:pointer;font-size:12px;font-weight:600;color:#8b95a8;transition:all .15s;user-select:none}
   .msn-cat-h:hover{background:rgba(255,255,255,.04);color:#f0f2f5}
@@ -113,6 +120,14 @@ sidebar.innerHTML = `
     <div class="msn-home-icon">M</div>
     <div><div style="font-size:13px;font-weight:700">MSC.AI</div><div style="font-size:10px;color:#5a6478;font-weight:400">← 返回首页</div></div>
   </a>
+  <a class="msn-pinned${currentPage==='decisions.html'?' msn-pinned-current':''}" href="/decisions.html">
+    <div class="msn-pinned-icon">⭐</div>
+    <div class="msn-pinned-body">
+      <div class="msn-pinned-title">决策面板</div>
+      <div class="msn-pinned-sub">自动聚合CEO反馈 · 推荐入口</div>
+    </div>
+    <span class="msn-pinned-arr">→</span>
+  </a>
   ${navHTML}
 `;
 document.body.prepend(sidebar);
@@ -148,110 +163,6 @@ document.querySelectorAll('.card-body .fb').forEach(fb => {
   }
 });
 
-// ═══ Feedback Versioning System ═══
-// Each entry: which section was updated, when, what changed
-// Badge auto-injects on sections with data-mod="..." attribute
-const MODS = {
-  'e4.3.v6': { desc: '确权触发mockup定价按钮改三级架构', date: '2026-04-15', ver: 'v6' },
-  'e5.3.v6': { desc: '权益对比表头改为免费/租赁/一次性', date: '2026-04-15', ver: 'v6' },
-  'e8.1.v6': { desc: '定价改为三级：¥99/周·¥349/月·¥699押金', date: '2026-04-15', ver: 'v6' },
-  'f3.1.v6': { desc: '任务品类重写：删涨粉，改App体验测试', date: '2026-04-15', ver: 'v6' },
-  'f4.1.v6': { desc: '每日任务池→每日活动基金', date: '2026-04-15', ver: 'v6' },
-  'f5.1.v6': { desc: '经验值裂变→直接给钱裂变', date: '2026-04-15', ver: 'v6' },
-  'f5.2.v6': { desc: '升级奖励→膨胀红包', date: '2026-04-15', ver: 'v6' },
-};
 
-const verStyle = document.createElement('style');
-verStyle.textContent = `
-  .mod-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:2px 8px;border-radius:4px;background:rgba(0,184,148,.1);color:#34d399;font-weight:600;margin-left:8px;border:1px solid rgba(0,184,148,.2)}
-  .mod-desc{padding:8px 14px;font-size:11px;color:#fbbf24;background:rgba(251,191,36,.05);border-top:1px solid rgba(251,191,36,.15);display:flex;align-items:center;gap:6px;line-height:1.5}
-  .mod-desc::before{content:'⚡';font-size:12px;flex-shrink:0}
-  .archive-wrap{max-width:960px;margin:32px auto 40px;padding:0 16px}
-  .archive-head{background:rgba(139,149,168,.05);border:1px solid rgba(139,149,168,.15);border-radius:10px 10px 0 0;padding:12px 16px;cursor:pointer;user-select:none;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#9CA0B0}
-  .archive-head:hover{background:rgba(139,149,168,.08)}
-  .archive-head .ar-arr{font-size:10px;transition:transform .2s;margin-left:auto}
-  .archive-head.open .ar-arr{transform:rotate(90deg)}
-  .archive-body{display:none;background:rgba(22,25,34,.4);border:1px solid rgba(139,149,168,.15);border-top:none;border-radius:0 0 10px 10px;padding:10px 16px 14px}
-  .archive-body.show{display:block}
-  .archive-hint{font-size:11px;color:#6B7084;margin-bottom:12px;line-height:1.6}
-  .archive-item{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.04);display:flex;gap:10px;align-items:flex-start;font-size:12px}
-  .archive-item:last-child{border-bottom:none}
-  .ar-id{font-family:monospace;font-size:11px;color:#6B7084;background:rgba(255,255,255,.03);padding:2px 6px;border-radius:3px;white-space:nowrap;flex-shrink:0}
-  .ar-choice{font-size:11px;padding:2px 8px;border-radius:3px;font-weight:600;white-space:nowrap;flex-shrink:0}
-  .ar-choice.a{background:rgba(52,211,153,.12);color:#34d399}
-  .ar-choice.d{background:rgba(251,191,36,.12);color:#fbbf24}
-  .ar-choice.x{background:rgba(248,113,113,.12);color:#f87171}
-  .ar-note{color:#9CA0B0;flex:1;font-size:11px;line-height:1.5}
-  .ar-delete{margin-left:auto;font-size:10px;padding:2px 6px;border-radius:3px;color:#6B7084;background:transparent;border:1px solid rgba(255,255,255,.08);cursor:pointer}
-  .ar-delete:hover{color:#f87171;border-color:rgba(248,113,113,.3)}
-`;
-document.head.appendChild(verStyle);
-
-// Apply mod badges + scan for archived (orphaned) feedback
-setTimeout(() => {
-  // 1. Add ⚡ vN update badge to section headings that have corresponding MOD entry
-  Object.entries(MODS).forEach(([key, mod]) => {
-    const fb = document.querySelector(`.fb[data-id="${key}"]`);
-    if (!fb) return;
-    const card = fb.closest('.card') || fb.closest('.section');
-    if (!card) return;
-    const header = card.querySelector('.card-head .cm, .section-head');
-    if (header && !header.querySelector('.mod-badge')) {
-      const badge = document.createElement('span');
-      badge.className = 'mod-badge';
-      badge.textContent = `${mod.ver}更新`;
-      header.appendChild(badge);
-    }
-  });
-
-  // 2. Detect orphaned feedback in localStorage (keys with no matching DOM element)
-  const pageLetter = location.pathname.match(/chat([A-Z])\.html/)?.[1];
-  if (!pageLetter) return;
-  const storageKey = `msc_${pageLetter.toLowerCase()}_fb`;
-  let localData = {};
-  try { localData = JSON.parse(localStorage.getItem(storageKey) || '{}'); } catch(e) {}
-
-  const domIds = new Set(Array.from(document.querySelectorAll('.fb[data-id]')).map(el => el.dataset.id));
-  const orphaned = Object.entries(localData).filter(([id, v]) => !domIds.has(id) && (v.c || v.n));
-
-  if (orphaned.length === 0) return;
-
-  // Build archive section
-  const archiveWrap = document.createElement('div');
-  archiveWrap.className = 'archive-wrap';
-  const choiceMap = { a: '✓ 同意', d: '💬 讨论', x: '✗ 不同意' };
-  let itemsHtml = '';
-  orphaned.forEach(([id, v]) => {
-    const choice = v.c ? `<span class="ar-choice ${v.c}">${choiceMap[v.c]}</span>` : '';
-    const note = v.n ? `<span class="ar-note">"${v.n.replace(/</g, '&lt;')}"</span>` : '<span class="ar-note" style="color:#5a6478">—</span>';
-    itemsHtml += `<div class="archive-item"><span class="ar-id">${id}</span>${choice}${note}<button class="ar-delete" onclick="msnDeleteArchive('${storageKey}','${id}',this)">删除</button></div>`;
-  });
-
-  archiveWrap.innerHTML = `
-    <div class="archive-head" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')">
-      <span>📁 归档反馈（${orphaned.length}条，板块已更新）</span>
-      <span class="ar-arr">▶</span>
-    </div>
-    <div class="archive-body">
-      <div class="archive-hint">以下反馈是你之前对已更新/已删除板块的反馈。更新后的板块需要重新给反馈。可以"删除"清空归档。</div>
-      ${itemsHtml}
-    </div>
-  `;
-
-  // Insert before the footer scripts
-  const mainEl = document.querySelector('.main');
-  if (mainEl) mainEl.appendChild(archiveWrap);
-  else document.body.appendChild(archiveWrap);
-}, 300);
-
-// Global helper to delete archived entry
-window.msnDeleteArchive = function(storageKey, id, btn) {
-  try {
-    const data = JSON.parse(localStorage.getItem(storageKey) || '{}');
-    delete data[id];
-    localStorage.setItem(storageKey, JSON.stringify(data));
-    btn.closest('.archive-item').style.display = 'none';
-  } catch(e) { console.error(e); }
-};
 
 })();

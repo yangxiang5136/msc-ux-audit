@@ -15,6 +15,14 @@
 .s-icon{width:34px;height:34px;background:linear-gradient(135deg,var(--green),var(--blue));border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:15px;color:#000;flex-shrink:0}
 .s-logo h1{font-size:14px;font-weight:700}.s-logo span{font-size:11px;color:var(--t3);display:block;font-weight:400}
 .s-stats{display:flex;gap:14px;font-size:12px}.s-st{display:flex;align-items:center;gap:4px}.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+
+.pinned-link{display:flex;align-items:center;gap:10px;margin:10px 14px;padding:11px 12px;background:linear-gradient(135deg,rgba(52,211,153,.12),rgba(116,185,255,.06));border:1px solid rgba(52,211,153,.3);border-radius:10px;text-decoration:none;color:inherit;transition:all .2s}
+.pinned-link:hover{background:linear-gradient(135deg,rgba(52,211,153,.18),rgba(116,185,255,.1));border-color:rgba(52,211,153,.5)}
+.pl-icon{width:26px;height:26px;border-radius:7px;background:rgba(52,211,153,.2);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.pl-body{flex:1;min-width:0}
+.pl-title{font-size:12px;font-weight:700;color:var(--green);line-height:1.3}
+.pl-sub{font-size:10px;color:var(--t3);line-height:1.3;margin-top:1px}
+.pl-arr{font-size:11px;color:var(--green);font-weight:700;flex-shrink:0}
 .nc{border-bottom:1px solid var(--brd)}.nc-h{display:flex;align-items:center;gap:10px;padding:13px 18px;cursor:pointer;font-size:13px;font-weight:600;color:var(--t2);transition:all .15s;user-select:none}.nc-h:hover{background:var(--bg3);color:var(--t1)}.nc-h .ci{font-size:15px;flex-shrink:0}.nc-h .ca{margin-left:auto;font-size:9px;color:var(--t3);transition:transform .2s}.nc-h.open .ca{transform:rotate(90deg)}.nc-items{display:none;padding:0 0 6px}.nc-items.show{display:block}.ni{display:flex;align-items:center;gap:8px;padding:7px 18px 7px 42px;font-size:12px;color:var(--t3);text-decoration:none;transition:all .15s;line-height:1.4}.ni:hover{color:var(--t1);background:var(--bg3)}.ni .nb{margin-left:auto;font-size:9px;padding:1px 5px;border-radius:3px;font-weight:600;flex-shrink:0}
 .main{margin-left:var(--sw);flex:1;padding:28px 24px 80px;max-width:800px}
 .mh{margin-bottom:28px}.mh h2{font-size:22px;font-weight:900;margin-bottom:4px}.mh p{font-size:13px;color:var(--t2)}
@@ -36,6 +44,17 @@
 .mob-tabs{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(10,12,16,.95);backdrop-filter:blur(12px);border-top:1px solid var(--brd);z-index:60;padding:4px 0 env(safe-area-inset-bottom,4px)}.mob-tabs-inner{display:flex;justify-content:space-around}.mt{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:9px;color:var(--t3);background:none;border:none;cursor:pointer;padding:5px 10px;font-family:inherit}.mt.active{color:var(--green)}.mt-i{font-size:16px}
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:45}
 @media(max-width:768px){.sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.overlay.show{display:block}.main{margin-left:0;padding:64px 14px 90px}.mob-head,.mob-tabs{display:block}}
+
+.hero-card{display:flex;align-items:center;gap:18px;background:linear-gradient(135deg,rgba(52,211,153,.12),rgba(116,185,255,.08));border:1.5px solid rgba(52,211,153,.35);border-radius:14px;padding:20px 22px;margin-bottom:32px;text-decoration:none;color:inherit;transition:all .2s;position:relative;overflow:hidden}
+.hero-card:hover{border-color:rgba(52,211,153,.6);background:linear-gradient(135deg,rgba(52,211,153,.18),rgba(116,185,255,.12));transform:translateX(2px)}
+.hero-icon{width:48px;height:48px;border-radius:12px;background:rgba(52,211,153,.2);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.hero-body{flex:1;min-width:0}
+.hero-title{font-size:17px;font-weight:700;color:var(--green);margin-bottom:4px;display:flex;align-items:center;gap:10px}
+.hero-badge{font-size:10px;padding:2px 8px;border-radius:4px;background:rgba(52,211,153,.18);color:var(--green);font-weight:600}
+.hero-desc{font-size:12px;color:var(--t2);line-height:1.6;margin-bottom:10px}
+.hero-meta{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--t3)}
+.hero-stat{display:flex;align-items:center;gap:5px}
+.hero-arr{font-size:16px;color:var(--green);font-weight:700;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -47,6 +66,14 @@
     <div class="s-logo"><div class="s-icon">M</div><div><h1>MSC.AI<span>产品设计中心</span></h1></div></div>
     <div class="s-stats"><div class="s-st"><div class="dot" style="background:var(--green)"></div><span id="sa">0</span></div><div class="s-st"><div class="dot" style="background:var(--amber)"></div><span id="sd">0</span></div><div class="s-st"><div class="dot" style="background:var(--red)"></div><span id="sx">0</span></div></div>
   </div>
+  <a class="pinned-link" href="decisions.html">
+    <div class="pl-icon">⭐</div>
+    <div class="pl-body">
+      <div class="pl-title">决策面板</div>
+      <div class="pl-sub">自动聚合反馈 · 主入口</div>
+    </div>
+    <span class="pl-arr">→</span>
+  </a>
   <div class="nc"><div class="nc-h open" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')"><span class="ci">📋</span>产品体验<span class="ca">▶</span></div><div class="nc-items show">
     <a class="ni" href="chatA.html">A · 信任与安全感<span class="nb" style="background:var(--red-d);color:var(--red)">关键</span></a>
     <a class="ni" href="chatB.html">B · 空状态+反馈闭环<span class="nb" style="background:var(--red-d);color:var(--red)">关键</span></a>
@@ -61,7 +88,6 @@
     <a class="ni" href="chatH.html">H · AI自动审核流程<span class="nb" style="background:rgba(162,155,254,.15);color:#A29BFE">提案</span></a>
   </div></div>
   <div class="nc"><div class="nc-h" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')"><span class="ci">📐</span>工程交付<span class="ca">▶</span></div><div class="nc-items">
-    <a class="ni" href="decisions.html">⭐ 决策面板<span class="nb" style="background:var(--green-d);color:var(--green)">推荐</span></a>
     <a class="ni" href="product-spec.html">📦 产品规格文档</a>
   </div></div>
   <div class="nc"><div class="nc-h" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')"><span class="ci">📋</span>更新记录<span class="ca">▶</span></div><div class="nc-items">
@@ -80,6 +106,21 @@
     <div class="fb-stats"><span><div class="dot" style="background:var(--green);width:7px;height:7px;border-radius:50%"></div><strong id="oa">0</strong> 同意</span><span><div class="dot" style="background:var(--amber);width:7px;height:7px;border-radius:50%"></div><strong id="od">0</strong> 讨论</span><span><div class="dot" style="background:var(--red);width:7px;height:7px;border-radius:50%"></div><strong id="ox">0</strong> 不同意</span></div>
     <button class="fb-exp" onclick="window.open('/api/export','_blank')">导出反馈</button>
   </div>
+    <a class="hero-card" href="decisions.html">
+    <div class="hero-icon">⭐</div>
+    <div class="hero-body">
+      <div class="hero-title">决策面板<span class="hero-badge">推荐入口</span></div>
+      <div class="hero-desc">自动聚合所有CEO反馈 · 已确认决策 · 待讨论事项 · 待反馈板块 · 零维护始终最新</div>
+      <div class="hero-meta">
+        <span class="hero-stat"><span class="dot" style="background:var(--green)"></span><span id="h-a">0</span> 已确认</span>
+        <span class="hero-stat"><span class="dot" style="background:var(--amber)"></span><span id="h-d">0</span> 待讨论</span>
+        <span class="hero-stat"><span class="dot" style="background:var(--red)"></span><span id="h-x">0</span> 已否决</span>
+        <span class="hero-stat"><span class="dot" style="background:var(--t3)"></span><span id="h-p">?</span> 待反馈</span>
+      </div>
+    </div>
+    <span class="hero-arr">→</span>
+  </a>
+
   <div class="cs" id="sec-ux"><div class="cl">📋 产品体验 — UX审计8维度</div><div class="cards">
     <a class="card" href="chatA.html"><div class="c-left"><div class="c-ico" style="background:var(--green-d)">🔒</div><div class="c-sev" style="background:var(--red-d);color:var(--red)">关键</div></div><div class="c-right"><h3>信任与安全感</h3><p>充值信任提示·资金托管面板·信用评分·费用确认·提现安全</p><div class="c-meta"><span class="c-tag" style="background:var(--green-d);color:var(--green)">4方案</span><span id="a-fb"></span></div></div><div class="c-arr">→</div></a>
     <a class="card" href="chatB.html"><div class="c-left"><div class="c-ico" style="background:var(--blue-d)">📭</div><div class="c-sev" style="background:var(--red-d);color:var(--red)">关键</div></div><div class="c-right"><h3>空状态 + 反馈闭环</h3><p>空状态引导·任务追踪·进度看板·微信通知·到账仪式</p><div class="c-meta"><span class="c-tag" style="background:var(--blue-d);color:var(--blue)">10方案</span><span id="b-fb"></span></div></div><div class="c-arr">→</div></a>
@@ -94,7 +135,6 @@
     <a class="card" href="chatH.html"><div class="c-left"><div class="c-ico" style="background:var(--purple-d)">🤖</div><div class="c-sev" style="background:rgba(162,155,254,.15);color:#A29BFE">提案</div></div><div class="c-right"><h3>AI自动审核流程</h3><p>AI视觉验证·三级分流·秒级结算·经济效益·实施路线</p><div class="c-meta"><span class="c-tag" style="background:var(--purple-d);color:var(--purple)">6板块</span><span class="c-tag" style="background:rgba(162,155,254,.15);color:#A29BFE">合伙人阅读</span><span id="h-fb"></span></div></div><div class="c-arr">→</div></a>
   </div></div>
   <div class="cs" id="sec-eng"><div class="cl">📐 工程交付 — 开发前必读</div><div class="cards">
-    <a class="card" href="decisions.html" style="border-color:rgba(52,211,153,.4)"><div class="c-left"><div class="c-ico" style="background:var(--green-d)">⭐</div><div class="c-sev" style="background:var(--green-d);color:var(--green)">推荐</div></div><div class="c-right"><h3>决策面板</h3><p>自动聚合所有CEO反馈：已确认决策·待讨论事项·已否决方案·待反馈板块。零维护，始终最新</p><div class="c-meta"><span class="c-tag" style="background:var(--green-d);color:var(--green)">自动聚合</span><span class="c-tag" style="background:var(--blue-d);color:var(--blue)">工程/合伙人参考</span></div></div><div class="c-arr">→</div></a>
     <a class="card" href="product-spec.html"><div class="c-left"><div class="c-ico" style="background:rgba(232,146,61,.1)">📦</div><div class="c-sev" style="background:rgba(232,146,61,.1);color:#e8923d">工程</div></div><div class="c-right"><h3>产品规格文档</h3><p>页面地图·5模块字段表·状态机·资金流·数据关系·查询场景</p><div class="c-meta"><span class="c-tag" style="background:rgba(232,146,61,.1);color:#e8923d">5模块</span><span id="ps-fb"></span></div></div><div class="c-arr">→</div></a>
   </div></div>
   <div class="cs" id="sec-log"><div class="cl">📋 更新记录</div><div class="cards">
@@ -110,8 +150,73 @@
 </div></div>
 <script>
 function sc(id,b){document.getElementById(id).scrollIntoView({behavior:'smooth'});document.querySelectorAll('.mt').forEach(t=>t.classList.remove('active'));b.classList.add('active')}
-async function update(){try{const r=await fetch('/api/feedback');if(!r.ok)return;const all=await r.json();const pages=[['chatA','a'],['chatB','b'],['chatC','c'],['chatD','d'],['architecture','arch'],['product-spec','ps'],['chatE','e'],['chatF','f'],['chatG','g'],['chatH','h']];let ta=0,td=0,tx=0;pages.forEach(([p,l])=>{let a=0,d=0,x=0;Object.values(all[p]||{}).forEach(v=>{if(v.c==='a')a++;else if(v.c==='d')d++;else if(v.c==='x')x++});ta+=a;td+=d;tx+=x;const el=document.getElementById(l+'-fb');if(el)el.textContent=(a+d+x)>0?`${a}✓ ${d}💬 ${x}✗`:''});['oa','sa'].forEach(i=>{const e=document.getElementById(i);if(e)e.textContent=ta});['od','sd'].forEach(i=>{const e=document.getElementById(i);if(e)e.textContent=td});['ox','sx'].forEach(i=>{const e=document.getElementById(i);if(e)e.textContent=tx})}catch(e){}}
+async function update(){try{
+  const pages=[['chatA','a','msc_ceo_feedback'],['chatB','b','msc_b_fb'],['chatC','c','msc_c_fb'],['chatD','d','msc_d_fb'],['chatE','e','msc_e_fb'],['chatF','f','msc_f_fb'],['chatG','g','msc_g_fb'],['chatH','h','msc_h_fb'],['architecture','arch','msc_arch_fb'],['product-spec','ps','msc_ps_fb']];
+  function cmpVer(a,b){const pa=String(a||'1').split('.').map(n=>parseInt(n,10)||0);const pb=String(b||'1').split('.').map(n=>parseInt(n,10)||0);for(let i=0;i<Math.max(pa.length,pb.length);i++){if((pa[i]||0)<(pb[i]||0))return -1;if((pa[i]||0)>(pb[i]||0))return 1}return 0}
+  let ta=0,td=0,tx=0;
+  pages.forEach(([p,l,key])=>{
+    let a=0,d=0,x=0;
+    try {
+      const data = JSON.parse(localStorage.getItem(key)||'{}');
+      Object.keys(data).forEach(id=>{
+        if(id==='_v')return;
+        const val=data[id];if(!val||typeof val!=='object')return;
+        const keys=Object.keys(val);
+        const isNested=keys.length>0&&keys.every(k=>/^\d+(\.\d+)*$/.test(k));
+        let fb;
+        if(isNested){fb=val[keys.sort(cmpVer).pop()]}else{fb=val}
+        if(fb&&fb.c==='a')a++;else if(fb&&fb.c==='d')d++;else if(fb&&fb.c==='x')x++;
+      });
+    } catch(e){}
+    ta+=a;td+=d;tx+=x;
+    const el=document.getElementById(l+'-fb');
+    if(el)el.textContent=(a+d+x)>0?`${a}✓ ${d}💬 ${x}✗`:'';
+  });
+  ['oa','sa'].forEach(i=>{const e=document.getElementById(i);if(e)e.textContent=ta});
+  ['od','sd'].forEach(i=>{const e=document.getElementById(i);if(e)e.textContent=td});
+  ['ox','sx'].forEach(i=>{const e=document.getElementById(i);if(e)e.textContent=tx});
+}catch(e){}}
 update();setInterval(update,5000);
+
+// Update hero decision counts from localStorage (supports new v2 nested format)
+function updateHero(){
+  const pages=[['chatA','msc_ceo_feedback'],['chatB','msc_b_fb'],['chatC','msc_c_fb'],['chatD','msc_d_fb'],['chatE','msc_e_fb'],['chatF','msc_f_fb'],['chatG','msc_g_fb'],['chatH','msc_h_fb'],['architecture','msc_arch_fb'],['product-spec','msc_ps_fb']];
+  let ta=0,td=0,tx=0;
+  // Compare versions like "6.2" vs "6" — pick highest
+  function cmpVer(a,b){
+    const pa=String(a||'1').split('.').map(n=>parseInt(n,10)||0);
+    const pb=String(b||'1').split('.').map(n=>parseInt(n,10)||0);
+    const len=Math.max(pa.length,pb.length);
+    for(let i=0;i<len;i++){if((pa[i]||0)<(pb[i]||0))return -1;if((pa[i]||0)>(pb[i]||0))return 1}return 0;
+  }
+  pages.forEach(([p,key])=>{
+    try {
+      const d = JSON.parse(localStorage.getItem(key)||'{}');
+      Object.keys(d).forEach(id=>{
+        if(id==='_v') return;
+        const val = d[id];
+        if(!val||typeof val!=='object') return;
+        // Detect nested v2 format: keys are version numbers
+        const keys = Object.keys(val);
+        const isNested = keys.length>0 && keys.every(k=>/^\d+(\.\d+)*$/.test(k));
+        if(isNested){
+          // Get latest version's feedback
+          const latestVer = keys.sort(cmpVer).pop();
+          const fb = val[latestVer];
+          if(fb&&fb.c==='a')ta++;else if(fb&&fb.c==='d')td++;else if(fb&&fb.c==='x')tx++;
+        } else {
+          // Old flat format (not yet migrated)
+          if(val.c==='a')ta++;else if(val.c==='d')td++;else if(val.c==='x')tx++;
+        }
+      });
+    } catch(e){}
+  });
+  const ha=document.getElementById('h-a');if(ha)ha.textContent=ta;
+  const hd=document.getElementById('h-d');if(hd)hd.textContent=td;
+  const hx=document.getElementById('h-x');if(hx)hx.textContent=tx;
+}
+updateHero();
+
 </script>
 </body>
 </html>

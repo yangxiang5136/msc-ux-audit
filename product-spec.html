@@ -1062,7 +1062,6 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',sans-seri
 
 </div><!-- end wrap -->
 
-<script src="/sync.js"></script>
 <script>
 function treeToggle(el){el.classList.toggle('open')}
 function modToggle(el){el.closest('.mod').classList.toggle('open')}
@@ -1135,8 +1134,10 @@ function renderFB(){
     if(v.n){const ta=w.querySelector('.fb-n');if(ta)ta.value=v.n}
   });
 }
-document.addEventListener('DOMContentLoaded',async()=>{if(typeof SYNC!=='undefined'){SYNC.init('product-spec','msc_ps_fb');await SYNC.pull()}renderFB()});
+document.addEventListener('DOMContentLoaded',async()=>{if(typeof SYNC!=='undefined'){await SYNC.pull()}renderFB()});
 </script>
 <script src="/nav.js"></script>
+<script>window.FB_KEY='msc_ps_fb';window.FB_PAGE='product-spec'</script>
+<script src="/fb.js"></script>
 </body>
 </html>

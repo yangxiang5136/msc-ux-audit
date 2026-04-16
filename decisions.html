@@ -49,6 +49,8 @@
 .item-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px;line-height:1.5}
 .item-meta{font-size:11px;color:var(--text3);display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px}
 .item-page{color:var(--accent-l);font-weight:600}
+.item-ver{font-size:10px;padding:1px 7px;border-radius:4px;background:rgba(251,191,36,.12);color:#fbbf24;font-weight:500;margin-left:6px;vertical-align:2px;font-family:monospace}
+.item-outdated{font-size:10px;color:#f87171;padding:1px 7px;border-radius:4px;background:rgba(248,113,113,.08);font-weight:500}
 .item-note{font-size:12px;color:var(--text2);line-height:1.6;padding:6px 10px;background:rgba(255,255,255,.02);border-radius:6px;margin-top:6px;border-left:2px solid var(--brd)}
 .item-link{padding:5px 12px;border-radius:6px;background:var(--bg3);color:var(--accent-l);font-size:11px;text-decoration:none;white-space:nowrap;flex-shrink:0;transition:all .15s;border:1px solid var(--brd)}
 .item-link:hover{background:var(--accent);color:white;border-color:var(--accent)}
@@ -142,12 +144,29 @@ async function loadAll() {
   document.getElementById('content').innerHTML = '<div class="loading">加载反馈数据中...</div>';
   ALL_ITEMS = [];
   
+  // Helper: parse version string for comparison
+  function parseVer(v) {
+    return String(v || '1').split('.').map(function(n){ return parseInt(n,10) || 0; });
+  }
+  function compareVer(a, b) {
+    var pa = parseVer(a), pb = parseVer(b);
+    var len = Math.max(pa.length, pb.length);
+    for (var i = 0; i < len; i++) {
+      var x = pa[i] || 0, y = pb[i] || 0;
+      if (x < y) return -1;
+      if (x > y) return 1;
+    }
+    return 0;
+  }
+  
   try {
+    // Load feedback data from localStorage (new nested format)
     const feedbackData = {};
     PAGES.forEach(page => {
       const letter = page.letter.toLowerCase();
       const storageKey = page.key === 'architecture' ? 'msc_arch_fb' 
                       : page.key === 'product-spec' ? 'msc_ps_fb'
+                      : page.key === 'chatA' ? 'msc_ceo_feedback'
                       : `msc_${letter}_fb`;
       try {
         const raw = localStorage.getItem(storageKey);
@@ -167,8 +186,10 @@ async function loadAll() {
         
         fbs.forEach(fb => {
           const id = fb.dataset.id;
-          const desc = fb.querySelector('.fb-d, .fb-t')?.textContent?.trim() || id;
+          const ver = fb.dataset.ver || '1';
+          const changelog = fb.dataset.changelog || '';
           
+          // Extract section title and description from DOM
           let sectionTitle = '';
           let sectionId = '';
           const section = fb.closest('.section');
@@ -183,21 +204,45 @@ async function loadAll() {
             if (sh) sectionTitle = sh.textContent.trim().substring(0, 60);
           }
           if (section && section.id) sectionId = section.id;
-          if (!sectionTitle.trim()) sectionTitle = desc.substring(0, 50);
           
-          const fb_data = pageFb[id] || {};
+          // Description comes from data-desc attribute or old .fb-d content
+          let desc = fb.dataset.desc || '';
+          if (!desc) {
+            const descEl = fb.querySelector('.fb-d');
+            if (descEl) desc = descEl.textContent.trim();
+          }
+          if (!sectionTitle.trim()) sectionTitle = desc.substring(0, 50) || id;
+          
+          // Read feedback for current version
+          const versionsData = pageFb[id] || {};
+          const currentFb = versionsData[ver] || {};
           const anchor = sectionId ? '#' + sectionId : '';
+          
+          // Determine status: current version's choice, or 'p' if pending
+          const status = currentFb.c || 'p';
+          
+          // Check if there are older versions with feedback (for "content updated" indicator)
+          const allVersions = Object.keys(versionsData).filter(v => {
+            return versionsData[v] && (versionsData[v].c || versionsData[v].n);
+          });
+          const olderVersionsWithFb = allVersions.filter(v => compareVer(v, ver) < 0);
+          const hasOutdatedFb = olderVersionsWithFb.length > 0 && !currentFb.c;
           
           ALL_ITEMS.push({
             id: id,
+            ver: ver,
+            changelog: changelog,
             page_key: page.key,
             page_letter: page.letter,
             page_name: page.name,
             page_url: page.url + anchor,
             section_title: sectionTitle.trim(),
             description: desc,
-            status: fb_data.c || 'p',
-            note: fb_data.n || ''
+            status: status,
+            note: currentFb.n || '',
+            timestamp: currentFb.t || '',
+            has_outdated: hasOutdatedFb,
+            outdated_vers: olderVersionsWithFb
           });
         });
       } catch(err) {
@@ -265,6 +310,11 @@ function filterPage(pageKey, btn) {
 
 function render() {
   let items = ALL_ITEMS.filter(i => i.status === CURRENT_TAB);
+  // In "待反馈" (p) tab, also include items that have outdated feedback (content updated, needs re-review)
+  if (CURRENT_TAB === 'p') {
+    const outdated = ALL_ITEMS.filter(i => i.has_outdated && i.status === 'p');
+    // Already included since status==='p' for items without current feedback
+  }
   if (CURRENT_PAGE !== 'all') {
     items = items.filter(i => i.page_key === CURRENT_PAGE);
   }
@@ -298,12 +348,29 @@ function render() {
     pageItems.forEach(item => {
       const badgeText = { a: '✓ 同意', d: '💬 讨论', x: '✗ 不同意', p: '⬜ 待反馈' }[item.status];
       const noteHtml = item.note ? `<div class="item-note">"${escapeHtml(item.note)}"</div>` : '';
+      
+      // Version tag
+      const verHtml = `<span class="item-ver">v${item.ver}</span>`;
+      
+      // "Content updated" indicator
+      let outdatedHtml = '';
+      if (item.has_outdated) {
+        const prevVers = item.outdated_vers.join(', v');
+        outdatedHtml = `<span class="item-outdated">⚡ 内容已更新 (旧版: v${prevVers})</span>`;
+      }
+      
+      // Date
+      const dateHtml = item.timestamp ? 
+        `<span>${new Date(item.timestamp).toISOString().slice(0,10)}</span>` : '';
+      
       html += `<div class="item">
         <span class="item-badge ${item.status}">${badgeText}</span>
         <div class="item-body">
-          <div class="item-title">${escapeHtml(item.section_title || item.description)}</div>
+          <div class="item-title">${escapeHtml(item.section_title || item.description)} ${verHtml}</div>
           <div class="item-meta">
-            <span>${escapeHtml(item.description)}</span>
+            ${escapeHtml(item.description) ? `<span>${escapeHtml(item.description)}</span>` : ''}
+            ${outdatedHtml}
+            ${dateHtml ? `<span style="color:var(--text3)">·</span>${dateHtml}` : ''}
             <span style="color:var(--text3)">·</span>
             <span>ID: <code style="font-family:monospace;font-size:10px;color:var(--text3)">${item.id}</code></span>
           </div>
