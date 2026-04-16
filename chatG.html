@@ -14,7 +14,7 @@ body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft
 .header .badge{font-size:11px;padding:3px 10px;background:rgba(0,184,148,.12);color:var(--green);border:1px solid rgba(0,184,148,.25);border-radius:20px}
 .main{max-width:960px;margin:0 auto;padding:24px 16px 80px}
 
-.nav{display:flex;gap:0;overflow-x:auto;border-bottom:1px solid var(--brd);margin-bottom:24px;position:sticky;top:48px;z-index:90;background:var(--bg);padding-top:8px}
+.nav{display:flex;gap:0;overflow-x:auto;border-bottom:1px solid var(--brd);margin-bottom:24px;position:sticky;top:82px;z-index:80;background:var(--bg);padding-top:8px}
 .nav a{padding:8px 14px;font-size:12px;color:var(--text3);text-decoration:none;white-space:nowrap;border-bottom:2px solid transparent;transition:all .15s}
 .nav a:hover{color:var(--text)}
 .nav a.active{color:var(--green);border-bottom-color:var(--green)}
@@ -82,9 +82,24 @@ body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft
 
 .copy-block{background:var(--bg3);border:1px solid var(--brd);border-radius:8px;padding:12px 16px;margin:8px 0;font-size:12px;font-family:'Courier New',monospace;color:var(--text2);position:relative;white-space:pre-wrap;line-height:1.6}
 .copy-label{position:absolute;top:6px;right:8px;font-size:10px;color:var(--text3);font-family:'PingFang SC',sans-serif}
+.summary-bar{position:sticky;top:49px;z-index:90;background:rgba(22,25,34,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--brd);padding:8px 20px;display:flex;align-items:center;gap:16px}
+.sb-item{font-size:12px;color:var(--text3);display:flex;align-items:center;gap:4px}
+.sb-n{font-weight:700;font-size:14px}
+.sb-n.g{color:var(--green)}.sb-n.a{color:var(--amber)}.sb-n.r{color:var(--red)}
 
 .fb{margin-top:14px;padding-top:14px;border-top:1px solid var(--brd)}
 .fb-l{font-size:11px;color:var(--text3);margin-bottom:6px}
+.fb-d{font-size:12px;color:var(--text2);margin-bottom:8px}
+.fb-row{display:flex;gap:6px;margin-bottom:8px}
+.fb-b{padding:5px 14px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--brd);background:transparent;color:var(--text3);transition:all .15s}
+.fb-b:hover{background:var(--bg3);color:var(--text)}
+.fb-b.s-a{background:var(--green-bg);color:var(--green);border-color:rgba(0,184,148,.3)}
+.fb-b.s-d{background:var(--amber-bg);color:var(--amber);border-color:rgba(253,203,110,.3)}
+.fb-b.s-x{background:var(--red-bg);color:var(--red);border-color:rgba(255,107,107,.3)}
+.fb-n{width:100%;background:var(--bg3);border:1px solid var(--brd);border-radius:6px;padding:8px 10px;font-size:11px;color:var(--text2);resize:vertical;min-height:36px;font-family:inherit}
+
+.fb{margin-top:14px;padding:14px 18px;border-top:1px solid var(--brd);background:rgba(255,255,255,.01)}
+.fb-l{font-size:11px;color:var(--text3);margin-bottom:4px}
 .fb-d{font-size:12px;color:var(--text2);margin-bottom:8px}
 .fb-row{display:flex;gap:6px;margin-bottom:8px}
 .fb-b{padding:5px 14px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--brd);background:transparent;color:var(--text3);transition:all .15s}
@@ -99,6 +114,12 @@ body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft
 
 <div class="header">
   <h1>MSC-G · 早期任务品类与卡片规范 <span class="badge">UI参考</span></h1>
+</div>
+
+<div class="summary-bar">
+  <div class="sb-item"><span class="sb-n g" id="ca2">0</span> 同意</div>
+  <div class="sb-item"><span class="sb-n a" id="cd2">0</span> 讨论</div>
+  <div class="sb-item"><span class="sb-n r" id="cx2">0</span> 不同意</div>
 </div>
 
 <div class="main">
@@ -223,6 +244,7 @@ body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft
       </tr>
     </table>
   </div></div>
+  <div class="fb" data-id="g1"><div class="fb-l">👤 CEO快速反馈</div><div class="fb-d">早期任务品类三档划分（轻量/标准/深度）</div><div class="fb-row"><button class="fb-b" onclick="sf(this,'a','g1')">✓ 同意</button><button class="fb-b" onclick="sf(this,'d','g1')">💬 需讨论</button><button class="fb-b" onclick="sf(this,'x','g1')">✗ 不同意</button></div><textarea class="fb-n" placeholder="备注..." onblur="sn(this,'g1')"></textarea></div>
 </div>
 
 <!-- ===== G.2 Mock数据 ===== -->
@@ -360,6 +382,7 @@ Bug奖励标准：
 
 发布者：MSC.AI官方 · ⭐ 5.0</div>
   </div></div>
+  <div class="fb" data-id="g2"><div class="fb-l">👤 CEO快速反馈</div><div class="fb-d">Mock数据8条列表+2条详情（UI设计师可直接复制）</div><div class="fb-row"><button class="fb-b" onclick="sf(this,'a','g2')">✓ 同意</button><button class="fb-b" onclick="sf(this,'d','g2')">💬 需讨论</button><button class="fb-b" onclick="sf(this,'x','g2')">✗ 不同意</button></div><textarea class="fb-n" placeholder="备注..." onblur="sn(this,'g2')"></textarea></div>
 </div>
 
 <!-- ===== G.3 卡片规范 ===== -->
@@ -478,6 +501,7 @@ Bug奖励标准：
       ④ 名额<20%时红色警示 + 进度条变红
     </div>
   </div></div>
+  <div class="fb" data-id="g3"><div class="fb-l">👤 CEO快速反馈</div><div class="fb-d">任务卡片4层视觉规范 + 示例mockup</div><div class="fb-row"><button class="fb-b" onclick="sf(this,'a','g3')">✓ 同意</button><button class="fb-b" onclick="sf(this,'d','g3')">💬 需讨论</button><button class="fb-b" onclick="sf(this,'x','g3')">✗ 不同意</button></div><textarea class="fb-n" placeholder="备注..." onblur="sn(this,'g3')"></textarea></div>
 </div>
 
 <!-- ===== G.4 Tab栏 ===== -->
@@ -495,6 +519,7 @@ Bug奖励标准：
     </table>
     <div class="tip">图标可保持不变，仅改文字标签。</div>
   </div></div>
+  <div class="fb" data-id="g4"><div class="fb-l">👤 CEO快速反馈</div><div class="fb-d">Tab栏名称修改：MSC→AI资产、发布→发任务、任务→接任务、我的→我的任务</div><div class="fb-row"><button class="fb-b" onclick="sf(this,'a','g4')">✓ 同意</button><button class="fb-b" onclick="sf(this,'d','g4')">💬 需讨论</button><button class="fb-b" onclick="sf(this,'x','g4')">✗ 不同意</button></div><textarea class="fb-n" placeholder="备注..." onblur="sn(this,'g4')"></textarea></div>
 </div>
 
 <!-- ===== G.5 信任信号 ===== -->
@@ -519,6 +544,7 @@ Bug奖励标准：
       </tr>
     </table>
   </div></div>
+  <div class="fb" data-id="g5"><div class="fb-l">👤 CEO快速反馈</div><div class="fb-d">信任信号V1最小集（支付托管+发布者信用）</div><div class="fb-row"><button class="fb-b" onclick="sf(this,'a','g5')">✓ 同意</button><button class="fb-b" onclick="sf(this,'d','g5')">💬 需讨论</button><button class="fb-b" onclick="sf(this,'x','g5')">✗ 不同意</button></div><textarea class="fb-n" placeholder="备注..." onblur="sn(this,'g5')"></textarea></div>
 </div>
 
 <!-- ===== G.6 确权定价 ===== -->
@@ -561,6 +587,7 @@ Bug奖励标准：
       我们没有会员制。第一个AI资产是免费送给用户的（确权即免费使用）。第二个起才走¥99/周、¥349/月、¥699一次性的定价。"会员"这个概念不存在。
     </div>
   </div></div>
+  <div class="fb" data-id="g6"><div class="fb-l">👤 CEO快速反馈</div><div class="fb-d">确权定价改三级架构 + 会员页删除</div><div class="fb-row"><button class="fb-b" onclick="sf(this,'a','g6')">✓ 同意</button><button class="fb-b" onclick="sf(this,'d','g6')">💬 需讨论</button><button class="fb-b" onclick="sf(this,'x','g6')">✗ 不同意</button></div><textarea class="fb-n" placeholder="备注..." onblur="sn(this,'g6')"></textarea></div>
 </div>
 
 </div><!-- end main -->
@@ -568,6 +595,15 @@ Bug奖励标准：
 <script src="/sync.js"></script>
 <script>
 function tog(el){el.classList.toggle('open');el.nextElementSibling.classList.toggle('show')}
+const SK='msc_g_fb';
+SYNC.init('chatG',SK);
+function ld(){try{return JSON.parse(localStorage.getItem(SK))||{}}catch{return{}}}
+function sv(d){localStorage.setItem(SK,JSON.stringify(d))}
+function sf(btn,c,id){const d=ld();btn.closest('.fb').querySelectorAll('.fb-b').forEach(b=>b.className='fb-b');btn.classList.add(c==='a'?'s-a':c==='d'?'s-d':'s-x');d[id]={...d[id],c};sv(d);up();SYNC.push(id,c)}
+function sn(ta,id){const d=ld();d[id]={...d[id],n:ta.value};sv(d);SYNC.push(id,undefined,ta.value)}
+function up(){const d=ld();let a=0,dd=0,x=0;Object.values(d).forEach(v=>{if(v.c==='a')a++;if(v.c==='d')dd++;if(v.c==='x')x++});document.getElementById('ca2').textContent=a;document.getElementById('cd2').textContent=dd;document.getElementById('cx2').textContent=x}
+document.querySelectorAll('.nav a').forEach(a=>{a.addEventListener('click',function(){document.querySelectorAll('.nav a').forEach(n=>n.classList.remove('active'));this.classList.add('active')})});
+document.addEventListener('DOMContentLoaded',async()=>{await SYNC.pull();const d=ld();Object.entries(d).forEach(([id,v])=>{const w=document.querySelector(`.fb[data-id="${id}"]`);if(!w)return;if(v.c){const bs=w.querySelectorAll('.fb-b');const cls=v.c==='a'?'s-a':v.c==='d'?'s-d':'s-x';const idx=v.c==='a'?0:v.c==='d'?1:2;if(bs[idx])bs[idx].classList.add(cls)}if(v.n){const ta=w.querySelector('.fb-n');if(ta)ta.value=v.n}});up()})
 </script>
 <script src="/nav.js"></script>
 </body>
