@@ -15,6 +15,8 @@ const PAGES = [
   { cat: '商业机制', icon: '🔐', items: [
     { href: 'chatE.html', label: 'E · AI资产确权', badge: '已更新', badgeColor: '#fbbf24' },
     { href: 'chatF.html', label: 'F · 裂变增长·任务体系', badge: '已更新', badgeColor: '#fbbf24' },
+    { href: 'chatG.html', label: 'G · 任务品类·UI规范', badge: '新', badgeColor: '#34d399' },
+    { href: 'chatH.html', label: 'H · AI自动审核流程', badge: '提案', badgeColor: '#A29BFE' },
   ]},
   { cat: '工程交付', icon: '📐', items: [
     { href: 'product-spec.html', label: '📦 产品规格文档' },

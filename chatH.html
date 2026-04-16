@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>MSC-H · AI自动审核流程</title>
+<style>
+:root{--bg:#0D0F14;--bg2:#161922;--bg3:#1C1F2B;--bg4:#1E2130;--brd:#2A2D3A;--text:#E8E9ED;--text2:#9CA0B0;--text3:#6B7084;--accent:#6C5CE7;--accent-l:#A29BFE;--green:#00B894;--green-bg:rgba(0,184,148,.12);--amber:#FDCB6E;--amber-bg:rgba(253,203,110,.12);--red:#FF6B6B;--red-bg:rgba(255,107,107,.12);--blue:#74B9FF;--blue-bg:rgba(116,185,255,.12);--gold:#F9CA24}
+*{margin:0;padding:0;box-sizing:border-box}body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased}
+.header{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--brd);padding:14px 20px;display:flex;align-items:center;gap:12px}
+.header h1{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}
+.header .badge{font-size:11px;padding:3px 10px;background:rgba(108,92,231,.12);color:var(--accent-l);border:1px solid rgba(108,92,231,.25);border-radius:20px}
+.summary-bar{position:sticky;top:49px;z-index:90;background:rgba(22,25,34,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--brd);padding:8px 20px;display:flex;align-items:center;gap:16px}
+.sb-item{font-size:12px;color:var(--text3);display:flex;align-items:center;gap:4px}
+.sb-n{font-weight:700;font-size:14px}
+.sb-n.g{color:var(--green)}.sb-n.a{color:var(--amber)}.sb-n.r{color:var(--red)}
+.main{max-width:960px;margin:0 auto;padding:24px 16px 80px}
+.nav{display:flex;gap:0;overflow-x:auto;border-bottom:1px solid var(--brd);margin-bottom:24px;position:sticky;top:82px;z-index:80;background:var(--bg);padding-top:8px}
+.nav a{padding:8px 14px;font-size:12px;color:var(--text3);text-decoration:none;white-space:nowrap;border-bottom:2px solid transparent;transition:all .15s}
+.nav a:hover{color:var(--text)}
+.nav a.active{color:var(--green);border-bottom-color:var(--green)}
+.section{margin-bottom:48px}
+.section-head{font-size:20px;font-weight:700;margin-bottom:6px;padding-top:20px}
+.section-head .n{color:var(--accent-l);margin-right:8px}
+.section-sub{font-size:14px;color:var(--text2);margin-bottom:20px;line-height:1.6}
+.card{border:1px solid var(--brd);border-radius:12px;overflow:hidden;margin-bottom:16px}
+.card-head{padding:14px 18px;background:var(--bg2);display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
+.card-head:hover{background:var(--bg3)}
+.cn{font-size:11px;padding:3px 8px;border-radius:5px;font-weight:700}
+.cn.g{background:var(--green-bg);color:var(--green)}
+.cn.b{background:var(--blue-bg);color:var(--blue)}
+.cn.r{background:var(--red-bg);color:var(--red)}
+.cn.go{background:var(--amber-bg);color:var(--amber)}
+.cn.p{background:rgba(108,92,231,.12);color:var(--accent-l)}
+.cm{flex:1;font-size:13px;font-weight:600}
+.ca{color:var(--text3);font-size:12px;transition:transform .2s}
+.card-head.open .ca{transform:rotate(180deg)}
+.card-body{display:none;padding:18px;background:var(--bg2);border-top:1px solid var(--brd)}
+.card-body.show{display:block}
+.tip{padding:12px 14px;border-left:3px solid var(--green);background:rgba(0,184,148,.04);border-radius:0 6px 6px 0;margin:12px 0;font-size:12px;color:var(--text2);line-height:1.8}
+.tip.warn{border-left-color:var(--amber);background:rgba(253,203,110,.04)}
+.tip.danger{border-left-color:var(--red);background:rgba(255,107,107,.04)}
+.t{width:100%;border-collapse:collapse;margin:12px 0;font-size:12px}
+.t th{background:var(--bg3);padding:8px 12px;text-align:left;font-weight:600;color:var(--text2)}
+.t td{padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.04)}
+.t tr:hover td{background:rgba(255,255,255,.02)}
+
+/* Pipeline visual */
+.pipeline{display:flex;gap:0;margin:20px 0;align-items:stretch}
+.pipe-node{flex:1;padding:16px 14px;background:var(--bg3);position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;min-height:120px;justify-content:center}
+.pipe-node:first-child{border-radius:12px 0 0 12px}
+.pipe-node:last-child{border-radius:0 12px 12px 0}
+.pipe-node::after{content:'';position:absolute;right:-1px;top:50%;transform:translateY(-50%);width:0;height:0;border-top:12px solid transparent;border-bottom:12px solid transparent;border-left:12px solid var(--bg3);z-index:2}
+.pipe-node:last-child::after{display:none}
+.pipe-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:8px;font-size:18px}
+.pipe-title{font-size:12px;font-weight:700;color:var(--text);margin-bottom:3px}
+.pipe-sub{font-size:10px;color:var(--text3);line-height:1.4}
+.pipe-node.ai{background:linear-gradient(135deg,rgba(108,92,231,.15),rgba(108,92,231,.08))}
+.pipe-node.ai::after{border-left-color:rgba(108,92,231,.12)}
+.pipe-node.rule{background:rgba(253,203,110,.06)}
+.pipe-node.rule::after{border-left-color:rgba(253,203,110,.06)}
+
+/* Tier cards */
+.tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:20px 0}
+.tier{border-radius:12px;padding:18px;position:relative;overflow:hidden}
+.tier::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.tier.t1::before{background:var(--green)}.tier.t2::before{background:var(--amber)}.tier.t3::before{background:var(--red)}
+.tier.t1{background:rgba(0,184,148,.04)}.tier.t2{background:rgba(253,203,110,.04)}.tier.t3{background:rgba(255,107,107,.04)}
+.tier-pct{font-size:28px;font-weight:700;margin-bottom:4px}
+.tier-pct.g{color:var(--green)}.tier-pct.a{color:var(--amber)}.tier-pct.r{color:var(--red)}
+.tier-name{font-size:14px;font-weight:700;margin-bottom:6px}
+.tier-desc{font-size:11px;color:var(--text2);line-height:1.6}
+.tier-time{margin-top:8px;font-size:12px;font-weight:600}
+
+/* Stats */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:20px 0}
+.stat{background:var(--bg2);border:1px solid var(--brd);border-radius:10px;padding:14px;text-align:center}
+.stat-n{font-size:24px;font-weight:700}
+.stat-l{font-size:11px;color:var(--text3);margin-top:4px}
+.stat-d{font-size:10px;margin-top:4px}
+
+/* Flow arrow connector */
+.flow-row{display:flex;align-items:center;gap:0;margin:16px 0;flex-wrap:nowrap}
+.flow-step{background:var(--bg2);border:1px solid var(--brd);border-radius:8px;padding:10px 14px;font-size:11px;text-align:center;flex-shrink:0}
+.flow-step .ft{font-weight:700;font-size:12px;margin-bottom:2px}
+.flow-arrow{color:var(--accent-l);font-size:16px;padding:0 6px;flex-shrink:0}
+.flow-step.highlight{border-color:var(--accent);background:rgba(108,92,231,.08)}
+
+/* Mockup */
+.mock-phone{width:280px;background:var(--bg3);border-radius:20px;padding:8px;margin:0 auto}
+.mock-screen{background:var(--bg2);border-radius:14px;overflow:hidden;min-height:380px}
+.mock-top{background:var(--accent);color:white;padding:10px 14px;font-size:12px;font-weight:600}
+.mock-body{padding:12px}
+.mock-card{background:var(--bg3);border:1px solid var(--brd);border-radius:8px;padding:10px 12px;margin-bottom:8px;font-size:11px}
+.mock-card .mc-head{display:flex;justify-content:space-between;margin-bottom:4px}
+.mock-card .mc-tag{font-size:9px;padding:1px 6px;border-radius:3px;font-weight:600}
+.mock-btn{display:block;width:100%;padding:10px;border-radius:8px;text-align:center;font-size:12px;font-weight:600;margin-top:8px;border:none;cursor:default}
+.mock-fab{width:40px;height:40px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;position:absolute;bottom:60px;right:20px}
+
+/* Roadmap */
+.roadmap{position:relative;padding-left:24px;margin:16px 0}
+.roadmap::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:2px;background:var(--brd)}
+.rm-item{position:relative;padding:12px 0 20px 20px}
+.rm-dot{position:absolute;left:-20px;top:16px;width:12px;height:12px;border-radius:50%;border:2px solid var(--brd)}
+.rm-dot.done{background:var(--green);border-color:var(--green)}
+.rm-dot.next{background:var(--accent);border-color:var(--accent)}
+.rm-dot.future{background:transparent}
+.rm-title{font-size:13px;font-weight:700}
+.rm-desc{font-size:11px;color:var(--text2);margin-top:4px;line-height:1.6}
+.rm-tag{display:inline-block;font-size:10px;padding:2px 8px;border-radius:4px;margin-top:6px;font-weight:600}
+
+.fb{margin-top:14px;padding-top:14px;border-top:1px solid var(--brd)}
+.fb-l{font-size:11px;color:var(--text3);margin-bottom:6px}
+.fb-d{font-size:12px;color:var(--text2);margin-bottom:8px}
+.fb-row{display:flex;gap:6px;margin-bottom:8px}
+.fb-b{padding:5px 14px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--brd);background:transparent;color:var(--text3);transition:all .15s}
+.fb-b:hover{background:var(--bg3);color:var(--text)}
+.fb-b.s-a{background:var(--green-bg);color:var(--green);border-color:rgba(0,184,148,.3)}
+.fb-b.s-d{background:var(--amber-bg);color:var(--amber);border-color:rgba(253,203,110,.3)}
+.fb-b.s-x{background:var(--red-bg);color:var(--red);border-color:rgba(255,107,107,.3)}
+.fb-n{width:100%;background:var(--bg3);border:1px solid var(--brd);border-radius:6px;padding:8px 10px;font-size:11px;color:var(--text2);resize:vertical;min-height:36px;font-family:inherit}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>MSC-H · AI自动审核流程 <span class="badge">提案</span></h1>
+</div>
+
+<div class="summary-bar">
+  <div class="sb-item"><span class="sb-n g" id="ca2">0</span> 同意</div>
+  <div class="sb-item"><span class="sb-n a" id="cd2">0</span> 讨论</div>
+  <div class="sb-item"><span class="sb-n r" id="cx2">0</span> 不同意</div>
+</div>
+
+<div class="main">
+
+<div class="nav">
+  <a href="#problem" class="active">H.1 问题</a>
+  <a href="#pipeline">H.2 AI流水线</a>
+  <a href="#tiers">H.3 三级分流</a>
+  <a href="#user-flow">H.4 用户端流程</a>
+  <a href="#economics">H.5 经济效益</a>
+  <a href="#roadmap">H.6 实施路线</a>
+</div>
+
+<!-- ===== H.1 ===== -->
+<div class="section" id="problem">
+  <div class="section-head"><span class="n">H.1</span>问题：人工审核不可持续</div>
+  <div class="section-sub">平台自己发布测试任务 → 平台自己审核提交 → 人工逐条审核不可能规模化</div>
+
+  <div class="card"><div class="card-head open" onclick="tog(this)"><span class="cn r">H.1.1</span><span class="cm">当前痛点</span><span class="ca">▼</span></div><div class="card-body show">
+    <div class="stats-row">
+      <div class="stat"><div class="stat-n" style="color:var(--red)">500+</div><div class="stat-l">预估日提交量</div><div class="stat-d" style="color:var(--text3)">首月10,000用户</div></div>
+      <div class="stat"><div class="stat-n" style="color:var(--red)">~2分钟</div><div class="stat-l">人工审核/条</div><div class="stat-d" style="color:var(--text3)">看截图+读描述+判断</div></div>
+      <div class="stat"><div class="stat-n" style="color:var(--red)">~17小时</div><div class="stat-l">人工需求/天</div><div class="stat-d" style="color:var(--text3)">500条×2分钟</div></div>
+      <div class="stat"><div class="stat-n" style="color:var(--red)">1-7天</div><div class="stat-l">用户等待审核</div><div class="stat-d" style="color:var(--text3)">影响留存</div></div>
+    </div>
+    <div class="tip danger"><strong>核心矛盾：</strong>用户希望秒级结算（赚到钱→立刻到账→才会继续用），但人工审核至少需要1天。审核越慢→用户越不愿意做任务→平台获得的反馈越少→产品改进越慢。</div>
+  </div></div>
+
+  <div class="card"><div class="card-head open" onclick="tog(this)"><span class="cn p">H.1.2</span><span class="cm">MSC.AI的独特优势</span><span class="ca">▼</span></div><div class="card-body show">
+    <div class="tip"><strong>关键洞察：</strong>平台审核自己App的测试截图，拥有100%的ground truth。<br><br>
+    我们知道每个页面长什么样（设计稿就是参照物），所以AI判断"这是不是我们App的截图"以及"这是哪个页面"的准确率会非常高。这是外部审核平台（如审核一个设计稿好不好）做不到的。</div>
+    <table class="t">
+      <tr><th>AI审核场景</th><th>我们能做（有ground truth）</th><th>外部平台做不到</th></tr>
+      <tr><td>截图是否来自我们App</td><td style="color:var(--green)">✓ 和已知UI状态库对比</td><td style="color:var(--red)">✗ 不知道正确UI长什么样</td></tr>
+      <tr><td>截图对应哪个页面</td><td style="color:var(--green)">✓ 页面指纹匹配</td><td style="color:var(--red)">✗ 没有页面库</td></tr>
+      <tr><td>反馈是否与已知Bug重复</td><td style="color:var(--green)">✓ 和内部Bug库语义匹配</td><td style="color:var(--red)">✗ 没有Bug库</td></tr>
+    </table>
+  </div></div>
+  <div class="fb" data-id="h1"><div class="fb-l">👤 CEO快速反馈</div><div class="fb-d">问题定义：人工审核不可持续 + MSC.AI有ground truth优势</div><div class="fb-row"><button class="fb-b" onclick="sf(this,'a','h1')">✓ 同意</button><button class="fb-b" onclick="sf(this,'d','h1')">💬 需讨论</button><button class="fb-b" onclick="sf(this,'x','h1')">✗ 不同意</button></div><textarea class="fb-n" placeholder="备注..." onblur="sn(this,'h1')"></textarea></div>
+</div>
+
+<!-- ===== H.2 ===== -->
+<div class="section" id="pipeline">
+  <div class="section-head"><span class="n">H.2</span>AI审核流水线</div>
+  <div class="section-sub">用户提交 → 4步自动处理 → 分流到三个层级</div>
+
+  <div class="card"><div class="card-head open" onclick="tog(this)"><span class="cn p">H.2.1</span><span class="cm">四步处理流水线</span><span class="ca">▼</span></div><div class="card-body show">
+
+    <div class="pipeline">
+      <div class="pipe-node ai">
+        <div class="pipe-icon" style="background:rgba(108,92,231,.2);color:var(--accent-l)">👁</div>
+        <div class="pipe-title">Step 1 · AI视觉</div>
+        <div class="pipe-sub">读截图/录屏：<br>是否是我们App？<br>哪个页面？<br>显示了什么？</div>
+      </div>
+      <div class="pipe-node ai">
+        <div class="pipe-icon" style="background:rgba(108,92,231,.2);color:var(--accent-l)">📝</div>
+        <div class="pipe-title">Step 2 · AI语义</div>
+        <div class="pipe-sub">读用户描述：<br>提取问题类型<br>匹配已知Bug<br>评估内容质量</div>
+      </div>
+      <div class="pipe-node rule">
+        <div class="pipe-icon" style="background:rgba(253,203,110,.15);color:var(--amber)">⚙</div>
+        <div class="pipe-title">Step 3 · 规则检查</div>
+        <div class="pipe-sub">去重检测<br>提交速度检查<br>录屏时长检查<br>截图重复检测</div>
+      </div>
+      <div class="pipe-node" style="background:rgba(0,184,148,.06)">
+        <div class="pipe-icon" style="background:rgba(0,184,148,.15);color:var(--green)">🔀</div>
+        <div class="pipe-title">Step 4 · 分流</div>
+        <div class="pipe-sub">综合评分<br>分配到三级：<br>自动通过 /<br>快速确认 /<br>人工审核</div>
+      </div>
+    </div>
+
+    <div class="tip"><strong>AI Vision具体做什么：</strong><br>
+    输入：用户提交的截图<br>
+    处理：和已知UI状态库（所有页面的设计稿）对比<br>
+    输出：① 是否是我们App的截图（是/否/不确定）② 匹配到的页面名称 ③ 截图中的关键UI元素<br><br>
+    <strong>技术实现：</strong>单次GPT-4o / Claude Vision API调用，成本约¥0.03/次。日均500次≈¥15/天。</div>
+  </div></div>
+
+  <div class="card"><div class="card-head open" onclick="tog(this)"><span class="cn go">H.2.2</span><span class="cm">六条自动检查规则（不需要AI）</span><span class="ca">▼</span></div><div class="card-body show">
+    <table class="t">
+      <tr><th>检查项</th><th>灌水条件</th><th>原理</th><th>实现难度</th></tr>
+      <tr><td><strong>提交速度</strong></td><td>接单→提交 < 60秒</td><td>不可能这么快做完</td><td style="color:var(--green)">极低</td></tr>
+      <tr><td><strong>录屏时长</strong></td><td>< 20秒</td><td>真操作至少30秒</td><td style="color:var(--green)">极低</td></tr>
+      <tr><td><strong>全满分检测</strong></td><td>所有评分都给5星</td><td>没区分度=没认真评</td><td style="color:var(--green)">极低</td></tr>
+      <tr><td><strong>文本长度</strong></td><td>描述 < 10字</td><td>"还行"不是有效反馈</td><td style="color:var(--green)">极低</td></tr>
+      <tr><td><strong>截图重复</strong></td><td>和之前提交相同</td><td>复制粘贴</td><td style="color:var(--amber)">低</td></tr>
+      <tr><td><strong>设备多账号</strong></td><td>同设备短时间多号</td><td>刷单行为</td><td style="color:var(--amber)">低</td></tr>
+    </table>
+    <div class="tip warn"><strong>前4条规则V1就应该做</strong>——纯前端校验，在用户点"提交"之前就能拦截，零后端成本。</div>
+  </div></div>
+  <div class="fb" data-id="h2"><div class="fb-l">👤 CEO快速反馈</div><div class="fb-d">AI流水线四步处理 + 六条自动规则</div><div class="fb-row"><button class="fb-b" onclick="sf(this,'a','h2')">✓ 同意</button><button class="fb-b" onclick="sf(this,'d','h2')">💬 需讨论</button><button class="fb-b" onclick="sf(this,'x','h2')">✗ 不同意</button></div><textarea class="fb-n" placeholder="备注..." onblur="sn(this,'h2')"></textarea></div>
+</div>
+
+<!-- ===== H.3 ===== -->
+<div class="section" id="tiers">
+  <div class="section-head"><span class="n">H.3</span>三级分流机制</div>
+  <div class="section-sub">AI评分后，每条提交分配到对应层级，人力只集中在最需要的10%</div>
+
+  <div class="card"><div class="card-head open" onclick="tog(this)"><span class="cn g">H.3.1</span><span class="cm">三级处理对照</span><span class="ca">▼</span></div><div class="card-body show">
+
+    <div class="tiers">
+      <div class="tier t1">
+        <div class="tier-pct g">~70%</div>
+        <div class="tier-name">Tier 1 · 自动通过</div>
+        <div class="tier-desc">
+          AI置信度 > 90%<br><br>
+          ✓ 截图确认是我们App<br>
+          ✓ 描述有实质内容<br>
+          ✓ 无重复<br>
+          ✓ 规则检查全通过<br><br>
+          <strong>处理方式：</strong>即时审批+秒级结算<br>
+        </div>
+        <div class="tier-time" style="color:var(--green)">⏱ 0人力 · 秒级完成</div>
+      </div>
+      <div class="tier t2">
+        <div class="tier-pct a">~20%</div>
+        <div class="tier-name">Tier 2 · AI辅助确认</div>
+        <div class="tier-desc">
+          AI置信度 50-90%<br><br>
+          AI生成摘要卡片：<br>
+          • 截图匹配了哪个页面<br>
+          • 检测到什么问题<br>
+          • 是否和已知Bug重复<br>
+          • AI的通过/拒绝建议<br><br>
+          <strong>处理方式：</strong>人工看摘要，一键确认
+        </div>
+        <div class="tier-time" style="color:var(--amber)">⏱ ~1秒/条 · 看摘要点确认</div>
+      </div>
+      <div class="tier t3">
+        <div class="tier-pct r">~10%</div>
+        <div class="tier-name">Tier 3 · 人工审核</div>
+        <div class="tier-desc">
+          AI置信度 < 50%<br>
+          或被标记为可疑<br><br>
+          需要人工查看：<br>
+          • 原始截图/录屏<br>
+          • 用户描述<br>
+          • AI标记的疑点<br><br>
+          <strong>处理方式：</strong>完整审核流程
+        </div>
+        <div class="tier-time" style="color:var(--red)">⏱ ~1分钟/条 · 完整审核</div>
+      </div>
+    </div>
+
+  </div></div>
+
+  <div class="card"><div class="card-head open" onclick="tog(this)"><span class="cn p">H.3.2</span><span class="cm">Tier 2 AI摘要卡片（审核者看到的）</span><span class="ca">▼</span></div><div class="card-body show">
+    <div class="tip">审核者不需要看原始截图和描述。AI预处理后，生成一张摘要卡片，审核者1秒做判断。</div>
+
+    <div class="mock-phone" style="width:340px">
+      <div class="mock-screen" style="min-height:auto">
+        <div class="mock-top" style="display:flex;justify-content:space-between;align-items:center">
+          <span>AI审核助手</span>
+          <span style="font-size:10px;opacity:.7">待确认 47条</span>
+        </div>
+        <div class="mock-body">
+          <div class="mock-card" style="border-left:3px solid var(--accent);border-radius:0 8px 8px 0">
+            <div class="mc-head">
+              <span style="font-size:10px;padding:1px 6px;border-radius:3px;background:rgba(108,92,231,.12);color:var(--accent-l);font-weight:600">🤖 AI分析</span>
+              <span style="color:var(--text3);font-size:10px">置信度 78%</span>
+            </div>
+            <div style="margin-top:8px;display:grid;gap:4px">
+              <div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">截图匹配</span><span style="color:var(--green)">接任务页面 ✓</span></div>
+              <div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">检测问题</span><span>接取按钮无响应</span></div>
+              <div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">相似Bug</span><span style="color:var(--amber)">BUG-047（3人已报告）</span></div>
+              <div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">质量评分</span><span>78/100</span></div>
+            </div>
+            <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--brd);font-size:10px;color:var(--text2)">
+              <strong>AI建议：通过</strong> — 匹配已知Bug，补充了iOS 17复现条件，录屏45秒内容真实
+            </div>
+          </div>
+          <div style="display:flex;gap:6px">
+            <div class="mock-btn" style="flex:1;background:var(--bg3);color:var(--red);font-size:11px;padding:8px">驳回</div>
+            <div class="mock-btn" style="flex:2;background:var(--accent);color:white;font-size:11px;padding:8px">✓ 通过（AI推荐）</div>
+          </div>
+
+          <div style="height:12px"></div>
+
+          <div class="mock-card" style="border-left:3px solid var(--red);border-radius:0 8px 8px 0">
+            <div class="mc-head">
+              <span style="font-size:10px;padding:1px 6px;border-radius:3px;background:var(--red-bg);color:var(--red);font-weight:600">⚠ AI标记</span>
+              <span style="color:var(--text3);font-size:10px">置信度 12%</span>
+            </div>
+            <div style="margin-top:8px;display:grid;gap:4px">
+              <div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">截图匹配</span><span style="color:var(--red)">非本App（Safari浏览器）</span></div>
+              <div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">提交速度</span><span style="color:var(--red)">23秒（过快）</span></div>
+            </div>
+            <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--brd);font-size:10px;color:var(--text2)">
+              <strong>AI建议：驳回</strong> — 截图非本App，提交速度异常
+            </div>
+          </div>
+          <div style="display:flex;gap:6px">
+            <div class="mock-btn" style="flex:2;background:rgba(255,107,107,.15);color:var(--red);font-size:11px;padding:8px">✗ 驳回（AI推荐）</div>
+            <div class="mock-btn" style="flex:1;background:var(--bg3);color:var(--text3);font-size:11px;padding:8px">通过</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tip">审核者的工作从"看截图→读描述→判断质量→决定通过/驳回"变成"看AI摘要→点一个按钮"。<br>每条<strong>从2分钟降到1秒</strong>。</div>
+  </div></div>
+  <div class="fb" data-id="h3"><div class="fb-l">👤 CEO快速反馈</div><div class="fb-d">三级分流机制 + AI摘要卡片设计</div><div class="fb-row"><button class="fb-b" onclick="sf(this,'a','h3')">✓ 同意</button><button class="fb-b" onclick="sf(this,'d','h3')">💬 需讨论</button><button class="fb-b" onclick="sf(this,'x','h3')">✗ 不同意</button></div><textarea class="fb-n" placeholder="备注..." onblur="sn(this,'h3')"></textarea></div>
+</div>
+
+<!-- ===== H.4 ===== -->
+<div class="section" id="user-flow">
+  <div class="section-head"><span class="n">H.4</span>用户端体验流程</div>
+  <div class="section-sub">接单者视角：从发现问题到收到钱的完整链路</div>
+
+  <div class="card"><div class="card-head open" onclick="tog(this)"><span class="cn b">H.4.1</span><span class="cm">极简提交流程（用户侧2步）</span><span class="ca">▼</span></div><div class="card-body show">
+
+    <div class="flow-row">
+      <div class="flow-step"><div class="ft">使用App</div>遇到问题<br>截图/录屏</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step highlight"><div class="ft">点浮标</div>截图自动附上<br>选模块+写一句话</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="ft">提交</div>30秒完成</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="border-color:var(--green);background:rgba(0,184,148,.06)"><div class="ft" style="color:var(--green)">秒级到账</div>Tier 1自动通过<br>70%的提交</div>
+    </div>
+
+    <div class="tip"><strong>用户只需要做3件事：</strong><br>
+    ① 截图/录屏（系统层操作，不在App内）<br>
+    ② 点浮标 → 截图自动附上 → 选一个tag（哪个模块）→ 打一句话<br>
+    ③ 提交<br><br>
+    <strong>自动采集（不需要用户操作）：</strong>当前页面URL、设备型号、系统版本、时间戳、关联任务ID<br><br>
+    <strong>评分/打分：</strong>折叠为可选项，默认不展开。大多数反馈的价值在截图+描述，不在评分。</div>
+  </div></div>
+
+  <div class="card"><div class="card-head open" onclick="tog(this)"><span class="cn go">H.4.2</span><span class="cm">新用户保护（前3单学习模式）</span><span class="ca">▼</span></div><div class="card-body show">
+    <table class="t">
+      <tr><th>环节</th><th>新用户（前3单）</th><th>老用户（第4单起）</th></tr>
+      <tr><td><strong>接单前</strong></td><td>完整示例展开显示</td><td>示例折叠</td></tr>
+      <tr><td><strong>执行中</strong></td><td>步骤引导始终可见</td><td>引导最小化</td></tr>
+      <tr><td><strong>自动检查</strong></td><td>⚠ 警告但允许提交</td><td>🚫 拦截，修了才能提交</td></tr>
+      <tr><td><strong>审核不过</strong></td><td>从不拒绝——"差一点，改一下再来"，无限重试</td><td>最多2次重试后拒绝</td></tr>
+      <tr><td><strong>质量分影响</strong></td><td>不记录（保护期）</td><td>记入个人质量分</td></tr>
+    </table>
+    <div class="tip warn">核心原则：<strong>新用户的前3单不存在"被拒绝"的路径。</strong>任何质量问题都以"引导改进"的方式呈现，不是"审核不通过"。这保证了激活率。</div>
+  </div></div>
+  <div class="fb" data-id="h4"><div class="fb-l">👤 CEO快速反馈</div><div class="fb-d">极简提交（2步+自动采集）+ 新用户前3单保护</div><div class="fb-row"><button class="fb-b" onclick="sf(this,'a','h4')">✓ 同意</button><button class="fb-b" onclick="sf(this,'d','h4')">💬 需讨论</button><button class="fb-b" onclick="sf(this,'x','h4')">✗ 不同意</button></div><textarea class="fb-n" placeholder="备注..." onblur="sn(this,'h4')"></textarea></div>
+</div>
+
+<!-- ===== H.5 ===== -->
+<div class="section" id="economics">
+  <div class="section-head"><span class="n">H.5</span>经济效益对比</div>
+  <div class="section-sub">日均500条提交的处理成本</div>
+
+  <div class="card"><div class="card-head open" onclick="tog(this)"><span class="cn g">H.5.1</span><span class="cm">人工 vs AI审核成本对比</span><span class="ca">▼</span></div><div class="card-body show">
+    <table class="t">
+      <tr><th></th><th>纯人工</th><th>AI + 人工</th><th>节省</th></tr>
+      <tr><td><strong>Tier 1（350条）</strong></td><td>~12小时</td><td style="color:var(--green)">0分钟（自动）</td><td style="color:var(--green)">12小时</td></tr>
+      <tr><td><strong>Tier 2（100条）</strong></td><td>~3.3小时</td><td style="color:var(--green)">~2分钟（一键确认）</td><td style="color:var(--green)">3.3小时</td></tr>
+      <tr><td><strong>Tier 3（50条）</strong></td><td>~1.7小时</td><td>~50分钟</td><td style="color:var(--green)">50分钟</td></tr>
+      <tr style="font-weight:700;font-size:13px"><td>日总计</td><td style="color:var(--red)">~17小时</td><td style="color:var(--green)">~52分钟</td><td style="color:var(--green)">节省95%</td></tr>
+    </table>
+
+    <div class="stats-row">
+      <div class="stat"><div class="stat-n" style="color:var(--green)">95%</div><div class="stat-l">人力节省</div></div>
+      <div class="stat"><div class="stat-n" style="color:var(--green)">¥15</div><div class="stat-l">AI日成本</div><div class="stat-d" style="color:var(--text3)">500次×¥0.03</div></div>
+      <div class="stat"><div class="stat-n" style="color:var(--green)">秒级</div><div class="stat-l">70%提交到账</div><div class="stat-d" style="color:var(--text3)">vs 原来1-7天</div></div>
+      <div class="stat"><div class="stat-n" style="color:var(--green)">52分钟</div><div class="stat-l">日人工需求</div><div class="stat-d" style="color:var(--text3)">vs 原来17小时</div></div>
+    </div>
+  </div></div>
+  <div class="fb" data-id="h5"><div class="fb-l">👤 CEO快速反馈</div><div class="fb-d">经济效益：17小时→52分钟，AI成本¥15/天</div><div class="fb-row"><button class="fb-b" onclick="sf(this,'a','h5')">✓ 同意</button><button class="fb-b" onclick="sf(this,'d','h5')">💬 需讨论</button><button class="fb-b" onclick="sf(this,'x','h5')">✗ 不同意</button></div><textarea class="fb-n" placeholder="备注..." onblur="sn(this,'h5')"></textarea></div>
+</div>
+
+<!-- ===== H.6 ===== -->
+<div class="section" id="roadmap">
+  <div class="section-head"><span class="n">H.6</span>实施路线</div>
+  <div class="section-sub">分三期实施，V1不需要AI</div>
+
+  <div class="card"><div class="card-head open" onclick="tog(this)"><span class="cn g">H.6.1</span><span class="cm">三期实施计划</span><span class="ca">▼</span></div><div class="card-body show">
+    <div class="roadmap">
+      <div class="rm-item">
+        <div class="rm-dot done"></div>
+        <div class="rm-title">V1 · 规则引擎 + 人工审核</div>
+        <div class="rm-desc">
+          前端校验4条规则（速度/时长/全满分/文本长度）→ 拦截最明显的灌水<br>
+          结构化提交表单（截图+模块tag+描述）→ 提升反馈质量<br>
+          人工审核后台（当前Pixso已有基础UI）
+        </div>
+        <div class="rm-tag" style="background:var(--green-bg);color:var(--green)">不需要AI · 纯前端+后台 · 随版本上线</div>
+      </div>
+      <div class="rm-item">
+        <div class="rm-dot next"></div>
+        <div class="rm-title">V1.5 · 加AI Vision（最高性价比）</div>
+        <div class="rm-desc">
+          一个Vision API调用判断"是不是我们App的截图"→ 过滤大量垃圾提交<br>
+          自动tag截图对应的页面模块<br>
+          置信度>90%的自动通过+即时结算
+        </div>
+        <div class="rm-tag" style="background:rgba(108,92,231,.12);color:var(--accent-l)">1个API调用 · 成本¥0.03/次 · 效果最显著</div>
+      </div>
+      <div class="rm-item">
+        <div class="rm-dot future"></div>
+        <div class="rm-title">V2 · 完整AI流水线</div>
+        <div class="rm-desc">
+          AI NLP读描述+提取结构化信息<br>
+          Bug库语义匹配+去重聚合<br>
+          AI摘要卡片+一键审核后台<br>
+          质量评分体系+个人信誉分
+        </div>
+        <div class="rm-tag" style="background:var(--amber-bg);color:var(--amber)">完整AI pipeline · 多模态 · 向量检索</div>
+      </div>
+    </div>
+    <div class="tip"><strong>关键决策点：</strong>V1.5是投入产出比最高的一步。一个Vision API调用（¥0.03/次），就能实现70%提交的自动审核+秒级结算。这一步的用户体验提升（从等1-7天变成秒到账）远超技术投入。</div>
+  </div></div>
+  <div class="fb" data-id="h6"><div class="fb-l">👤 CEO快速反馈</div><div class="fb-d">三期实施路线：V1规则引擎→V1.5加Vision→V2完整pipeline</div><div class="fb-row"><button class="fb-b" onclick="sf(this,'a','h6')">✓ 同意</button><button class="fb-b" onclick="sf(this,'d','h6')">💬 需讨论</button><button class="fb-b" onclick="sf(this,'x','h6')">✗ 不同意</button></div><textarea class="fb-n" placeholder="备注..." onblur="sn(this,'h6')"></textarea></div>
+</div>
+
+</div>
+
+<script src="/sync.js"></script>
+<script>
+function tog(el){el.classList.toggle('open');el.nextElementSibling.classList.toggle('show')}
+const SK='msc_h_fb';
+SYNC.init('chatH',SK);
+function ld(){try{return JSON.parse(localStorage.getItem(SK))||{}}catch{return{}}}
+function sv(d){localStorage.setItem(SK,JSON.stringify(d))}
+function sf(btn,c,id){const d=ld();btn.closest('.fb').querySelectorAll('.fb-b').forEach(b=>b.className='fb-b');btn.classList.add(c==='a'?'s-a':c==='d'?'s-d':'s-x');d[id]={...d[id],c};sv(d);up();SYNC.push(id,c)}
+function sn(ta,id){const d=ld();d[id]={...d[id],n:ta.value};sv(d);SYNC.push(id,undefined,ta.value)}
+function up(){const d=ld();let a=0,dd=0,x=0;Object.values(d).forEach(v=>{if(v.c==='a')a++;if(v.c==='d')dd++;if(v.c==='x')x++});document.getElementById('ca2').textContent=a;document.getElementById('cd2').textContent=dd;document.getElementById('cx2').textContent=x}
+document.querySelectorAll('.nav a').forEach(a=>{a.addEventListener('click',function(){document.querySelectorAll('.nav a').forEach(n=>n.classList.remove('active'));this.classList.add('active')})});
+document.addEventListener('DOMContentLoaded',async()=>{await SYNC.pull();const d=ld();Object.entries(d).forEach(([id,v])=>{const w=document.querySelector(`.fb[data-id="${id}"]`);if(!w)return;if(v.c){const bs=w.querySelectorAll('.fb-b');const cls=v.c==='a'?'s-a':v.c==='d'?'s-d':'s-x';const idx=v.c==='a'?0:v.c==='d'?1:2;if(bs[idx])bs[idx].classList.add(cls)}if(v.n){const ta=w.querySelector('.fb-n');if(ta)ta.value=v.n}});up()})
+</script>
+<script src="/nav.js"></script>
+</body>
+</html>

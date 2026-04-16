@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>MSC-G · 早期任务品类与卡片规范</title>
+<style>
+:root{--bg:#0D0F14;--bg2:#161922;--bg3:#1C1F2B;--brd:#2A2D3A;--text:#E8E9ED;--text2:#9CA0B0;--text3:#6B7084;--accent:#6C5CE7;--accent-l:#A29BFE;--green:#00B894;--green-bg:rgba(0,184,148,.12);--amber:#FDCB6E;--amber-bg:rgba(253,203,110,.12);--red:#FF6B6B;--red-bg:rgba(255,107,107,.12);--blue:#74B9FF;--blue-bg:rgba(116,185,255,.12);--gold:#F9CA24}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased}
+
+.header{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--brd);padding:14px 20px}
+.header h1{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}
+.header .badge{font-size:11px;padding:3px 10px;background:rgba(0,184,148,.12);color:var(--green);border:1px solid rgba(0,184,148,.25);border-radius:20px}
+.main{max-width:960px;margin:0 auto;padding:24px 16px 80px}
+
+.nav{display:flex;gap:0;overflow-x:auto;border-bottom:1px solid var(--brd);margin-bottom:24px;position:sticky;top:48px;z-index:90;background:var(--bg);padding-top:8px}
+.nav a{padding:8px 14px;font-size:12px;color:var(--text3);text-decoration:none;white-space:nowrap;border-bottom:2px solid transparent;transition:all .15s}
+.nav a:hover{color:var(--text)}
+.nav a.active{color:var(--green);border-bottom-color:var(--green)}
+
+.section{margin-bottom:40px}
+.section-head{font-size:20px;font-weight:700;margin-bottom:6px;padding-top:20px}
+.section-head .n{color:var(--accent-l);margin-right:8px}
+.section-sub{font-size:14px;color:var(--text2);margin-bottom:20px;line-height:1.6}
+
+.card{border:1px solid var(--brd);border-radius:12px;overflow:hidden;margin-bottom:16px}
+.card-head{padding:14px 18px;background:var(--bg2);display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
+.card-head:hover{background:var(--bg3)}
+.cn{font-size:11px;padding:3px 8px;border-radius:5px;font-weight:700}
+.cn.g{background:var(--green-bg);color:var(--green)}
+.cn.b{background:var(--blue-bg);color:var(--blue)}
+.cn.r{background:var(--red-bg);color:var(--red)}
+.cn.go{background:var(--amber-bg);color:var(--amber)}
+.cn.p{background:rgba(108,92,231,.12);color:var(--accent-l)}
+.cm{flex:1;font-size:13px;font-weight:600}
+.ca{color:var(--text3);font-size:12px;transition:transform .2s}
+.card-head.open .ca{transform:rotate(180deg)}
+.card-body{display:none;padding:18px;background:var(--bg2);border-top:1px solid var(--brd)}
+.card-body.show{display:block}
+
+.t{width:100%;border-collapse:collapse;margin:12px 0;font-size:12px}
+.t th{background:var(--bg3);padding:8px 12px;text-align:left;font-weight:600;color:var(--text2);white-space:nowrap}
+.t td{padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.04)}
+.t tr:hover td{background:rgba(255,255,255,.02)}
+.t .price{color:var(--green);font-weight:700;font-size:14px}
+.t .time{color:var(--amber);font-size:11px}
+.t .tag{display:inline-block;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:600}
+.t .tag-easy{background:var(--green-bg);color:var(--green)}
+.t .tag-mid{background:var(--amber-bg);color:var(--amber)}
+.t .tag-hard{background:var(--red-bg);color:var(--red)}
+
+.tip{padding:12px 14px;border-left:3px solid var(--green);background:rgba(0,184,148,.04);border-radius:0 6px 6px 0;margin:12px 0;font-size:12px;color:var(--text2);line-height:1.8}
+.tip.warn{border-left-color:var(--amber);background:rgba(253,203,110,.04)}
+.tip.danger{border-left-color:var(--red);background:rgba(255,107,107,.04)}
+
+/* Phone mockup for card design */
+.phone{width:320px;background:white;border-radius:24px;padding:12px;margin:16px auto;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.phone-inner{background:#f5f6fa;border-radius:16px;overflow:hidden;font-family:'PingFang SC',sans-serif}
+.phone .status-bar{background:#6C5CE7;color:white;padding:6px 16px;font-size:11px;display:flex;justify-content:space-between}
+.task-card-demo{background:white;margin:8px;border-radius:12px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,.08);position:relative;border-left:3px solid #6C5CE7}
+.tc-row1{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.tc-price{font-size:22px;font-weight:900;color:#00B894}
+.tc-price span{font-size:12px;color:#999;font-weight:400}
+.tc-tags{display:flex;gap:4px}
+.tc-tag{font-size:9px;padding:2px 6px;border-radius:3px;font-weight:600}
+.tc-tag.purple{background:#f0eeff;color:#6C5CE7}
+.tc-tag.green{background:#e8f8f5;color:#00B894}
+.tc-tag.red{background:#fde8e8;color:#e74c3c}
+.tc-title{font-size:14px;font-weight:700;color:#1a1a2e;margin-bottom:4px}
+.tc-desc{font-size:11px;color:#999;margin-bottom:8px}
+.tc-row3{display:flex;gap:12px;font-size:11px;color:#888;align-items:center}
+.tc-row3 .icon{margin-right:2px}
+.tc-row4{display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:8px;border-top:1px solid #f0f0f0}
+.tc-credit{display:flex;align-items:center;gap:4px;font-size:11px;color:#888}
+.tc-credit .score{color:#f59e0b;font-weight:700}
+.tc-slots{font-size:11px}
+.tc-slots .warn{color:#e74c3c;font-weight:600}
+.tc-slots .ok{color:#888}
+.tc-progress{height:3px;background:#f0f0f0;border-radius:2px;margin-top:4px;overflow:hidden}
+.tc-progress-bar{height:100%;border-radius:2px}
+
+.copy-block{background:var(--bg3);border:1px solid var(--brd);border-radius:8px;padding:12px 16px;margin:8px 0;font-size:12px;font-family:'Courier New',monospace;color:var(--text2);position:relative;white-space:pre-wrap;line-height:1.6}
+.copy-label{position:absolute;top:6px;right:8px;font-size:10px;color:var(--text3);font-family:'PingFang SC',sans-serif}
+
+.fb{margin-top:14px;padding-top:14px;border-top:1px solid var(--brd)}
+.fb-l{font-size:11px;color:var(--text3);margin-bottom:6px}
+.fb-d{font-size:12px;color:var(--text2);margin-bottom:8px}
+.fb-row{display:flex;gap:6px;margin-bottom:8px}
+.fb-b{padding:5px 14px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--brd);background:transparent;color:var(--text3);transition:all .15s}
+.fb-b:hover{background:var(--bg3);color:var(--text)}
+.fb-b.s-a{background:var(--green-bg);color:var(--green);border-color:rgba(0,184,148,.3)}
+.fb-b.s-d{background:var(--amber-bg);color:var(--amber);border-color:rgba(253,203,110,.3)}
+.fb-b.s-x{background:var(--red-bg);color:var(--red);border-color:rgba(255,107,107,.3)}
+.fb-n{width:100%;background:var(--bg3);border:1px solid var(--brd);border-radius:6px;padding:8px 10px;font-size:11px;color:var(--text2);resize:vertical;min-height:36px;font-family:inherit}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>MSC-G · 早期任务品类与卡片规范 <span class="badge">UI参考</span></h1>
+</div>
+
+<div class="main">
+
+<div class="nav">
+  <a href="#tasks" class="active">G.1 任务品类</a>
+  <a href="#mockdata">G.2 Mock数据</a>
+  <a href="#cardspec">G.3 卡片规范</a>
+  <a href="#tabspec">G.4 Tab栏修改</a>
+  <a href="#trustspec">G.5 信任信号</a>
+  <a href="#pricing-update">G.6 确权定价更新</a>
+</div>
+
+<!-- ===== G.1 任务品类 ===== -->
+<div class="section" id="tasks">
+  <div class="section-head"><span class="n">G.1</span>早期任务品类（平台自己出资）</div>
+  <div class="section-sub">所有任务都是平台自己需要的事，围绕APP优化展开。按复杂度分三档。<br>
+  <strong style="color:var(--red)">❌ CEO已否决：</strong>自媒体涨粉、小红书点赞、内容种草等外部平台任务一律不做。</div>
+
+  <div class="card"><div class="card-head open" onclick="tog(this)"><span class="cn g">G.1.1</span><span class="cm">第一档：轻量任务（¥1-3/次 · 2-5分钟）</span><span class="ca">▼</span></div><div class="card-body show">
+    <table class="t">
+      <tr><th>任务名称</th><th>用户操作</th><th>交付物</th><th>单价</th><th>耗时</th><th>平台价值</th></tr>
+      <tr>
+        <td><strong>新用户注册体验</strong></td>
+        <td>模拟新用户走完注册流程，标记卡点</td>
+        <td>截图3-5张+问卷</td>
+        <td class="price">¥1.5</td>
+        <td class="time">~3分钟</td>
+        <td>注册漏斗优化</td>
+      </tr>
+      <tr>
+        <td><strong>页面加载反馈</strong></td>
+        <td>打开指定页面，记录加载时间和感受</td>
+        <td>截图+评分表</td>
+        <td class="price">¥1</td>
+        <td class="time">~2分钟</td>
+        <td>性能瓶颈定位</td>
+      </tr>
+      <tr>
+        <td><strong>文案可读性测试</strong></td>
+        <td>阅读指定页面文案，标记看不懂的地方</td>
+        <td>标注截图+建议</td>
+        <td class="price">¥2</td>
+        <td class="time">~3分钟</td>
+        <td>文案优化</td>
+      </tr>
+      <tr>
+        <td><strong>AI助手对话评测</strong></td>
+        <td>按指定话题和AI助手对话3轮，评价回答质量</td>
+        <td>对话截图+评分</td>
+        <td class="price">¥2</td>
+        <td class="time">~4分钟</td>
+        <td>AI调优数据</td>
+      </tr>
+    </table>
+  </div></div>
+
+  <div class="card"><div class="card-head open" onclick="tog(this)"><span class="cn b">G.1.2</span><span class="cm">第二档：标准任务（¥3-5/次 · 5-15分钟）</span><span class="ca">▼</span></div><div class="card-body show">
+    <table class="t">
+      <tr><th>任务名称</th><th>用户操作</th><th>交付物</th><th>单价</th><th>耗时</th><th>平台价值</th></tr>
+      <tr>
+        <td><strong>完整功能体验测试</strong></td>
+        <td>按步骤操作指定功能模块+录屏+填问卷</td>
+        <td>录屏+问卷</td>
+        <td class="price">¥5</td>
+        <td class="time">~10分钟</td>
+        <td>Bug发现+UX数据</td>
+      </tr>
+      <tr>
+        <td><strong>任务发布流程测试</strong></td>
+        <td>模拟发布一个测试任务，记录每步体验</td>
+        <td>录屏+反馈表</td>
+        <td class="price">¥3</td>
+        <td class="time">~8分钟</td>
+        <td>发布流程优化</td>
+      </tr>
+      <tr>
+        <td><strong>设备兼容性测试</strong></td>
+        <td>在特定机型/系统版本上操作指定功能</td>
+        <td>截图+设备信息+Bug描述</td>
+        <td class="price">¥5</td>
+        <td class="time">~10分钟</td>
+        <td>兼容性覆盖</td>
+      </tr>
+      <tr>
+        <td><strong>竞品对比体验</strong></td>
+        <td>体验指定竞品相同功能，填写对比表</td>
+        <td>对比表+截图</td>
+        <td class="price">¥5</td>
+        <td class="time">~15分钟</td>
+        <td>竞品情报</td>
+      </tr>
+    </table>
+  </div></div>
+
+  <div class="card"><div class="card-head open" onclick="tog(this)"><span class="cn go">G.1.3</span><span class="cm">第三档：深度任务（¥8-15/次 · 15-30分钟）</span><span class="ca">▼</span></div><div class="card-body show">
+    <table class="t">
+      <tr><th>任务名称</th><th>用户操作</th><th>交付物</th><th>单价</th><th>耗时</th><th>平台价值</th></tr>
+      <tr>
+        <td><strong>全链路体验测试</strong></td>
+        <td>从注册→接任务→完成→提现，走完整流程</td>
+        <td>录屏+详细反馈报告</td>
+        <td class="price">¥10</td>
+        <td class="time">~20分钟</td>
+        <td>全链路体验数据</td>
+      </tr>
+      <tr>
+        <td><strong>Bug猎人挑战</strong></td>
+        <td>在指定模块内自由探索，尝试触发异常</td>
+        <td>Bug截图+复现步骤</td>
+        <td class="price">¥8-15/Bug</td>
+        <td class="time">~20分钟</td>
+        <td>Bug发现</td>
+      </tr>
+      <tr>
+        <td><strong>确权流程体验测试</strong></td>
+        <td>走完AI资产创建→确权→查看证书全流程</td>
+        <td>录屏+每步评分</td>
+        <td class="price">¥10</td>
+        <td class="time">~15分钟</td>
+        <td>确权转化优化</td>
+      </tr>
+    </table>
+  </div></div>
+</div>
+
+<!-- ===== G.2 Mock数据 ===== -->
+<div class="section" id="mockdata">
+  <div class="section-head"><span class="n">G.2</span>UI Mock数据（直接复制粘贴）</div>
+  <div class="section-sub">以下数据供UI设计师直接用于Pixso中替换当前的"小红书涨粉"内容。</div>
+
+  <div class="card"><div class="card-head open" onclick="tog(this)"><span class="cn p">G.2.1</span><span class="cm">任务广场列表 Mock数据（8条）</span><span class="ca">▼</span></div><div class="card-body show">
+    <div class="tip">以下8条任务数据可直接用于任务广场列表页。每条包含：任务名、单价、预计耗时、参与人数、剩余名额、截止时间。</div>
+
+    <div class="copy-block"><span class="copy-label">复制用</span>任务1：
+标题：新用户注册体验测试
+单价：¥1.5/次
+耗时：~3分钟
+参与：856人参与
+名额：剩余 12/50
+截止：剩余2天
+标签：轻量 · AI可辅助
+
+任务2：
+标题：AI助手对话质量评测
+单价：¥2/次
+耗时：~4分钟
+参与：423人参与
+名额：剩余 28/100
+截止：剩余3天
+标签：轻量
+
+任务3：
+标题：完整功能体验测试
+单价：¥5/次
+耗时：~10分钟
+参与：1,247人参与
+名额：剩余 3/30 🔴
+截止：剩余1天 🔴
+标签：标准 · 热门
+
+任务4：
+标题：任务发布流程测试
+单价：¥3/次
+耗时：~8分钟
+参与：312人参与
+名额：剩余 45/80
+截止：剩余5天
+标签：标准
+
+任务5：
+标题：设备兼容性测试（iOS 17）
+单价：¥5/次
+耗时：~10分钟
+参与：89人参与
+名额：剩余 41/50
+截止：剩余4天
+标签：标准 · 限定机型
+
+任务6：
+标题：全链路体验测试
+单价：¥10/次
+耗时：~20分钟
+参与：2,061人参与
+名额：剩余 5/20
+截止：剩余2天
+标签：深度 · 高收益
+
+任务7：
+标题：Bug猎人挑战 · 资产模块
+单价：¥8-15/个Bug
+耗时：~20分钟
+参与：156人参与
+名额：不限
+截止：长期
+标签：深度 · 高收益
+
+任务8：
+标题：文案可读性测试
+单价：¥2/次
+耗时：~3分钟
+参与：1,580人参与
+名额：剩余 67/200
+截止：剩余6天
+标签：轻量</div>
+  </div></div>
+
+  <div class="card"><div class="card-head open" onclick="tog(this)"><span class="cn p">G.2.2</span><span class="cm">任务详情页 Mock数据（2条完整）</span><span class="ca">▼</span></div><div class="card-body show">
+
+    <div class="copy-block"><span class="copy-label">复制用 · 任务详情1</span>标题：完整功能体验测试
+单价：¥5/次
+预计耗时：~10分钟（≈¥30/时）
+参与人数：1,247人参与
+名额进度：27/30 已接取（剩余3个 🔴）
+截止时间：剩余1天 12小时
+任务类型：功能测试
+社会证明：97%接单者成功完成此类任务
+
+任务描述：
+请按照以下步骤测试MSC.AI小程序的"接任务"功能模块：
+1. 打开任务广场，浏览至少5个任务卡片
+2. 选择任意一个任务，进入详情页
+3. 点击"领取任务"按钮，完成接取
+4. 录屏记录整个过程（含加载等待时间）
+5. 填写体验反馈问卷（问卷链接在接取后显示）
+
+交付物要求：
+• 录屏文件（30秒-3分钟）
+• 完成反馈问卷
+
+发布者：MSC.AI官方 · ⭐ 5.0
+累计发布 52个任务 · 结算率 100%</div>
+
+    <div class="copy-block" style="margin-top:16px"><span class="copy-label">复制用 · 任务详情2</span>标题：Bug猎人挑战 · 资产模块
+单价：¥8-15/个Bug（根据严重度）
+预计耗时：~20分钟
+参与人数：156人参与
+名额进度：不限名额
+截止时间：长期有效
+任务类型：Bug测试
+社会证明：平均每人发现1.3个Bug
+
+任务描述：
+请在MSC.AI小程序的"AI资产"模块中自由探索，尝试触发异常情况：
+• 可尝试极端输入（超长文字、特殊字符等）
+• 可尝试快速连续点击按钮
+• 可尝试在弱网环境下操作
+• 可尝试中途切换页面/退出再进入
+
+Bug奖励标准：
+• 界面显示异常（文字溢出/图片加载失败等）：¥8/个
+• 功能逻辑Bug（操作结果不符合预期）：¥10/个
+• 数据异常（金额显示错误/状态不同步）：¥15/个
+
+交付物要求：
+• Bug截图（标注异常位置）
+• 复现步骤（1-2-3描述）
+• 设备信息（机型+系统版本）
+
+发布者：MSC.AI官方 · ⭐ 5.0</div>
+  </div></div>
+</div>
+
+<!-- ===== G.3 卡片规范 ===== -->
+<div class="section" id="cardspec">
+  <div class="section-head"><span class="n">G.3</span>任务卡片设计规范</div>
+  <div class="section-sub">当前Pixso的卡片只显示任务名+单价，信息密度不足。以下是建议的4层视觉层级。</div>
+
+  <div class="card"><div class="card-head open" onclick="tog(this)"><span class="cn g">G.3.1</span><span class="cm">4层视觉权重规范 + 示例卡片</span><span class="ca">▼</span></div><div class="card-body show">
+
+    <table class="t">
+      <tr><th>层级</th><th>元素</th><th>字号/样式</th><th>用户决策作用</th></tr>
+      <tr>
+        <td><strong>第1层</strong><br><span class="tag tag-easy">最醒目</span></td>
+        <td>单次收入金额</td>
+        <td>22px · 粗体 · 绿色(#00B894)</td>
+        <td>"这个任务值不值得做"</td>
+      </tr>
+      <tr>
+        <td><strong>第2层</strong></td>
+        <td>任务标题 + 类型色条</td>
+        <td>14px · 粗体 · 左侧3px色条</td>
+        <td>"这是什么类型的任务"</td>
+      </tr>
+      <tr>
+        <td><strong>第3层</strong></td>
+        <td>预计耗时 · 时薪换算 · 截止日期</td>
+        <td>11px · 灰色 · 图标+文字</td>
+        <td>"花多久能做完 · 时薪合不合算"</td>
+      </tr>
+      <tr>
+        <td><strong>第4层</strong></td>
+        <td>发布者信用 · 剩余名额 · 标签</td>
+        <td>11px · 进度条 · pill标签</td>
+        <td>"靠不靠谱 · 还来得及吗"</td>
+      </tr>
+    </table>
+
+    <div style="text-align:center;margin-top:20px">
+      <p style="font-size:12px;color:var(--text3);margin-bottom:8px">↓ 建议的任务卡片样式 ↓</p>
+    </div>
+
+    <div class="phone">
+      <div class="phone-inner">
+        <div class="status-bar"><span>接任务</span><span>9:41</span></div>
+
+        <div class="task-card-demo" style="border-left-color:#6C5CE7">
+          <div class="tc-row1">
+            <div class="tc-price">¥5 <span>/次</span></div>
+            <div class="tc-tags">
+              <span class="tc-tag purple">功能测试</span>
+              <span class="tc-tag green">热门</span>
+            </div>
+          </div>
+          <div class="tc-title">完整功能体验测试</div>
+          <div class="tc-row3">
+            <span><span class="icon">⏱</span> ~10分钟</span>
+            <span><span class="icon">💰</span> ≈¥30/时</span>
+            <span><span class="icon">⏰</span> 剩余1天</span>
+          </div>
+          <div class="tc-row4">
+            <div class="tc-credit">MSC.AI官方 <span class="score">⭐ 5.0</span></div>
+            <div class="tc-slots"><span class="warn">剩余 3/30</span></div>
+          </div>
+          <div class="tc-progress"><div class="tc-progress-bar" style="width:90%;background:linear-gradient(90deg,#e74c3c,#ff6b6b)"></div></div>
+        </div>
+
+        <div class="task-card-demo" style="border-left-color:#00B894">
+          <div class="tc-row1">
+            <div class="tc-price">¥2 <span>/次</span></div>
+            <div class="tc-tags">
+              <span class="tc-tag purple">AI评测</span>
+            </div>
+          </div>
+          <div class="tc-title">AI助手对话质量评测</div>
+          <div class="tc-row3">
+            <span><span class="icon">⏱</span> ~4分钟</span>
+            <span><span class="icon">💰</span> ≈¥30/时</span>
+            <span><span class="icon">⏰</span> 剩余3天</span>
+          </div>
+          <div class="tc-row4">
+            <div class="tc-credit">MSC.AI官方 <span class="score">⭐ 5.0</span></div>
+            <div class="tc-slots"><span class="ok">剩余 28/100</span></div>
+          </div>
+          <div class="tc-progress"><div class="tc-progress-bar" style="width:28%;background:var(--green)"></div></div>
+        </div>
+
+        <div class="task-card-demo" style="border-left-color:#F9CA24">
+          <div class="tc-row1">
+            <div class="tc-price">¥10 <span>/次</span></div>
+            <div class="tc-tags">
+              <span class="tc-tag red">深度</span>
+              <span class="tc-tag green">高收益</span>
+            </div>
+          </div>
+          <div class="tc-title">全链路体验测试</div>
+          <div class="tc-row3">
+            <span><span class="icon">⏱</span> ~20分钟</span>
+            <span><span class="icon">💰</span> ≈¥30/时</span>
+            <span><span class="icon">⏰</span> 剩余2天</span>
+          </div>
+          <div class="tc-row4">
+            <div class="tc-credit">MSC.AI官方 <span class="score">⭐ 5.0</span></div>
+            <div class="tc-slots"><span class="warn">剩余 5/20</span></div>
+          </div>
+          <div class="tc-progress"><div class="tc-progress-bar" style="width:75%;background:linear-gradient(90deg,#f59e0b,#e74c3c)"></div></div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="tip">
+      <strong>关键差异 vs 当前Pixso：</strong><br>
+      ① 增加了第3层（耗时+时薪+截止）和第4层（信用+名额进度条）<br>
+      ② 金额使用绿色粗体22px（当前Pixso中金额不够醒目）<br>
+      ③ 左侧3px色条区分任务类型<br>
+      ④ 名额<20%时红色警示 + 进度条变红
+    </div>
+  </div></div>
+</div>
+
+<!-- ===== G.4 Tab栏 ===== -->
+<div class="section" id="tabspec">
+  <div class="section-head"><span class="n">G.4</span>底部Tab栏名称修改</div>
+  <div class="section-sub">Tab结构保持4个不变，名称修改如下。</div>
+
+  <div class="card"><div class="card-head open" onclick="tog(this)"><span class="cn g">G.4.1</span><span class="cm">Tab名称对照</span><span class="ca">▼</span></div><div class="card-body show">
+    <table class="t">
+      <tr><th>位置</th><th>当前名称</th><th>改为</th><th>说明</th></tr>
+      <tr><td>Tab 1</td><td>MSC</td><td><strong>AI资产</strong></td><td>智能资产管理入口（名称暂定）</td></tr>
+      <tr><td>Tab 2</td><td>发布</td><td><strong>发任务</strong></td><td>发布者路径</td></tr>
+      <tr><td>Tab 3</td><td>任务</td><td><strong>接任务</strong></td><td>接单者路径</td></tr>
+      <tr><td>Tab 4</td><td>我的</td><td><strong>我的任务</strong></td><td>个人中心</td></tr>
+    </table>
+    <div class="tip">图标可保持不变，仅改文字标签。</div>
+  </div></div>
+</div>
+
+<!-- ===== G.5 信任信号 ===== -->
+<div class="section" id="trustspec">
+  <div class="section-head"><span class="n">G.5</span>信任信号（V1最小集）</div>
+  <div class="section-sub">当前Pixso缺少信任信号。V1至少加以下两处，改动极小。</div>
+
+  <div class="card"><div class="card-head open" onclick="tog(this)"><span class="cn b">G.5.1</span><span class="cm">支付确认页 + 任务详情页</span><span class="ca">▼</span></div><div class="card-body show">
+    <table class="t">
+      <tr><th>位置</th><th>增加内容</th><th>样式</th><th>改动量</th></tr>
+      <tr>
+        <td>支付确认弹窗（确认支付¥699上方）</td>
+        <td>🔒 资金由平台托管，确权保证金可随时退还</td>
+        <td>12px · 绿色 · 绿色透明背景</td>
+        <td>加一行文案</td>
+      </tr>
+      <tr>
+        <td>任务详情页（发布者信息区）</td>
+        <td>MSC.AI官方 · ⭐ 5.0 · 已发布52个任务 · 结算率100%</td>
+        <td>发布者头像旁增加信用行</td>
+        <td>加一个小组件</td>
+      </tr>
+    </table>
+  </div></div>
+</div>
+
+<!-- ===== G.6 确权定价 ===== -->
+<div class="section" id="pricing-update">
+  <div class="section-head"><span class="n">G.6</span>确权定价页修改指南</div>
+  <div class="section-sub">当前Pixso显示"永久确权 ¥699"和"按月 ¥19.9"。需改为三级架构。</div>
+
+  <div class="card"><div class="card-head open" onclick="tog(this)"><span class="cn r">G.6.1</span><span class="cm">定价卡片修改（最关键的改动）</span><span class="ca">▼</span></div><div class="card-body show">
+    <table class="t">
+      <tr><th></th><th>当前Pixso</th><th>改为</th></tr>
+      <tr>
+        <td><strong>左卡片</strong></td>
+        <td>永久确权 ¥699 · 可交易<br>月均收益¥106</td>
+        <td><strong>周租赁 ¥99/周</strong> · 不可退<br>AI资产使用权 · 无证书 · 无交易权<br>适合短期试用</td>
+      </tr>
+      <tr>
+        <td><strong>中卡片（新增）</strong></td>
+        <td>—</td>
+        <td><strong>月租赁 ¥349/月</strong> · 不可退<br>AI资产使用权 · 无证书 · 无交易权<br>适合中期使用</td>
+      </tr>
+      <tr>
+        <td><strong>右卡片</strong></td>
+        <td>按月 ¥19.9/月<br>稳定收益</td>
+        <td><strong>一次性确权 ¥699押金</strong> · 可退 <span class="tag tag-easy">推荐</span><br>完整权益+¥699任务基金+确权证书+链上存证<br>长期持有，押金随时退</td>
+      </tr>
+    </table>
+
+    <div class="tip warn" style="margin-top:12px">
+      <strong>定价策略核心逻辑（给UI设计师参考）：</strong><br>
+      • 租赁 = "租用"（不可退，无押金）vs 一次性 = "拥有"（押金可退+送等额基金）<br>
+      • Break-even约7周：7周×¥99=¥693 ≈ ¥699押金 → 自然引导用户选一次性<br>
+      • ¥699卡片应标注"推荐"badge，视觉最突出<br>
+      • 底部保留"累计为确权用户获得收益 190,220,900 元"
+    </div>
+  </div></div>
+
+  <div class="card"><div class="card-head open" onclick="tog(this)"><span class="cn r">G.6.2</span><span class="cm">会员页面处理</span><span class="ca">▼</span></div><div class="card-body show">
+    <div class="tip danger">
+      <strong>当前Pixso有"MSC.AI会员"页面（单月¥19.9/三个月¥16.9）——需要删除。</strong><br><br>
+      我们没有会员制。第一个AI资产是免费送给用户的（确权即免费使用）。第二个起才走¥99/周、¥349/月、¥699一次性的定价。"会员"这个概念不存在。
+    </div>
+  </div></div>
+</div>
+
+</div><!-- end main -->
+
+<script src="/sync.js"></script>
+<script>
+function tog(el){el.classList.toggle('open');el.nextElementSibling.classList.toggle('show')}
+</script>
+<script src="/nav.js"></script>
+</body>
+</html>
