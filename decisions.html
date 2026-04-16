@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>决策面板 · MSC.AI</title>
+<style>
+:root{--bg:#0D0F14;--bg2:#161922;--bg3:#1C1F2B;--bg4:#1E2130;--brd:#2A2D3A;--text:#E8E9ED;--text2:#9CA0B0;--text3:#6B7084;--accent:#6C5CE7;--accent-l:#A29BFE;--green:#00B894;--green-bg:rgba(0,184,148,.12);--amber:#FDCB6E;--amber-bg:rgba(253,203,110,.12);--red:#FF6B6B;--red-bg:rgba(255,107,107,.12);--blue:#74B9FF;--blue-bg:rgba(116,185,255,.12)}
+*{margin:0;padding:0;box-sizing:border-box}body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased}
+.header{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--brd);padding:14px 20px;display:flex;align-items:center;gap:12px}
+.header h1{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}
+.header .badge{font-size:11px;padding:3px 10px;background:rgba(0,184,148,.12);color:var(--green);border:1px solid rgba(0,184,148,.25);border-radius:20px}
+
+.main{max-width:960px;margin:0 auto;padding:24px 16px 80px}
+
+.intro{background:var(--bg2);border:1px solid var(--brd);border-radius:12px;padding:18px 22px;margin-bottom:24px;display:flex;gap:16px;align-items:flex-start}
+.intro-icon{width:44px;height:44px;border-radius:12px;background:rgba(0,184,148,.15);color:var(--green);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.intro h2{font-size:17px;font-weight:700;margin-bottom:6px;color:var(--text)}
+.intro p{font-size:13px;color:var(--text2);line-height:1.7}
+
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--brd);margin-bottom:20px;overflow-x:auto}
+.tab{padding:12px 20px;font-size:13px;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;background:none;border-left:none;border-right:none;border-top:none;font-family:inherit;font-weight:600;transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:8px}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--text)}
+.tab.active.t-a{border-bottom-color:var(--green)}
+.tab.active.t-d{border-bottom-color:var(--amber)}
+.tab.active.t-x{border-bottom-color:var(--red)}
+.tab.active.t-p{border-bottom-color:var(--text3)}
+.tab .tn{font-weight:700;font-size:14px;padding:1px 8px;border-radius:10px;background:var(--bg3)}
+.tab.t-a.active .tn{background:var(--green-bg);color:var(--green)}
+.tab.t-d.active .tn{background:var(--amber-bg);color:var(--amber)}
+.tab.t-x.active .tn{background:var(--red-bg);color:var(--red)}
+
+.filter-bar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.filter-label{font-size:11px;color:var(--text3);margin-right:4px}
+.filter-btn{padding:4px 12px;border-radius:14px;font-size:11px;border:1px solid var(--brd);background:transparent;color:var(--text3);cursor:pointer;font-family:inherit;transition:all .15s}
+.filter-btn:hover{color:var(--text)}
+.filter-btn.active{background:var(--accent);color:white;border-color:var(--accent)}
+
+.list{display:flex;flex-direction:column;gap:10px}
+.item{background:var(--bg2);border:1px solid var(--brd);border-radius:10px;padding:14px 18px;display:flex;align-items:flex-start;gap:14px;transition:all .15s}
+.item:hover{border-color:var(--brd);background:var(--bg3)}
+.item-badge{padding:2px 10px;border-radius:5px;font-size:11px;font-weight:700;white-space:nowrap;flex-shrink:0;margin-top:3px}
+.item-badge.a{background:var(--green-bg);color:var(--green)}
+.item-badge.d{background:var(--amber-bg);color:var(--amber)}
+.item-badge.x{background:var(--red-bg);color:var(--red)}
+.item-badge.p{background:rgba(139,149,168,.1);color:var(--text3)}
+.item-body{flex:1;min-width:0}
+.item-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px;line-height:1.5}
+.item-meta{font-size:11px;color:var(--text3);display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.item-page{color:var(--accent-l);font-weight:600}
+.item-note{font-size:12px;color:var(--text2);line-height:1.6;padding:6px 10px;background:rgba(255,255,255,.02);border-radius:6px;margin-top:6px;border-left:2px solid var(--brd)}
+.item-link{padding:5px 12px;border-radius:6px;background:var(--bg3);color:var(--accent-l);font-size:11px;text-decoration:none;white-space:nowrap;flex-shrink:0;transition:all .15s;border:1px solid var(--brd)}
+.item-link:hover{background:var(--accent);color:white;border-color:var(--accent)}
+
+.empty{text-align:center;padding:60px 20px;color:var(--text3)}
+.empty h3{font-size:15px;margin-bottom:8px;color:var(--text2)}
+.empty p{font-size:13px;line-height:1.8}
+
+.loading{text-align:center;padding:60px 20px;color:var(--text3);font-size:13px}
+.loading::before{content:'';display:inline-block;width:16px;height:16px;border:2px solid var(--brd);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;margin-right:8px;vertical-align:-3px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.stats-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.stat-card{background:var(--bg2);border:1px solid var(--brd);border-radius:10px;padding:16px;text-align:center}
+.stat-n{font-size:28px;font-weight:700;margin-bottom:4px}
+.stat-n.g{color:var(--green)}.stat-n.a{color:var(--amber)}.stat-n.r{color:var(--red)}.stat-n.p{color:var(--text2)}
+.stat-l{font-size:11px;color:var(--text3)}
+
+.page-group{margin-bottom:24px}
+.page-group-title{font-size:12px;font-weight:700;color:var(--text3);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--brd);display:flex;align-items:center;gap:8px}
+.page-group-title .pg-count{font-size:11px;font-weight:600;color:var(--text3);background:var(--bg3);padding:1px 8px;border-radius:8px;margin-left:auto}
+
+.refresh-btn{padding:6px 12px;border-radius:6px;background:var(--bg3);border:1px solid var(--brd);color:var(--text2);font-size:11px;cursor:pointer;font-family:inherit;margin-left:auto;transition:all .15s}
+.refresh-btn:hover{background:var(--bg4);color:var(--text)}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>⭐ 决策面板 <span class="badge">自动聚合</span></h1>
+  <button class="refresh-btn" onclick="loadAll()">↻ 刷新</button>
+</div>
+
+<div class="main">
+
+<div class="intro">
+  <div class="intro-icon">⭐</div>
+  <div>
+    <h2>单一真相源 · 自动聚合CEO反馈</h2>
+    <p>本页面根据你在各页面标注的反馈（同意/讨论/不同意）自动聚合，<strong style="color:var(--green)">无需手动维护</strong>。每次在任何页面点反馈按钮，这里下次加载时自动更新。<br>
+    <span style="font-size:12px;color:var(--text3)">推荐工作流：① 看"待反馈"→ 逐一审视 · ② 看"已确认"→ 告诉团队可以开发 · ③ 看"待讨论"→ 整理会议议题<br>
+    数据来源：浏览器本地存储（每个设备独立）。换设备看不到之前的反馈。</span></p>
+  </div>
+</div>
+
+<div class="stats-summary">
+  <div class="stat-card"><div class="stat-n g" id="s-a">—</div><div class="stat-l">✓ 已确认决策</div></div>
+  <div class="stat-card"><div class="stat-n a" id="s-d">—</div><div class="stat-l">💬 待讨论事项</div></div>
+  <div class="stat-card"><div class="stat-n r" id="s-x">—</div><div class="stat-l">✗ 已否决方案</div></div>
+  <div class="stat-card"><div class="stat-n p" id="s-p">—</div><div class="stat-l">⬜ 待反馈板块</div></div>
+</div>
+
+<div class="tabs">
+  <button class="tab t-a active" data-tab="a" onclick="showTab('a',this)"><span>已确认</span><span class="tn" id="tn-a">0</span></button>
+  <button class="tab t-d" data-tab="d" onclick="showTab('d',this)"><span>待讨论</span><span class="tn" id="tn-d">0</span></button>
+  <button class="tab t-x" data-tab="x" onclick="showTab('x',this)"><span>已否决</span><span class="tn" id="tn-x">0</span></button>
+  <button class="tab t-p" data-tab="p" onclick="showTab('p',this)"><span>待反馈</span><span class="tn" id="tn-p">0</span></button>
+</div>
+
+<div class="filter-bar" id="page-filter">
+  <span class="filter-label">按页面筛选：</span>
+  <button class="filter-btn active" data-page="all" onclick="filterPage('all',this)">全部</button>
+</div>
+
+<div id="content">
+  <div class="loading">加载反馈数据中...</div>
+</div>
+
+</div>
+
+<script src="/nav.js"></script>
+<script>
+const PAGES = [
+  { key:'chatA', letter:'A', name:'信任与安全感', url:'chatA.html' },
+  { key:'chatB', letter:'B', name:'空状态+反馈闭环', url:'chatB.html' },
+  { key:'chatC', letter:'C', name:'卡片+金额感知', url:'chatC.html' },
+  { key:'chatD', letter:'D', name:'确认+留存+异常', url:'chatD.html' },
+  { key:'chatE', letter:'E', name:'AI资产确权', url:'chatE.html' },
+  { key:'chatF', letter:'F', name:'裂变增长·任务体系', url:'chatF.html' },
+  { key:'chatG', letter:'G', name:'任务品类·UI规范', url:'chatG.html' },
+  { key:'chatH', letter:'H', name:'AI自动审核流程', url:'chatH.html' },
+  { key:'architecture', letter:'架', name:'界面架构方案', url:'architecture.html' },
+  { key:'product-spec', letter:'规', name:'产品规格文档', url:'product-spec.html' },
+];
+
+let ALL_ITEMS = [];
+let CURRENT_TAB = 'a';
+let CURRENT_PAGE = 'all';
+
+async function loadAll() {
+  document.getElementById('content').innerHTML = '<div class="loading">加载反馈数据中...</div>';
+  ALL_ITEMS = [];
+  
+  try {
+    const feedbackData = {};
+    PAGES.forEach(page => {
+      const letter = page.letter.toLowerCase();
+      const storageKey = page.key === 'architecture' ? 'msc_arch_fb' 
+                      : page.key === 'product-spec' ? 'msc_ps_fb'
+                      : `msc_${letter}_fb`;
+      try {
+        const raw = localStorage.getItem(storageKey);
+        feedbackData[page.key] = raw ? JSON.parse(raw) : {};
+      } catch(e) {
+        feedbackData[page.key] = {};
+      }
+    });
+    
+    for (const page of PAGES) {
+      try {
+        const html = await (await fetch('/' + page.url)).text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const fbs = doc.querySelectorAll('.fb[data-id]');
+        const pageFb = feedbackData[page.key] || {};
+        
+        fbs.forEach(fb => {
+          const id = fb.dataset.id;
+          const desc = fb.querySelector('.fb-d, .fb-t')?.textContent?.trim() || id;
+          
+          let sectionTitle = '';
+          let sectionId = '';
+          const section = fb.closest('.section');
+          const card = fb.closest('.card');
+          if (card) {
+            const cm = card.querySelector('.card-head .cm, .card-name');
+            const cn = card.querySelector('.card-head .cn, .card-num');
+            sectionTitle = (cn?.textContent?.trim() || '') + ' ' + (cm?.textContent?.trim() || '');
+          }
+          if (section && !sectionTitle.trim()) {
+            const sh = section.querySelector('.section-head, .section-name');
+            if (sh) sectionTitle = sh.textContent.trim().substring(0, 60);
+          }
+          if (section && section.id) sectionId = section.id;
+          if (!sectionTitle.trim()) sectionTitle = desc.substring(0, 50);
+          
+          const fb_data = pageFb[id] || {};
+          const anchor = sectionId ? '#' + sectionId : '';
+          
+          ALL_ITEMS.push({
+            id: id,
+            page_key: page.key,
+            page_letter: page.letter,
+            page_name: page.name,
+            page_url: page.url + anchor,
+            section_title: sectionTitle.trim(),
+            description: desc,
+            status: fb_data.c || 'p',
+            note: fb_data.n || ''
+          });
+        });
+      } catch(err) {
+        console.error('Failed to load', page.url, err);
+      }
+    }
+    
+    updateStats();
+    buildPageFilter();
+    render();
+  } catch(err) {
+    document.getElementById('content').innerHTML = '<div class="empty"><h3>加载失败</h3><p>无法读取反馈数据。请刷新页面重试。</p></div>';
+    console.error(err);
+  }
+}
+
+function updateStats() {
+  const counts = { a: 0, d: 0, x: 0, p: 0 };
+  ALL_ITEMS.forEach(i => counts[i.status]++);
+  document.getElementById('s-a').textContent = counts.a;
+  document.getElementById('s-d').textContent = counts.d;
+  document.getElementById('s-x').textContent = counts.x;
+  document.getElementById('s-p').textContent = counts.p;
+  document.getElementById('tn-a').textContent = counts.a;
+  document.getElementById('tn-d').textContent = counts.d;
+  document.getElementById('tn-x').textContent = counts.x;
+  document.getElementById('tn-p').textContent = counts.p;
+}
+
+function buildPageFilter() {
+  const filterBar = document.getElementById('page-filter');
+  const existingBtns = filterBar.querySelectorAll('.filter-btn');
+  existingBtns.forEach((btn, i) => { if (i > 0) btn.remove(); });
+  
+  const pageCounts = {};
+  ALL_ITEMS.forEach(i => {
+    pageCounts[i.page_key] = (pageCounts[i.page_key] || 0) + 1;
+  });
+  
+  PAGES.forEach(p => {
+    if (pageCounts[p.key]) {
+      const btn = document.createElement('button');
+      btn.className = 'filter-btn';
+      btn.dataset.page = p.key;
+      btn.onclick = () => filterPage(p.key, btn);
+      btn.textContent = `${p.letter} · ${p.name}`;
+      filterBar.appendChild(btn);
+    }
+  });
+}
+
+function showTab(tab, btn) {
+  CURRENT_TAB = tab;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+function filterPage(pageKey, btn) {
+  CURRENT_PAGE = pageKey;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+function render() {
+  let items = ALL_ITEMS.filter(i => i.status === CURRENT_TAB);
+  if (CURRENT_PAGE !== 'all') {
+    items = items.filter(i => i.page_key === CURRENT_PAGE);
+  }
+  
+  const container = document.getElementById('content');
+  
+  if (items.length === 0) {
+    const emptyMsg = {
+      a: { title: '暂无已确认决策', p: '当CEO在任何页面点✓同意时，决策会自动出现在这里' },
+      d: { title: '暂无待讨论事项', p: '所有讨论中的话题会自动聚合在这里' },
+      x: { title: '暂无否决方案', p: '已否决的设计会保留在此作为历史参考' },
+      p: { title: '所有板块都已给反馈 👏', p: '每个板块都有CEO表态了，赞' }
+    }[CURRENT_TAB];
+    container.innerHTML = `<div class="empty"><h3>${emptyMsg.title}</h3><p>${emptyMsg.p}</p></div>`;
+    return;
+  }
+  
+  const grouped = {};
+  items.forEach(item => {
+    if (!grouped[item.page_key]) grouped[item.page_key] = [];
+    grouped[item.page_key].push(item);
+  });
+  
+  let html = '';
+  PAGES.forEach(page => {
+    if (!grouped[page.key]) return;
+    const pageItems = grouped[page.key];
+    html += `<div class="page-group">
+      <div class="page-group-title">${page.letter} · ${page.name}<span class="pg-count">${pageItems.length}</span></div>
+      <div class="list">`;
+    pageItems.forEach(item => {
+      const badgeText = { a: '✓ 同意', d: '💬 讨论', x: '✗ 不同意', p: '⬜ 待反馈' }[item.status];
+      const noteHtml = item.note ? `<div class="item-note">"${escapeHtml(item.note)}"</div>` : '';
+      html += `<div class="item">
+        <span class="item-badge ${item.status}">${badgeText}</span>
+        <div class="item-body">
+          <div class="item-title">${escapeHtml(item.section_title || item.description)}</div>
+          <div class="item-meta">
+            <span>${escapeHtml(item.description)}</span>
+            <span style="color:var(--text3)">·</span>
+            <span>ID: <code style="font-family:monospace;font-size:10px;color:var(--text3)">${item.id}</code></span>
+          </div>
+          ${noteHtml}
+        </div>
+        <a class="item-link" href="/${item.page_url}" target="_blank">查看原设计 →</a>
+      </div>`;
+    });
+    html += '</div></div>';
+  });
+  
+  container.innerHTML = html;
+}
+
+function escapeHtml(s) {
+  return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+loadAll();
+</script>
+</body>
+</html>

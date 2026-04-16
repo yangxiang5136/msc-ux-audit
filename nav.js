@@ -19,10 +19,12 @@ const PAGES = [
     { href: 'chatH.html', label: 'H · AI自动审核流程', badge: '提案', badgeColor: '#A29BFE' },
   ]},
   { cat: '工程交付', icon: '📐', items: [
+    { href: 'decisions.html', label: '⭐ 决策面板', badge: '推荐', badgeColor: '#34d399' },
     { href: 'product-spec.html', label: '📦 产品规格文档' },
   ]},
   { cat: '更新记录', icon: '📋', items: [
-    { href: 'changelog.html#v6', label: 'v6 · 三级定价+CEO反馈整合', badge: '最新', badgeColor: '#34d399' },
+    { href: 'changelog.html#v7', label: 'v7 · 决策面板+首页修复', badge: '最新', badgeColor: '#34d399' },
+    { href: 'changelog.html#v6', label: 'v6 · 三级定价+CEO反馈整合' },
     { href: 'changelog.html#v5', label: 'v5 · chatF重写+确权交互' },
     { href: 'changelog.html#v4', label: 'v4 · CEO反馈修改' },
     { href: 'changelog.html#v3', label: 'v3 · 统一导航' },

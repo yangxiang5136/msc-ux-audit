@@ -55,14 +55,47 @@
 <div class="main">
 
 <!-- V5 -->
-<div class="ver" id="v6">
+<div class="ver" id="v7">
   <div class="ver-head open" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')">
-    <span class="ver-tag latest">v6</span>
-    <span class="ver-title">三级定价 + CEO反馈整合 + 导航统一</span>
+    <span class="ver-tag latest">v7</span>
+    <span class="ver-title">决策面板 + 首页侧栏修复 + 反馈版本化</span>
     <span class="ver-date">2026-04-15</span>
     <span class="ver-arrow">▼</span>
   </div>
   <div class="ver-body show">
+    <div class="ch-stats"><span class="ch-stat new-stat">3项新增</span><span class="ch-stat mod-stat">3项修改</span><span class="ch-stat fix-stat">2项修复</span></div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">决策面板（核心新增）</div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>decisions.html 自动聚合CEO反馈</strong>：已确认/待讨论/已否决/待反馈四个维度，零维护，新加板块自动出现<a class="ch-link" href="/decisions.html">→ 决策面板</a></div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content">统计仪表盘 + 按页面筛选 + 一键跳转原设计</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">首页修复</div>
+      <div class="ch-item"><span class="ch-type fix">修</span><div class="ch-content"><strong>移除</strong>错误插入到 &lt;/html&gt; 之后的G/H孤儿卡片（第二张截图的bug）</div></div>
+      <div class="ch-item"><span class="ch-type mod">改</span><div class="ch-content"><strong>侧边栏更新</strong>：加入G/H/决策面板，所有page加A-F前缀，加v6/v7更新记录</div></div>
+      <div class="ch-item"><span class="ch-type mod">改</span><div class="ch-content">G/H卡片插入到商业机制section正确位置，样式统一</div></div>
+      <div class="ch-item"><span class="ch-type mod">改</span><div class="ch-content">反馈统计script扩展，包含G/H页面数据</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">反馈版本化系统</div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>更新过的板块</strong>用 .v6 后缀新data-id（chatE: e4.3.v6/e5.3.v6/e8.1.v6；chatF: f3.1.v6-f7.1.v6）</div></div>
+      <div class="ch-item"><span class="ch-type fix">修</span><div class="ch-content">chatG补齐summary-bar + 6个反馈块 + sync.js</div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>nav.js自动检测归档反馈</strong>：扫localStorage，把孤儿反馈显示在每页底部可折叠区</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="ver" id="v6">
+  <div class="ver-head" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')">
+    <span class="ver-tag prev">v6</span>
+    <span class="ver-title">三级定价 + CEO反馈整合 + 导航统一</span>
+    <span class="ver-date">2026-04-15</span>
+    <span class="ver-arrow">▼</span>
+  </div>
+  <div class="ver-body">
     <div class="ch-stats"><span class="ch-stat new-stat">6项新增</span><span class="ch-stat mod-stat">5项修改</span><span class="ch-stat del-stat">3项删除</span></div>
 
     <div class="ch-section">
