@@ -1,0 +1,7 @@
+{
+  "_version": 2,
+  "_synced_at": null,
+  "_synced_by": null,
+  "_note": "Team-shared feedback state. Gets merged into localStorage on page load. Update via decisions panel's 📤 同步到团队 button.",
+  "pages": {}
+}

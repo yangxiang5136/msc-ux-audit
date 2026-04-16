@@ -80,12 +80,19 @@
 <body>
 
 <div class="header">
-  <h1>⭐ 决策面板 <span class="badge">自动聚合</span></h1>
-  <div style="margin-left:auto;display:flex;gap:6px;align-items:center">
-    <button class="refresh-btn" onclick="exportFeedback()" title="导出所有反馈为JSON文件">⬇ 导出</button>
-    <button class="refresh-btn" onclick="importFeedback()" title="从JSON文件导入反馈">⬆ 导入</button>
+  <h1>⭐ 决策面板 <span class="badge">实时同步</span></h1>
+  <div style="margin-left:auto;display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+    <button class="refresh-btn" onclick="pushLocalToSupabase()" title="把本地localStorage的反馈一次性推送到Supabase（首次迁移用）" style="background:rgba(52,211,153,.15);color:#34d399;border-color:rgba(52,211,153,.4)">☁ 推送本地到后端</button>
+    <button class="refresh-btn" onclick="exportFeedback()" title="导出本地反馈为 JSON 文件">⬇ 导出</button>
+    <button class="refresh-btn" onclick="importFeedback()" title="从 JSON 文件导入反馈">⬆ 导入</button>
     <button class="refresh-btn" onclick="loadAll()" title="重新加载">↻ 刷新</button>
     <button class="refresh-btn" onclick="clearAllFeedback()" title="清空所有反馈" style="color:#f87171">🗑 清空</button>
+  </div>
+</div>
+
+<div style="max-width:960px;margin:12px auto 0;padding:0 16px">
+  <div id="sync-info" style="font-size:12px;color:var(--text3);padding:8px 14px;background:var(--bg2);border-radius:8px;border:1px solid var(--brd)">
+    检查团队同步状态中...
   </div>
 </div>
 
@@ -131,6 +138,7 @@
 
 </div>
 
+<script type="module" src="/sb.js"></script>
 <script src="/nav.js"></script>
 <script>
 const PAGES = [
@@ -208,7 +216,129 @@ async function loadAll() {
     return migrated;
   }
   
+  // Merge remote feedback-synced.json into localStorage (newer wins)
+  async function mergeFromRemote() {
+    try {
+      const res = await fetch('/feedback-synced.json', { cache: 'no-store' });
+      if (!res.ok) return null;
+      const remote = await res.json();
+      if (!remote || !remote.pages) return null;
+      
+      const PAGE_KEY_MAP = {
+        chatA: 'msc_ceo_feedback', chatB: 'msc_b_fb', chatC: 'msc_c_fb',
+        chatD: 'msc_d_fb', chatE: 'msc_e_fb', chatF: 'msc_f_fb',
+        chatG: 'msc_g_fb', chatH: 'msc_h_fb',
+        architecture: 'msc_arch_fb', 'product-spec': 'msc_ps_fb'
+      };
+      
+      Object.keys(remote.pages).forEach(pageKey => {
+        const storageKey = PAGE_KEY_MAP[pageKey];
+        if (!storageKey) return;
+        const remotePageData = remote.pages[pageKey];
+        let local = {};
+        try { local = JSON.parse(localStorage.getItem(storageKey) || '{}'); } catch(e){}
+        const merged = Object.assign({ _v: 2 }, local);
+        Object.keys(remotePageData).forEach(id => {
+          if (id === '_v') return;
+          const remoteSection = remotePageData[id];
+          if (!remoteSection || typeof remoteSection !== 'object') return;
+          if (!merged[id]) merged[id] = {};
+          Object.keys(remoteSection).forEach(ver => {
+            const rfb = remoteSection[ver];
+            if (!rfb || typeof rfb !== 'object') return;
+            const lfb = merged[id][ver];
+            if (!lfb) {
+              merged[id][ver] = rfb;
+            } else {
+              const lt = lfb.t ? Date.parse(lfb.t) : 0;
+              const rt = rfb.t ? Date.parse(rfb.t) : 0;
+              if (rt > lt) merged[id][ver] = rfb;
+            }
+          });
+        });
+        localStorage.setItem(storageKey, JSON.stringify(merged));
+      });
+      
+      return remote._synced_at || null;
+    } catch(e) {
+      return null;
+    }
+  }
+  
+  // Wait for Supabase (timeout 3s → offline mode)
+  function waitForSB() {
+    return new Promise(function(resolve) {
+      if (window.MSC_SB) { resolve(window.MSC_SB); return; }
+      var timeout = setTimeout(function() { resolve(null); }, 3000);
+      window.addEventListener('msc-sb-ready', function() {
+        clearTimeout(timeout);
+        resolve(window.MSC_SB);
+      }, { once: true });
+    });
+  }
+  
   try {
+    // FIRST: pull all feedback from Supabase (authoritative team state)
+    const sb = await waitForSB();
+    let syncedFromDB = false;
+    if (sb) {
+      try {
+        const rows = await sb.fetchAll();  // fetch ALL pages
+        if (rows && rows.length > 0) {
+          // Merge into localStorage per page
+          const pageKeys = {
+            chatA: 'msc_ceo_feedback', chatB: 'msc_b_fb', chatC: 'msc_c_fb',
+            chatD: 'msc_d_fb', chatE: 'msc_e_fb', chatF: 'msc_f_fb',
+            chatG: 'msc_g_fb', chatH: 'msc_h_fb',
+            architecture: 'msc_arch_fb', 'product-spec': 'msc_ps_fb'
+          };
+          const byPage = {};
+          rows.forEach(r => {
+            if (!byPage[r.page_key]) byPage[r.page_key] = [];
+            byPage[r.page_key].push(r);
+          });
+          Object.keys(byPage).forEach(pageKey => {
+            const storageKey = pageKeys[pageKey];
+            if (!storageKey) return;
+            let local = {};
+            try { local = JSON.parse(localStorage.getItem(storageKey) || '{"_v":2}'); } catch(e) { local = {_v:2}; }
+            if (local._v !== 2) local = { _v: 2 };
+            byPage[pageKey].forEach(r => {
+              if (!local[r.section_id]) local[r.section_id] = {};
+              const remoteObj = { c: r.choice, n: r.note || '', t: r.updated_at };
+              const localRow = local[r.section_id][r.version];
+              if (!localRow) { local[r.section_id][r.version] = remoteObj; return; }
+              const lt = localRow.t ? Date.parse(localRow.t) : 0;
+              const rt = remoteObj.t ? Date.parse(remoteObj.t) : 0;
+              if (rt > lt) local[r.section_id][r.version] = remoteObj;
+            });
+            localStorage.setItem(storageKey, JSON.stringify(local));
+          });
+          syncedFromDB = true;
+        }
+      } catch(e) { console.warn('Supabase fetch failed:', e); }
+    }
+    
+    // Legacy: also try the git-based feedback-synced.json
+    const syncedAt = await mergeFromRemote();
+    
+    // Update sync status indicator
+    const syncInfo = document.getElementById('sync-info');
+    if (syncInfo) {
+      if (syncedFromDB) {
+        syncInfo.innerHTML = `🟢 <strong>实时同步已连接</strong> · Supabase 后端 · 任何人给反馈都会几秒内同步到这里`;
+        syncInfo.style.color = '#34d399';
+      } else if (syncedAt) {
+        const d = new Date(syncedAt);
+        const iso = d.toISOString().slice(0,16).replace('T',' ');
+        syncInfo.innerHTML = `🟡 <strong>Git 同步</strong>（Supabase 未连接）· 最后推送: ${iso} UTC`;
+        syncInfo.style.color = '#fbbf24';
+      } else {
+        syncInfo.innerHTML = `⚪ <strong>离线模式</strong>（Supabase 未连接 + 无 Git 同步数据）· 仅显示本浏览器反馈`;
+        syncInfo.style.color = '#6B7084';
+      }
+    }
+    
     // Load feedback data from localStorage with lazy migration
     const feedbackData = {};
     PAGES.forEach(page => {
@@ -298,6 +428,24 @@ async function loadAll() {
     buildPageFilter();
     render();
     updateDiagnostic();
+    // Subscribe to realtime changes so decisions panel stays live
+    if (sb && !window._MSC_SUB) {
+      window._MSC_SUB = sb.subscribe(function(payload) {
+        // Any feedback change → reload everything (simple, reliable)
+        console.log('[Decisions] Realtime update:', payload);
+        // Brief visual nudge
+        const syncInfo = document.getElementById('sync-info');
+        if (syncInfo) {
+          const prev = syncInfo.innerHTML;
+          syncInfo.innerHTML = `🔄 <strong>收到新反馈</strong> · 正在刷新...`;
+          syncInfo.style.color = '#60a5fa';
+          setTimeout(() => loadAll(), 400);
+        } else {
+          loadAll();
+        }
+      });
+    }
+    
   } catch(err) {
     document.getElementById('content').innerHTML = '<div class="empty"><h3>加载失败</h3><p>无法读取反馈数据。请刷新页面重试。</p></div>';
     console.error(err);
@@ -326,7 +474,8 @@ function updateDiagnostic() {
       html += `<div style="color:#f87171">${k}: JSON 解析失败</div>`;
     }
   });
-  html = `<div style="margin-bottom:8px;color:var(--text);font-weight:600">总计 ${totalEntries} 条反馈跨 ${keys.filter(k=>localStorage.getItem(k)).length} 个页面</div>` + html;
+  const sbStatus = window.MSC_SB ? `<div style="color:var(--green);margin-top:6px">☁ Supabase 客户端：已连接</div>` : `<div style="color:#f87171;margin-top:6px">☁ Supabase 客户端：未连接（离线模式）</div>`;
+  html = `<div style="margin-bottom:8px;color:var(--text);font-weight:600">总计 ${totalEntries} 条反馈跨 ${keys.filter(k=>localStorage.getItem(k)).length} 个页面</div>` + html + sbStatus;
   diag.innerHTML = html;
 }
 
@@ -355,7 +504,7 @@ function exportFeedback() {
   setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
 }
 
-// Import feedback from a JSON file (merges into localStorage)
+// Import feedback from JSON file (merges into localStorage)
 function importFeedback() {
   const input = document.createElement('input');
   input.type = 'file';
@@ -389,7 +538,66 @@ function importFeedback() {
   input.click();
 }
 
-// Clear all feedback (with confirmation)
+// Push all localStorage feedback to Supabase (one-time migration)
+async function pushLocalToSupabase(event) {
+  if (!window.MSC_SB) {
+    alert('❌ Supabase 客户端未就绪。打开 DevTools Console 看报错。');
+    return;
+  }
+  if (!confirm('确认把本地 localStorage 的反馈推送到 Supabase 后端？\n\n这会 upsert 所有本地反馈到云端。如果云端有更新数据，按时间戳比较较新的保留。继续？')) return;
+  
+  const pageKeys = {
+    chatA: 'msc_ceo_feedback', chatB: 'msc_b_fb', chatC: 'msc_c_fb',
+    chatD: 'msc_d_fb', chatE: 'msc_e_fb', chatF: 'msc_f_fb',
+    chatG: 'msc_g_fb', chatH: 'msc_h_fb',
+    architecture: 'msc_arch_fb', 'product-spec': 'msc_ps_fb'
+  };
+  
+  const rows = [];
+  Object.entries(pageKeys).forEach(([pageKey, storageKey]) => {
+    try {
+      const data = JSON.parse(localStorage.getItem(storageKey) || '{}');
+      if (!data || typeof data !== 'object') return;
+      Object.keys(data).forEach(sectionId => {
+        if (sectionId === '_v') return;
+        const versions = data[sectionId];
+        if (!versions || typeof versions !== 'object') return;
+        const keys = Object.keys(versions);
+        const isNested = keys.length > 0 && keys.every(k => /^\d+(\.\d+)*$/.test(k));
+        if (isNested) {
+          keys.forEach(ver => {
+            const fb = versions[ver];
+            if (!fb || (!fb.c && !fb.n)) return;
+            rows.push({ page_key: pageKey, section_id: sectionId, version: ver, choice: fb.c, note: fb.n || '' });
+          });
+        } else if (versions.c || versions.n) {
+          rows.push({ page_key: pageKey, section_id: sectionId, version: '1', choice: versions.c, note: versions.n || '' });
+        }
+      });
+    } catch(e) {}
+  });
+  
+  if (rows.length === 0) { alert('本地没有反馈数据可推送。'); return; }
+  
+  const btn = event && event.target;
+  const origText = btn ? btn.textContent : '';
+  if (btn) { btn.textContent = `☁ 推送中 (0/${rows.length})...`; btn.disabled = true; }
+  
+  let ok = 0, fail = 0;
+  for (let i = 0; i < rows.length; i++) {
+    const r = rows[i];
+    try {
+      const result = await window.MSC_SB.upsert(r.page_key, r.section_id, r.version, r.choice, r.note);
+      if (result) ok++; else fail++;
+    } catch(e) { fail++; console.warn('Upsert failed:', r, e); }
+    if (btn) btn.textContent = `☁ 推送中 (${i+1}/${rows.length})...`;
+  }
+  
+  if (btn) { btn.textContent = origText; btn.disabled = false; }
+  alert(`✓ 推送完成：${ok} 条成功，${fail} 条失败。正在刷新...`);
+  loadAll();
+}
+
 function clearAllFeedback() {
   if (!confirm('确认清空所有反馈？此操作不可撤销。建议先导出备份。')) return;
   const keys = ['msc_ceo_feedback','msc_b_fb','msc_c_fb','msc_d_fb','msc_e_fb','msc_f_fb','msc_g_fb','msc_h_fb','msc_arch_fb','msc_ps_fb'];

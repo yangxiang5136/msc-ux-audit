@@ -195,6 +195,10 @@
     save(data);
     renderFB(fbEl, data);
     updateStats(data);
+    // Push to Supabase (non-blocking, fires and forgets)
+    if (window.MSC_SB) {
+      window.MSC_SB.upsert(PAGE, id, ver, choice, existing.n);
+    }
   }
 
   function onNote(fbEl, note) {
@@ -209,6 +213,9 @@
     data[id][ver] = existing;
     save(data);
     updateStats(data);
+    if (window.MSC_SB) {
+      window.MSC_SB.upsert(PAGE, id, ver, existing.c, note);
+    }
   }
 
   function updateStats(data) {
@@ -267,13 +274,129 @@
   style.textContent = css;
   document.head.appendChild(style);
 
+  // Fetch and merge remote feedback-synced.json (git-based team sync)
+  // Non-blocking: if fetch fails, just proceed with local data
+  async function mergeRemote() {
+    try {
+      var res = await fetch('/feedback-synced.json', { cache: 'no-store' });
+      if (!res.ok) return;
+      var remote = await res.json();
+      if (!remote || !remote.pages) return;
+      var pageKey = PAGE;
+      var remotePageData = remote.pages[pageKey];
+      if (!remotePageData) return;
+
+      var local = load();
+      var merged = Object.assign({ _v: 2 }, local);
+
+      // For each id in remote, merge versions into local (newer timestamp wins)
+      Object.keys(remotePageData).forEach(function(id) {
+        if (id === '_v') return;
+        var remoteSection = remotePageData[id];
+        if (!remoteSection || typeof remoteSection !== 'object') return;
+        if (!merged[id]) merged[id] = {};
+        Object.keys(remoteSection).forEach(function(ver) {
+          var remoteFb = remoteSection[ver];
+          if (!remoteFb || typeof remoteFb !== 'object') return;
+          var localFb = merged[id][ver];
+          if (!localFb) {
+            merged[id][ver] = remoteFb;
+          } else {
+            // Compare timestamps — newer wins
+            var lt = localFb.t ? Date.parse(localFb.t) : 0;
+            var rt = remoteFb.t ? Date.parse(remoteFb.t) : 0;
+            if (rt > lt) merged[id][ver] = remoteFb;
+          }
+        });
+      });
+      save(merged);
+      return merged;
+    } catch (e) {
+      // Silent — remote sync is optional
+      return null;
+    }
+  }
+
+  // Wait for Supabase client to be ready (loaded from sb.js). Timeout after 3s → fallback to offline mode.
+  function waitForSB() {
+    return new Promise(function(resolve) {
+      if (window.MSC_SB) { resolve(window.MSC_SB); return; }
+      var timeout = setTimeout(function() {
+        console.warn('[FB] Supabase not ready after 3s, running offline');
+        resolve(null);
+      }, 3000);
+      window.addEventListener('msc-sb-ready', function() {
+        clearTimeout(timeout);
+        resolve(window.MSC_SB);
+      }, { once: true });
+    });
+  }
+
+  // Fetch latest feedback from Supabase for current page, merge into localStorage
+  async function fetchFromSupabase(sb) {
+    if (!sb) return;
+    try {
+      var rows = await sb.fetchAll(PAGE);
+      if (!rows || rows.length === 0) return;
+      var data = load();
+      var changed = false;
+      rows.forEach(function(r) {
+        if (!data[r.section_id]) data[r.section_id] = {};
+        var local = data[r.section_id][r.version];
+        var remoteObj = { c: r.choice, n: r.note || '', t: r.updated_at };
+        if (!local) { data[r.section_id][r.version] = remoteObj; changed = true; return; }
+        var lt = local.t ? Date.parse(local.t) : 0;
+        var rt = remoteObj.t ? Date.parse(remoteObj.t) : 0;
+        if (rt > lt) {
+          data[r.section_id][r.version] = remoteObj;
+          changed = true;
+        }
+      });
+      if (changed) save(data);
+    } catch(e) { console.warn('[FB] Supabase fetch failed:', e); }
+  }
+
+  // Subscribe to realtime changes; re-render affected .fb blocks when remote updates arrive
+  function subscribeRealtime(sb) {
+    if (!sb) return;
+    sb.subscribe(function(payload) {
+      var row = payload.new;
+      if (!row || row.page_key !== PAGE) return;
+      var data = load();
+      if (!data[row.section_id]) data[row.section_id] = {};
+      var remoteObj = { c: row.choice, n: row.note || '', t: row.updated_at };
+      var local = data[row.section_id][row.version];
+      // Always take remote on realtime push (it's authoritative for this row)
+      data[row.section_id][row.version] = remoteObj;
+      save(data);
+      // Re-render the affected .fb element if visible
+      var fbEl = document.querySelector('.fb[data-id="' + row.section_id + '"][data-ver="' + row.version + '"]');
+      if (!fbEl) fbEl = document.querySelector('.fb[data-id="' + row.section_id + '"]:not([data-ver])');
+      if (fbEl) {
+        renderFB(fbEl, data);
+        // Brief flash to indicate remote update
+        fbEl.style.transition = 'background 0.3s';
+        fbEl.style.background = 'rgba(52,211,153,.12)';
+        setTimeout(function(){ fbEl.style.background = ''; }, 1200);
+      }
+      updateStats(data);
+    });
+  }
+
   // Run on DOMContentLoaded
-  function init() {
-    var data = migrate();
+  async function init() {
+    migrate();
+    // Wait briefly for Supabase, but don't block rendering if it's slow
+    var sb = await waitForSB();
+    await fetchFromSupabase(sb);
+    // Legacy: also merge from git-based feedback-synced.json (for old data not yet in Supabase)
+    await mergeRemote();
+    var data = load();
     document.querySelectorAll('.fb[data-id]').forEach(function(fbEl){
       renderFB(fbEl, data);
     });
     updateStats(data);
+    subscribeRealtime(sb);
   }
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
@@ -282,5 +405,5 @@
   }
 
   // Expose for debugging
-  window.MSC_FB = { load: load, save: save, migrate: migrate, getFB: getFB, getAllVersions: getAllVersions, parseVer: parseVer, compareVer: compareVer };
+  window.MSC_FB = { load: load, save: save, migrate: migrate, mergeRemote: mergeRemote, fetchFromSupabase: fetchFromSupabase, getFB: getFB, getAllVersions: getAllVersions, parseVer: parseVer, compareVer: compareVer };
 })();

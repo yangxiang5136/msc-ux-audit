@@ -55,9 +55,102 @@
 <div class="main">
 
 <!-- V5 -->
+<div class="ver" id="v7.3">
+  <div class="ver-head open" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')">
+    <span class="ver-tag latest">v7.3</span>
+    <span class="ver-title">Supabase 实时后端（秒级跨设备同步）</span>
+    <span class="ver-date">2026-04-16</span>
+    <span class="ver-arrow">▼</span>
+  </div>
+  <div class="ver-body show">
+    <div class="ch-stats"><span class="ch-stat new-stat">4项新增</span><span class="ch-stat fix-stat">1项修复</span></div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">真实时跨设备同步</div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>sb.js</strong>：Supabase JS 客户端封装。fetchAll / upsert / subscribe 三个核心方法</div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>fb.js 升级</strong>：点反馈按钮→写到 Supabase + 本地 localStorage；订阅实时变更，其他设备给的反馈秒级同步到当前页（高亮绿色闪烁提示）</div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>决策面板升级</strong>：订阅全站实时变更；CEO 在任何设备给反馈，你的决策面板几秒内自动刷新</div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>☁ 推送本地到后端</strong>按钮：一次性把 localStorage 的历史反馈迁移到 Supabase（首次使用）</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">诚实的限制</div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content">Supabase 免费层：500MB DB + 50k 月活。内部用够用到天荒地老</div></div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content">RLS 策略：当前是"任何人都能读写"（内部工具场景够用）。后续可加登录+RLS 按角色精细控制</div></div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content">离线fallback：Supabase 挂了 / esm.sh 挂了，站点还能用（读写 localStorage），只是失去实时同步</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">修复</div>
+      <div class="ch-item"><span class="ch-type fix">修</span><div class="ch-content">删除 v7.2 的 pushToTeam 按钮（git 同步方式被 Supabase 实时同步淘汰）</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="ver" id="v7.2">
+  <div class="ver-head open" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')">
+    <span class="ver-tag prev">v7.2</span>
+    <span class="ver-title">Git-based 团队反馈同步</span>
+    <span class="ver-date">2026-04-16</span>
+    <span class="ver-arrow">▼</span>
+  </div>
+  <div class="ver-body show">
+    <div class="ch-stats"><span class="ch-stat new-stat">3项新增</span><span class="ch-stat fix-stat">1项修复</span></div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">团队同步机制（解决跨设备问题）</div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>feedback-synced.json</strong>：仓库根目录的团队状态文件。所有页面加载时 fetch 这份，和本地 localStorage 按时间戳合并（新的胜出）</div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>📤 推送到团队按钮</strong>：决策面板一键生成 Claude Code commit 指令。复制粘贴到 Claude Code，自动把本地反馈写入 feedback-synced.json 并 push</div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content">决策面板顶部<strong>同步状态指示器</strong>：🟢 团队已同步 · 时间戳 / ⚪ 无团队同步数据</div></div>
+      <div class="ch-item"><span class="ch-type fix">修</span><div class="ch-content">清理三个僵尸文件（server.js / feedback.json / data/feedback.json），它们实际上是 v5 时代 fetch 失败留下的 HTML 错误页</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">典型使用流程</div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content">CEO 在他手机给反馈 → 点"⬇ 导出" → 发给 Sean → Sean 点"⬆ 导入" → Sean 点"📤 推送到团队" → 粘贴指令到 Claude Code → Railway 自动部署 → 所有人下次加载自动看到</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="ver" id="v7.2">
+  <div class="ver-head open" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')">
+    <span class="ver-tag prev">v7.2</span>
+    <span class="ver-title">Git-based 跨设备同步（路径 2 实施）</span>
+    <span class="ver-date">2026-04-16</span>
+    <span class="ver-arrow">▼</span>
+  </div>
+  <div class="ver-body show">
+    <div class="ch-stats"><span class="ch-stat new-stat">3项新增</span><span class="ch-stat fix-stat">1项清理</span></div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">跨设备同步机制</div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>feedback-synced.json</strong>：仓库根目录的团队共享反馈状态文件。每次页面加载自动 fetch 并 merge（时间戳新的胜出）</div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>📤 推送到团队</strong>按钮：一键生成可粘贴到 Claude Code 的指令（包含完整 JSON），执行后会 commit feedback-synced.json → push → Railway 自动部署 → 团队所有设备下次打开自动合并<a class="ch-link" href="/decisions.html">→ 决策面板</a></div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content">决策面板顶部"🟢 团队已同步 · [时间]"状态提示，清楚显示团队共享状态时间点</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">清理</div>
+      <div class="ch-item"><span class="ch-type fix">修</span><div class="ch-content">删除僵尸文件：sync.js、server.js、feedback.json、data/feedback.json（都是早期遗留的HTML 404错误页，被当成JSON/JS存进了zip）</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">使用流程</div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content">
+      <strong>CEO 给完反馈后跨设备同步</strong>：<br>
+      ① CEO 在他设备上点完同意/讨论/不同意 → <br>
+      ② 打开决策面板点"📤 推送到团队" → <br>
+      ③ 复制弹窗里的指令，粘贴到 Claude Code → <br>
+      ④ Claude Code 自动 commit+push → Railway 重新部署（1-2分钟）→ <br>
+      ⑤ 你在电脑上打开决策面板，自动合并 CEO 的反馈
+      </div></div>
+    </div>
+  </div>
+</div>
+
 <div class="ver" id="v7.1">
   <div class="ver-head open" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')">
-    <span class="ver-tag latest">v7.1</span>
+    <span class="ver-tag prev">v7.1</span>
     <span class="ver-title">决策面板惰性迁移 + 导入导出 + 诊断面板</span>
     <span class="ver-date">2026-04-16</span>
     <span class="ver-arrow">▼</span>

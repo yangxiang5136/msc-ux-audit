@@ -22,7 +22,8 @@ const PAGES = [
     { href: 'product-spec.html', label: '📦 产品规格文档' },
   ]},
   { cat: '更新记录', icon: '📋', items: [
-    { href: 'changelog.html#v7.1', label: 'v7.1 · 决策面板修复+导入导出', badge: '最新', badgeColor: '#34d399' },
+    { href: 'changelog.html#v7.2', label: 'v7.2 · Git-based 团队同步', badge: '最新', badgeColor: '#34d399' },
+    { href: 'changelog.html#v7.1', label: 'v7.1 · 决策面板修复+导入导出' },
     { href: 'changelog.html#v7', label: 'v7 · 决策面板+首页修复' },
     { href: 'changelog.html#v6', label: 'v6 · 三级定价+CEO反馈整合' },
     { href: 'changelog.html#v5', label: 'v5 · chatF重写+确权交互' },
