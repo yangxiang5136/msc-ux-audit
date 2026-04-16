@@ -54,10 +54,257 @@
 
 <div class="main">
 
-<!-- V5 -->
+<!-- V7.4.7 -->
+<div class="ver" id="v7.4.7">
+  <div class="ver-head open" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')">
+    <span class="ver-tag latest">v7.4.7</span>
+    <span class="ver-title">E nav 顺序修正 + 孤儿 link 防御</span>
+    <span class="ver-date">2026-04-16</span>
+    <span class="ver-arrow">▼</span>
+  </div>
+  <div class="ver-body show">
+    <div class="ch-stats"><span class="ch-stat fix-stat">2项修复</span></div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">Bug 现象</div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content"><strong>Sean 反馈</strong>：在 chatE 里点 E.5 之后 nav 高亮的是 E.4.3；点 E.6 高亮 E.5；所有 E.4.3 之后的 tab 都"错一位"</div></div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content"><strong>根因</strong>：chatE 的 nav 里有一条 <code>&lt;a href="#triggers"&gt;E.4.3 触发时机&lt;/a&gt;</code>，但页面里根本没有 <code>id="triggers"</code> 的 section——这是一个"孤儿 link"。v7.4.6 的 scroll-spy 算法用<strong>两个平行数组</strong>（ids + sections）存映射，<code>filter(Boolean)</code> 过滤掉 null section 后两数组长度不一致，所有索引整体前移一位</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">修复</div>
+      <div class="ch-item"><span class="ch-type fix">修</span><div class="ch-content"><strong>chatE nav 删除 E.4.3</strong>：E.4.3 触发时机的内容在正文里仍然保留，只是不再独立作为 tab</div></div>
+      <div class="ch-item"><span class="ch-type fix">修</span><div class="ch-content"><strong>scroll-spy 根因修复</strong>：把 <code>sectionIds</code> 和 <code>sections</code> 两个数组合并成单一的 <code>pairs = [{id, el, link}, ...]</code>，过滤孤儿后索引天然一致。以后即使任何页面有孤儿 link，后续 tab 的 active 也不会错位</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">孤儿扫描</div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content">扫了全部 10 个页面的 nav link，目前 E.4.3 修掉后<strong>无孤儿</strong>。脚本保留在 <code>/tmp/orphan-check.js</code>，以后新加 nav link 时可以先扫一下</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- V7.4.6 -->
+<div class="ver" id="v7.4.6">
+  <div class="ver-head open" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')">
+    <span class="ver-tag prev">v7.4.6</span>
+    <span class="ver-title">全站 nav 统一：A 风格底部高亮线 + 直接跳转 + 自动 active</span>
+    <span class="ver-date">2026-04-16</span>
+    <span class="ver-arrow">▼</span>
+  </div>
+  <div class="ver-body show">
+    <div class="ch-stats"><span class="ch-stat fix-stat">5项修复</span><span class="ch-stat new-stat">1项新增</span></div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">Bug 修复</div>
+      <div class="ch-item"><span class="ch-type fix">修</span><div class="ch-content"><strong>G/H nav 不跟随滚动</strong>：v7.4.5 删掉 summary-bar 后，G/H 原本的 <code>.nav</code>（非 sticky）没人挡着就滚走了。v7.4.6 通过 nav.js 全局 CSS 强制所有 <code>.nav/.nav-bar</code> 为 sticky top:52</div></div>
+      <div class="ch-item"><span class="ch-type fix">修</span><div class="ch-content"><strong>B/C/D/架构方案/产品规格 平滑滚动 → 直接跳转</strong>：nav.js 拦截所有 <code>.nav a[href^="#"]</code> 点击，用 <code>scrollTo(behavior:'instant')</code> 代替浏览器默认的 smooth 滚动</div></div>
+      <div class="ch-item"><span class="ch-type fix">修</span><div class="ch-content"><strong>B/C/D/E/F/架构/产品规格 点击 tab 后不高亮</strong>：点击 handler 里自动给被点 tab 加 <code>.active</code> class，清除其他 tab</div></div>
+      <div class="ch-item"><span class="ch-type fix">修</span><div class="ch-content"><strong>所有页面 tab 样式统一</strong>：以 chatA 为标杆——默认文字灰 + 透明 2px 底边；active 时文字变页面主色 + 底部显示 2px 主色线。覆盖掉 B/C/D/E/F 原来"整块 tab 背景色 + 边框"的写法</div></div>
+      <div class="ch-item"><span class="ch-type fix">修</span><div class="ch-content"><strong>per-page 主色保留</strong>：A/G 绿、B 蓝、C 金、D 红、E/H 紫、F 绿、架构青、产品规格橙。通过 <code>body.page-chatX .nav a.active</code> 选择器实现</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">新增：自动 scroll-spy</div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content">滚动时自动高亮当前视口顶部附近的 section 对应的 nav tab。点击和滚动两种交互都能保持 active 状态正确</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">实现</div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content">只动 nav.js 一个文件，加一段通用 CSS 覆盖 + 一段 IIFE 处理点击/scroll-spy。每个 HTML 页面零修改。body 上自动打 <code>page-chatX</code> class 用于 CSS 选择器锁定主色</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- V7.4.5 -->
+<div class="ver" id="v7.4.5">
+  <div class="ver-head open" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')">
+    <span class="ver-tag prev">v7.4.5</span>
+    <span class="ver-title">A/B/G/H 布局统一 + 架构方案归位</span>
+    <span class="ver-date">2026-04-16</span>
+    <span class="ver-arrow">▼</span>
+  </div>
+  <div class="ver-body show">
+    <div class="ch-stats"><span class="ch-stat fix-stat">4项修复</span><span class="ch-stat mod-stat">1项调整</span></div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">chatA 布局修复</div>
+      <div class="ch-item"><span class="ch-type fix">修</span><div class="ch-content"><strong>标题栏置顶生效</strong>：chatA 用的是 <code>.site-header</code> / <code>.nav-bar</code>（非 .header/.nav），nav.js 之前的 CSS 覆盖规则没命中它，导致 A 的标题栏不跟随滚动。v7.4.5 在 nav.js 里把 CSS 选择器扩展到 <code>.header,.site-header</code> 和 <code>.nav,.nav-bar</code></div></div>
+      <div class="ch-item"><span class="ch-type fix">修</span><div class="ch-content"><strong>说明文字位置</strong>：chatA 的 "关于示例内容" 说明块从 <code>&lt;header&gt;</code> 后面挪到 <code>&lt;nav&gt;</code> 后面，sticky 堆叠完毕后再显示正文说明</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">chatB 布局修复</div>
+      <div class="ch-item"><span class="ch-type fix">修</span><div class="ch-content"><strong>说明文字位置</strong>：同上，从 <code>.header</code> 后挪到 <code>.nav</code> 后</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">chatG / chatH 布局修复</div>
+      <div class="ch-item"><span class="ch-type fix">修</span><div class="ch-content"><strong>统计栏合并到标题栏右侧</strong>：以 C/D 为视觉标准，把 G/H 原本独占一行的 <code>.summary-bar</code>（"同意/讨论/不同意"统计）合并进 <code>.header</code> 的右侧，删掉独立的 summary-bar 元素。header 改为 flex 左右布局，标题在左 / 统计在右</div></div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content">统计数字 id（<code>ca2/cd2/cx2</code>）保留，fb.js 的 updateStats 仍然会找到并更新</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">导航结构调整</div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content"><strong>界面架构方案</strong>从"产品体验"类目挪到"工程交付"——定位更准确（它是架构决策文档，不是 UX 设计方案）。index.html 硬编码侧边栏和 nav.js 侧边栏同步更新</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">测试</div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content">jsdom 验证全部 sticky 元素 top 值正确（A=0+52、B=0+52、G=0+flex-header、H=0+flex-header）；折叠可见性测试 7 个页面全部 ✓ 无回归</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- V7.4.4 -->
+<div class="ver" id="v7.4.4">
+  <div class="ver-head open" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')">
+    <span class="ver-tag prev">v7.4.4</span>
+    <span class="ver-title">紧急修复：E/F 内容被底部 bar 遮挡</span>
+    <span class="ver-date">2026-04-16</span>
+    <span class="ver-arrow">▼</span>
+  </div>
+  <div class="ver-body show">
+    <div class="ch-stats"><span class="ch-stat fix-stat">1项紧急修复</span></div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">Bug（v7.4.3 引入的回归）</div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content"><strong>现象</strong>：chatE、chatF 页面正文完全空白，只剩顶部标题栏和底部统计条跑到了顶部</div></div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content"><strong>根因</strong>：class 命名重复 — chatG/H 的 <code>.summary-bar</code> 是 sticky 顶部标签栏，而 chatE/F 的 <code>.summary-bar</code> 是 fixed 底部统计条。v7.4.3 加的 <code>.summary-bar{top:49px !important}</code> 只想修 G/H，但把 E/F 的底部 bar 也拖到了 top:49px，fixed+top+left+right 形成一个大面积遮罩盖死了正文区</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">修复</div>
+      <div class="ch-item"><span class="ch-type fix">修</span><div class="ch-content"><strong>删掉 nav.js 里错误的 <code>.summary-bar{top:49px}</code></strong>：chatG/H 的 summary-bar 在自己 CSS 里本来就写了 <code>top:49px</code>，不需要 nav.js 重复设置。chatE/F 的底部 fixed bar 现在恢复正常</div></div>
+      <div class="ch-item"><span class="ch-type fix">修</span><div class="ch-content">同时把 <code>.summary-bar</code> 的背景覆盖也去掉了（仅对 .header 和 .nav 生效）</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">教训</div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content">class 命名复用是隐形地雷。<code>.summary-bar</code> 在站点两组页面里语义完全不同，nav.js 的全局 !important 不加区分就会踩雷。以后 nav.js 改 CSS 必须对所有页面都跑一遍 jsdom 验证</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- V7.4.3 -->
+<div class="ver" id="v7.4.3">
+  <div class="ver-head open" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')">
+    <span class="ver-tag prev">v7.4.3</span>
+    <span class="ver-title">顶部悬空修复 + sticky 层级修正</span>
+    <span class="ver-date">2026-04-16</span>
+    <span class="ver-arrow">▼</span>
+  </div>
+  <div class="ver-body show">
+    <div class="ch-stats"><span class="ch-stat fix-stat">3项修复</span></div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">根因诊断</div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content"><strong>Sean 报告"顶部导航栏有悬空"</strong>。排查发现是 v7 的 nav.js 注入 CSS 修了 <code>.header{top:0}</code> 但忘了同步修 <code>.nav{top:88px}</code>——而原 88px 是按 "36px 顶部旧 nav + 52px header" 计算的。老顶部 nav 被隐藏后，.nav 却还停在 88px，导致 header(52) 和 nav(88) 之间有 36px 悬空</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">修复内容（全部在 nav.js 里）</div>
+      <div class="ch-item"><span class="ch-type fix">修</span><div class="ch-content"><strong>.nav top 修正</strong>：<code>top:88px → top:52px</code>，紧贴 header 下沿</div></div>
+      <div class="ch-item"><span class="ch-type fix">修</span><div class="ch-content"><strong>sticky 背景不透明化</strong>：<code>.header/.nav/.summary-bar</code> 去掉 backdrop-filter 改为纯色背景 <code>#0D0F14</code>。之前半透明 + blur 在某些浏览器下会让下层内容"透"上来造成视觉混乱</div></div>
+      <div class="ch-item"><span class="ch-type fix">修</span><div class="ch-content"><strong>anchor 跳转补偿 scroll-margin</strong>：给 .section[id] / .card[id] / h1-h3[id] / [id^="sec-"] 加 <code>scroll-margin-top:110px</code>，点击侧边栏锚点跳转时内容不会被 sticky header 遮挡</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">影响范围</div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content">只动 nav.js 一个文件。chatB/C/D/E/F 的 .nav 自动调整，chatG/H 的 .summary-bar 保持 49px 不变（它们的 header 高度不同）</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">测试</div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content">jsdom 验证 7 个页面 sticky 元素 top 值；折叠可见性测试没有回归</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- V7.4.2 -->
+<div class="ver" id="v7.4.2">
+  <div class="ver-head open" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')">
+    <span class="ver-tag prev">v7.4.2</span>
+    <span class="ver-title">折叠真正修复：两套 CSS 模式兼容</span>
+    <span class="ver-date">2026-04-16</span>
+    <span class="ver-arrow">▼</span>
+  </div>
+  <div class="ver-body show">
+    <div class="ch-stats"><span class="ch-stat fix-stat">1项核心修复</span></div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">真相：两套 CSS 冲突</div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content"><strong>根因</strong>：Sean 反馈"B/C/D 折叠打不开"确实是真 bug。排查发现站点有两套不兼容的 CSS 折叠模式：<br>• <strong>Pattern A</strong>（chatE/F/G/H）：<code>.card-body.show { display:block }</code><br>• <strong>Pattern B</strong>（chatB/C/D）：<code>.card.open .card-body { display:block }</code><br>fb.js 里的 <code>toggle()</code> 只处理了 Pattern A（给 head 加 .open、给 body 加 .show），完全忽略了 Pattern B——所以 B/C/D 点击后 classes 变了但 CSS 规则不命中，body 永远 display:none</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">修复方案</div>
+      <div class="ch-item"><span class="ch-type fix">修</span><div class="ch-content"><strong>tog / toggle / toggleCeo / toggleAll 全部重写</strong>：检测当前开/关状态（从 head.open、body.show、card.open 三个标志中任一为真判定"开"），然后<strong>同步设置全部三个标志</strong>——两种 CSS 模式自动兼容，而且能修复初始状态不一致的 HTML</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">测试验证</div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content">jsdom 对 7 个页面（chatB-H）做了"点击展开 → CSS 可见性检查"测试，全部 <code>VISIBLE=✓</code>。toggle 对称性测试（点击两次回到原状）也全部通过</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">v7.4.1 保留的其他改动</div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content">个性化视图过滤（4 角色 + 💡 灯泡按钮 + chatE 8 卡试点）</div></div>
+      <div class="ch-item"><span class="ch-type fix">修</span><div class="ch-content">补齐旧版 onclick 函数 stub、视图过滤 try/catch、architecture 死代码清理</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- V7.4.1 -->
+<div class="ver" id="v7.4.1">
+  <div class="ver-head open" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')">
+    <span class="ver-tag prev">v7.4.1</span>
+    <span class="ver-title">折叠功能保护性修复 + 视图过滤首发</span>
+    <span class="ver-date">2026-04-16</span>
+    <span class="ver-arrow">▼</span>
+  </div>
+  <div class="ver-body show">
+    <div class="ch-stats"><span class="ch-stat new-stat">3项新增</span><span class="ch-stat fix-stat">4项修复</span></div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">折叠保护（修复 Sean 反馈）</div>
+      <div class="ch-item"><span class="ch-type fix">修</span><div class="ch-content"><strong>补齐所有旧版 onclick 函数的 stub</strong>：sel、sf、onChoice（反馈按钮）、openRedPkt、resetSlide、startCountdown（chatD mockup 交互）。之前这些函数缺失会让浏览器抛 ReferenceError，可能中断页面后续 JS 执行（视浏览器而异）</div></div>
+      <div class="ch-item"><span class="ch-type fix">修</span><div class="ch-content"><strong>视图过滤模块包 try/catch</strong>：即使视图过滤内部报错，也不会影响 tog/toggle 等折叠函数的定义和运行</div></div>
+      <div class="ch-item"><span class="ch-type fix">修</span><div class="ch-content"><strong>architecture.html 的 SYNC 死代码清理</strong>：v7.3 迁移到 Supabase 时遗漏的旧 git-sync SYNC.push/pull 调用已删除，避免 DOMContentLoaded 时抛 ReferenceError</div></div>
+      <div class="ch-item"><span class="ch-type fix">修</span><div class="ch-content"><strong>折叠函数加 null 检查</strong>：tog/toggle/toggleCeo 对传入 null 时静默 return，避免异常调用场景崩溃</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">验证范围</div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content">用 jsdom 自动化测试了 10 个页面（chatA-H + architecture + product-spec），所有 card-head 点击折叠测试通过，所有 onclick 引用的函数都有定义</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">个性化视图过滤（核心新功能）</div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>角色选择弹窗</strong>：首次访问任意页面弹出，4 个角色（🎯 CEO / 🎨 UI / ⚙️ 工程 / 👁 全部），选择后永久记住（localStorage）</div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>角色高亮</strong>：跟当前角色相关的卡片加左侧色条 + 内描边；不相关的 CSS grayscale + 半透明压暗（不重排，保留空间记忆）</div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>💡 灯泡按钮</strong>：每张卡片右上角加灯泡，点击切换"亮/灭"——灭灯=个人永久隐藏这块。亮/灭用 CSS grayscale 控制同一个 emoji 的视觉效果</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">设计原则</div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content"><strong>宽松起步</strong>：第一版只压暗、不真正隐藏，相关的高亮、不相关的变灰但仍占位置可点。等团队反馈再决定是否加强</div></div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content"><strong>个性化覆盖</strong>：角色默认是 Sean 定的规则；用户可以用 💡 在默认基础上微调"我额外不想看哪块"，这是产品默认 + 个人偏好的分层</div></div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content"><strong>"全部"角色</strong>：专供项目负责人，不应用任何过滤。Sean 自己用这个，不需要手动调整</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">试点范围</div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>chatE 8 张卡片</strong>已打 data-tags 试点：E.2.1(eng)、E.2.2(ceo+eng)、E.4.1(ceo+ui)、E.4.2(ui)、E.4.3(ui+ceo)、E.6.2(ui+ceo)、E.7.3(ceo)、E.8.1(ceo+eng)。其他页面/卡片暂未打标签 = 默认全员可见</div></div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content"><strong>调试方法</strong>：浏览器 Console 输入 <code>MSC_VIEW.reset()</code> 重置所有偏好；<code>MSC_VIEW.setRole('ui')</code> 强制切角色；<code>MSC_VIEW.showPicker()</code> 打开选择弹窗</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- V7.3.1 -->
 <div class="ver" id="v7.3.1">
   <div class="ver-head open" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')">
-    <span class="ver-tag latest">v7.3.1</span>
+    <span class="ver-tag prev">v7.3.1</span>
     <span class="ver-title">修复批量推送时的 UI 重复渲染</span>
     <span class="ver-date">2026-04-16</span>
     <span class="ver-arrow">▼</span>

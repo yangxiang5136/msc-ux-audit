@@ -79,7 +79,6 @@
     <a class="ni" href="chatB.html">B · 空状态+反馈闭环<span class="nb" style="background:var(--red-d);color:var(--red)">关键</span></a>
     <a class="ni" href="chatC.html">C · 卡片+金额感知</a>
     <a class="ni" href="chatD.html">D · 确认+留存+异常</a>
-    <a class="ni" href="architecture.html">🏗️ 界面架构方案<span class="nb" style="background:var(--teal-d);color:var(--teal)">已定</span></a>
   </div></div>
   <div class="nc"><div class="nc-h" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')"><span class="ci">🔐</span>商业机制<span class="ca">▶</span></div><div class="nc-items">
     <a class="ni" href="chatE.html">E · AI资产确权<span class="nb" style="background:rgba(251,191,36,.15);color:#fbbf24">已更新</span></a>
@@ -88,10 +87,20 @@
     <a class="ni" href="chatH.html">H · AI自动审核流程<span class="nb" style="background:rgba(162,155,254,.15);color:#A29BFE">提案</span></a>
   </div></div>
   <div class="nc"><div class="nc-h" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')"><span class="ci">📐</span>工程交付<span class="ca">▶</span></div><div class="nc-items">
+    <a class="ni" href="architecture.html">🏗️ 界面架构方案<span class="nb" style="background:var(--teal-d);color:var(--teal)">已定</span></a>
     <a class="ni" href="product-spec.html">📦 产品规格文档</a>
   </div></div>
   <div class="nc"><div class="nc-h" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')"><span class="ci">📋</span>更新记录<span class="ca">▶</span></div><div class="nc-items">
-    <a class="ni" href="changelog.html#v7.2">v7.2 · 团队同步<span class="nb" style="background:var(--green-d);color:var(--green)">最新</span></a>
+    <a class="ni" href="changelog.html#v7.4.7">v7.4.7 · E nav + 孤儿防御<span class="nb" style="background:var(--green-d);color:var(--green)">最新</span></a>
+    <a class="ni" href="changelog.html#v7.4.6">v7.4.6 · nav 统一风格</a>
+    <a class="ni" href="changelog.html#v7.4.5">v7.4.5 · A/B/G/H 布局统一</a>
+    <a class="ni" href="changelog.html#v7.4.4">v7.4.4 · E/F 遮挡紧急修复</a>
+    <a class="ni" href="changelog.html#v7.4.3">v7.4.3 · 顶部悬空修复</a>
+    <a class="ni" href="changelog.html#v7.4.2">v7.4.2 · 折叠真正修复</a>
+    <a class="ni" href="changelog.html#v7.4.1">v7.4.1 · 视图过滤+保护修复</a>
+    <a class="ni" href="changelog.html#v7.3.1">v7.3.1 · 批量推送修复</a>
+    <a class="ni" href="changelog.html#v7.3">v7.3 · Supabase 实时后端</a>
+    <a class="ni" href="changelog.html#v7.2">v7.2 · 团队同步</a>
     <a class="ni" href="changelog.html#v7.1">v7.1 · 决策面板修复+导入导出</a>
     <a class="ni" href="changelog.html#v7">v7 · 决策面板+首页修复</a>
     <a class="ni" href="changelog.html#v6">v6 · 三级定价+G/H</a>
@@ -220,5 +229,7 @@ function updateHero(){
 updateHero();
 
 </script>
+<!-- v7.4: View Filter (no FB_KEY set, so feedback logic skipped — only view filter runs) -->
+<script src="/fb.js"></script>
 </body>
 </html>

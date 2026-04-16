@@ -1,7 +1,8 @@
 /*
- * MSC.AI Shared Navigation v6
+ * MSC.AI Shared Navigation v7
  * Add <script src="/nav.js"></script> to any page — sidebar auto-injects
  * v6: A-F prefixes on all pages, unified naming
+ * v7.4: added v7.4 changelog entry
  */
 (function(){
 const PAGES = [
@@ -10,7 +11,6 @@ const PAGES = [
     { href: 'chatB.html', label: 'B · 空状态+反馈闭环', badge: '关键', badgeColor: '#f87171' },
     { href: 'chatC.html', label: 'C · 卡片+金额感知' },
     { href: 'chatD.html', label: 'D · 确认+留存+异常' },
-    { href: 'architecture.html', label: '🏗️ 界面架构方案', badge: '已定', badgeColor: '#34d399' },
   ]},
   { cat: '商业机制', icon: '🔐', items: [
     { href: 'chatE.html', label: 'E · AI资产确权', badge: '已更新', badgeColor: '#fbbf24' },
@@ -19,10 +19,20 @@ const PAGES = [
     { href: 'chatH.html', label: 'H · AI自动审核流程', badge: '提案', badgeColor: '#A29BFE' },
   ]},
   { cat: '工程交付', icon: '📐', items: [
+    { href: 'architecture.html', label: '🏗️ 界面架构方案', badge: '已定', badgeColor: '#34d399' },
     { href: 'product-spec.html', label: '📦 产品规格文档' },
   ]},
   { cat: '更新记录', icon: '📋', items: [
-    { href: 'changelog.html#v7.2', label: 'v7.2 · Git-based 团队同步', badge: '最新', badgeColor: '#34d399' },
+    { href: 'changelog.html#v7.4.7', label: 'v7.4.7 · E nav + 孤儿防御', badge: '最新', badgeColor: '#34d399' },
+    { href: 'changelog.html#v7.4.6', label: 'v7.4.6 · nav 统一风格' },
+    { href: 'changelog.html#v7.4.5', label: 'v7.4.5 · A/B/G/H 布局统一' },
+    { href: 'changelog.html#v7.4.4', label: 'v7.4.4 · E/F 遮挡紧急修复' },
+    { href: 'changelog.html#v7.4.3', label: 'v7.4.3 · 顶部悬空修复' },
+    { href: 'changelog.html#v7.4.2', label: 'v7.4.2 · 折叠真正修复' },
+    { href: 'changelog.html#v7.4.1', label: 'v7.4.1 · 视图过滤+保护修复' },
+    { href: 'changelog.html#v7.3.1', label: 'v7.3.1 · 批量推送修复' },
+    { href: 'changelog.html#v7.3', label: 'v7.3 · Supabase 实时后端' },
+    { href: 'changelog.html#v7.2', label: 'v7.2 · Git-based 团队同步' },
     { href: 'changelog.html#v7.1', label: 'v7.1 · 决策面板修复+导入导出' },
     { href: 'changelog.html#v7', label: 'v7 · 决策面板+首页修复' },
     { href: 'changelog.html#v6', label: 'v6 · 三级定价+CEO反馈整合' },
@@ -109,7 +119,84 @@ style.textContent = `
   /* Hide old inline top nav when sidebar is present */
   body > div[style*="position:sticky"][style*="z-index:9999"]{display:none !important}
   /* Fix gap: old header was top:36px to account for old nav, now reset to 0 */
-  .header{top:0 !important}
+  .header,.site-header{top:0 !important}
+  /* v7.4.3: same fix for .nav (was top:88px = 36 header gap + 52 header height, now just 52) */
+  .nav,.nav-bar{top:52px !important}
+  /* v7.4.5: chatA .site-header height is ~57px (padding:16px + 25px content), so its nav-bar
+     needs more than 52px. Use min offset per page — A nav uses 60px via override. */
+  /* v7.4.4: removed global .summary-bar{top:49px} — was breaking chatE/F (fixed bottom bar) */
+  /* v7.4.3: ensure sticky header has solid (not translucent) background
+     so content underneath doesn't bleed through. */
+  .header,.site-header{background:#0D0F14 !important;backdrop-filter:none !important}
+  .nav,.nav-bar{background:#0D0F14 !important;backdrop-filter:none !important}
+  /* v7.4.3: when clicking anchor links, offset scroll so content isn't hidden
+     beneath sticky header. */
+  .section[id],.card[id],h1[id],h2[id],h3[id],[id^="sec-"]{scroll-margin-top:110px}
+
+  /* ═══════════════════════════════════════════════════════════════════════
+   * v7.4.6: UNIFIED NAV TAB STYLE — all pages use A's "bottom-line" style
+   * - Default: text muted, transparent 2px bottom border
+   * - Active/hover: text in page accent color, bottom border in page accent
+   * - Overrides each page's own .nav a styles (background, border, etc)
+   * ═══════════════════════════════════════════════════════════════════════ */
+  /* Base style for all nav anchors — override background/border from old styles */
+  .nav a, .nav-item, .nav-bar a {
+    display: inline-flex !important;
+    align-items: center !important;
+    padding: 10px 14px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    background: transparent !important;
+    border: 0 !important;
+    border-bottom: 2px solid transparent !important;
+    border-radius: 0 !important;
+    color: var(--text2, var(--text-muted, #8b95a8)) !important;
+    text-decoration: none !important;
+    white-space: nowrap !important;
+    transition: color 0.15s, border-bottom-color 0.15s !important;
+  }
+  .nav a:hover, .nav-item:hover, .nav-bar a:hover {
+    color: var(--text, #E8E9ED) !important;
+  }
+  /* Active state — subclass per page so color stays page-specific. Default green. */
+  .nav a.active, .nav-item.active, .nav-bar a.active {
+    color: var(--accent-green, #34d399) !important;
+    border-bottom-color: var(--accent-green, #34d399) !important;
+  }
+  /* Per-page active color overrides (identified by body class or existing CSS var patterns) */
+  /* chatB: blue — override via .nav a.active when page has --blue */
+  body.page-chatB .nav a.active { color: #60a5fa !important; border-bottom-color: #60a5fa !important; }
+  body.page-chatC .nav a.active { color: #F9CA24 !important; border-bottom-color: #F9CA24 !important; }
+  body.page-chatD .nav a.active { color: #f87171 !important; border-bottom-color: #f87171 !important; }
+  body.page-chatE .nav a.active { color: #A29BFE !important; border-bottom-color: #A29BFE !important; }
+  body.page-chatF .nav a.active { color: #34d399 !important; border-bottom-color: #34d399 !important; }
+  body.page-chatG .nav a.active { color: #34d399 !important; border-bottom-color: #34d399 !important; }
+  body.page-chatH .nav a.active { color: #A29BFE !important; border-bottom-color: #A29BFE !important; }
+  body.page-architecture .nav a.active { color: #5CE7C8 !important; border-bottom-color: #5CE7C8 !important; }
+  body.page-product-spec .nav a.active { color: #e8923d !important; border-bottom-color: #e8923d !important; }
+
+  /* Ensure nav container is sticky on ALL pages (G/H were static before) */
+  .nav, .nav-bar {
+    position: sticky !important;
+    top: 52px !important;
+    z-index: 90 !important;
+    background: #0D0F14 !important;
+    backdrop-filter: none !important;
+    border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+    overflow-x: auto !important;
+    scrollbar-width: none !important;
+    margin-bottom: 0 !important;
+  }
+  /* .nav uses flex directly, padding needed */
+  .nav {
+    padding: 0 20px !important;
+    display: flex !important;
+    gap: 2px !important;
+  }
+  /* .nav-bar wraps .nav-inner which already handles flex + max-width — don't force its padding */
+  .nav-bar { padding: 0 !important; }
+  .nav-inner { display: flex !important; gap: 2px !important; padding: 0 24px !important; }
+  .nav::-webkit-scrollbar, .nav-bar::-webkit-scrollbar { display: none !important; }
 `;
 document.head.appendChild(style);
 
@@ -164,6 +251,84 @@ document.querySelectorAll('.card-body .fb').forEach(fb => {
     fb.style.borderTop = '1px solid rgba(255,255,255,.06)';
   }
 });
+
+/* ═══════════════════════════════════════════════════════════════════════
+ * v7.4.6: Unified nav tab behavior across all pages
+ * 1. Tag body with page class (for per-page accent color)
+ * 2. Intercept anchor clicks: instant jump (no smooth scroll), auto-update .active
+ * 3. Scroll-spy: when scrolling freely, highlight the nav tab whose section is in view
+ * ═══════════════════════════════════════════════════════════════════════ */
+(function(){
+  // 1) Tag body with page class
+  const pageKey = currentPage.replace('.html', '') || 'index';
+  document.body.classList.add('page-' + pageKey);
+
+  // 2) Find all nav anchor links (across both .nav and .nav-bar styles)
+  const navLinks = document.querySelectorAll('.nav a[href^="#"], .nav-bar a[href^="#"], .nav-item[href^="#"]');
+  if (navLinks.length === 0) return;
+
+  function setActive(activeLink) {
+    navLinks.forEach(a => a.classList.remove('active'));
+    if (activeLink) activeLink.classList.add('active');
+  }
+
+  // 3) Intercept clicks — instant jump, no smooth scroll
+  navLinks.forEach(link => {
+    link.addEventListener('click', function(e) {
+      const href = this.getAttribute('href');
+      if (!href || !href.startsWith('#')) return;
+      const targetId = href.slice(1);
+      const target = document.getElementById(targetId);
+      if (!target) return;
+      e.preventDefault();
+      // Instant scroll (not smooth)
+      const headerOffset = 110; // header(~52) + nav(~40) + margin
+      const rect = target.getBoundingClientRect();
+      const targetY = rect.top + window.pageYOffset - headerOffset;
+      window.scrollTo({ top: targetY, behavior: 'instant' });
+      // Update URL hash without triggering native scroll
+      history.replaceState(null, '', href);
+      // Immediately set this link active
+      setActive(this);
+    });
+  });
+
+  // 4) Scroll-spy — when user scrolls freely, highlight the nav tab matching
+  //    the section currently near the top of viewport.
+  //    v7.4.7: keep id and section element paired (was: two parallel arrays,
+  //    which silently broke whenever a nav link pointed to a non-existent id)
+  const pairs = Array.from(navLinks)
+    .map(a => {
+      const id = a.getAttribute('href').slice(1);
+      const el = document.getElementById(id);
+      return el ? { id: id, el: el, link: a } : null;
+    })
+    .filter(Boolean);
+
+  let spyTimer = null;
+  function updateSpy() {
+    const scrollY = window.pageYOffset;
+    const offset = 140;
+    let activeIdx = -1;
+    for (let i = 0; i < pairs.length; i++) {
+      const secTop = pairs[i].el.getBoundingClientRect().top + scrollY;
+      if (secTop - offset <= scrollY) activeIdx = i;
+      else break;
+    }
+    if (activeIdx >= 0) {
+      const activeLink = pairs[activeIdx].link;
+      if (!activeLink.classList.contains('active')) {
+        setActive(activeLink);
+      }
+    }
+  }
+  window.addEventListener('scroll', function() {
+    if (spyTimer) return;
+    spyTimer = setTimeout(function() { spyTimer = null; updateSpy(); }, 50);
+  });
+  // Run once on load to sync initial state
+  setTimeout(updateSpy, 100);
+})();
 
 
 

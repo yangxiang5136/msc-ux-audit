@@ -7,13 +7,14 @@
 <style>
 :root{--bg:#0D0F14;--bg2:#161922;--bg3:#1C1F2B;--bg4:#1E2130;--brd:#2A2D3A;--text:#E8E9ED;--text2:#9CA0B0;--text3:#6B7084;--accent:#6C5CE7;--accent-l:#A29BFE;--green:#00B894;--green-bg:rgba(0,184,148,.12);--amber:#FDCB6E;--amber-bg:rgba(253,203,110,.12);--red:#FF6B6B;--red-bg:rgba(255,107,107,.12);--blue:#74B9FF;--blue-bg:rgba(116,185,255,.12);--gold:#F9CA24}
 *{margin:0;padding:0;box-sizing:border-box}body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased}
-.header{position:sticky;top:0;z-index:100;background:#0D0F14;border-bottom:1px solid var(--brd);padding:14px 20px;display:flex;align-items:center;gap:12px}
-.header h1{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}
+.header{position:sticky;top:0;z-index:100;background:#0D0F14;border-bottom:1px solid var(--brd);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.header h1{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;margin:0}
 .header .badge{font-size:11px;padding:3px 10px;background:rgba(108,92,231,.12);color:var(--accent-l);border:1px solid rgba(108,92,231,.25);border-radius:20px}
-.summary-bar{position:sticky;top:49px;z-index:90;background:#161922;border-bottom:1px solid var(--brd);padding:8px 20px;display:flex;align-items:center;gap:16px}
-.sb-item{font-size:12px;color:var(--text3);display:flex;align-items:center;gap:4px}
-.sb-n{font-weight:700;font-size:14px}
-.sb-n.g{color:var(--green)}.sb-n.a{color:var(--amber)}.sb-n.r{color:var(--red)}
+.header .stats{display:flex;align-items:center;gap:14px;font-size:12px;color:var(--text2);flex-shrink:0}
+.header .stats span{display:flex;align-items:center;gap:4px}
+.header .stats .s-a{color:var(--green)}
+.header .stats .s-d{color:#fbbf24}
+.header .stats .s-x{color:#f87171}
 .main{max-width:960px;margin:0 auto;padding:24px 16px 80px}
 .nav{display:flex;gap:0;overflow-x:auto;border-bottom:1px solid var(--brd);margin-bottom:24px;}
 .nav a{padding:8px 14px;font-size:12px;color:var(--text3);text-decoration:none;white-space:nowrap;border-bottom:2px solid transparent;transition:all .15s}
@@ -125,12 +126,11 @@
 
 <div class="header">
   <h1>MSC-H · AI自动审核流程 <span class="badge">提案</span></h1>
-</div>
-
-<div class="summary-bar">
-  <div class="sb-item"><span class="sb-n g" id="ca2">0</span> 同意</div>
-  <div class="sb-item"><span class="sb-n a" id="cd2">0</span> 讨论</div>
-  <div class="sb-item"><span class="sb-n r" id="cx2">0</span> 不同意</div>
+  <div class="stats">
+    <span class="s-a">✓ <b id="ca2">0</b></span>
+    <span class="s-d">💬 <b id="cd2">0</b></span>
+    <span class="s-x">✗ <b id="cx2">0</b></span>
+  </div>
 </div>
 
 <div class="nav">

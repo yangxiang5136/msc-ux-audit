@@ -402,11 +402,11 @@ const K='msc_arch_fb';
 function ld(){try{return JSON.parse(localStorage.getItem(K))||{}}catch{return{}}}
 function sv(d){localStorage.setItem(K,JSON.stringify(d));up()}
 function tog(h){h.closest('.cflow').classList.toggle('open')}
-function sf(b,t,id){const cls=t==='a'?'s-a':t==='d'?'s-d':'s-x';const was=b.classList.contains(cls);b.parentElement.querySelectorAll('.fb-b').forEach(x=>x.className='fb-b');const d=ld();if(was){if(!d[id])d[id]={};delete d[id].c;d[id].t=new Date().toISOString();sv(d);SYNC.push(id,'')}else{b.classList.add(cls);d[id]={...(d[id]||{}),c:t,t:new Date().toISOString()};sv(d);SYNC.push(id,t)}}
-function sn(ta,id){const d=ld();d[id]={...(d[id]||{}),n:ta.value,t:new Date().toISOString()};sv(d);SYNC.push(id,undefined,ta.value)}
+function sf(b,t,id){const cls=t==='a'?'s-a':t==='d'?'s-d':'s-x';const was=b.classList.contains(cls);b.parentElement.querySelectorAll('.fb-b').forEach(x=>x.className='fb-b');const d=ld();if(was){if(!d[id])d[id]={};delete d[id].c;d[id].t=new Date().toISOString();sv(d)}else{b.classList.add(cls);d[id]={...(d[id]||{}),c:t,t:new Date().toISOString()};sv(d)}}
+function sn(ta,id){const d=ld();d[id]={...(d[id]||{}),n:ta.value,t:new Date().toISOString()};sv(d)}
 function up(){const d=ld();let a=0,dd=0,x=0;Object.values(d).forEach(v=>{if(v.c==='a')a++;if(v.c==='d')dd++;if(v.c==='x')x++});document.getElementById('ca').textContent=a;document.getElementById('cd').textContent=dd;document.getElementById('cx').textContent=x}
 function render(d){Object.entries(d).forEach(([id,v])=>{const w=document.querySelector('.fb[data-id="'+id+'"]');if(!w)return;if(v.c){const bs=w.querySelectorAll('.fb-b');bs.forEach(x=>x.className='fb-b');const idx=v.c==='a'?0:v.c==='d'?1:2;if(bs[idx])bs[idx].classList.add(v.c==='a'?'s-a':v.c==='d'?'s-d':'s-x')}if(v.n){const ta=w.querySelector('.fb-n');if(ta)ta.value=v.n}});up()}
-document.addEventListener('DOMContentLoaded',async()=>{await SYNC.pull();render(ld())});
+document.addEventListener('DOMContentLoaded',()=>{render(ld())});
 const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){const id=e.target.id;document.querySelectorAll('.nav a').forEach(a=>{a.classList.toggle('active',a.getAttribute('href')==='#'+id)})}})},{rootMargin:'-100px 0px -60% 0px'});
 document.querySelectorAll('.sec[id]').forEach(s=>obs.observe(s));
 
