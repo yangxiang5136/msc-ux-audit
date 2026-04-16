@@ -157,8 +157,15 @@ const PAGES = [
 let ALL_ITEMS = [];
 let CURRENT_TAB = 'a';
 let CURRENT_PAGE = 'all';
+let _isLoading = false;
+let _pendingLoad = false;
+let _bulkPushing = false;
 
 async function loadAll() {
+  // Reentrance guard — if already loading, queue one more run after
+  if (_isLoading) { _pendingLoad = true; return; }
+  _isLoading = true;
+  
   document.getElementById('content').innerHTML = '<div class="loading">加载反馈数据中...</div>';
   ALL_ITEMS = [];
   
@@ -429,26 +436,33 @@ async function loadAll() {
     render();
     updateDiagnostic();
     // Subscribe to realtime changes so decisions panel stays live
+    // Debounced: multiple events within 800ms only trigger ONE reload
     if (sb && !window._MSC_SUB) {
+      let _debounceTimer = null;
       window._MSC_SUB = sb.subscribe(function(payload) {
-        // Any feedback change → reload everything (simple, reliable)
-        console.log('[Decisions] Realtime update:', payload);
-        // Brief visual nudge
+        // Skip during bulk push (we'll refresh once at the end)
+        if (_bulkPushing) return;
+        console.log('[Decisions] Realtime update queued:', payload.eventType || payload.event);
         const syncInfo = document.getElementById('sync-info');
         if (syncInfo) {
-          const prev = syncInfo.innerHTML;
           syncInfo.innerHTML = `🔄 <strong>收到新反馈</strong> · 正在刷新...`;
           syncInfo.style.color = '#60a5fa';
-          setTimeout(() => loadAll(), 400);
-        } else {
-          loadAll();
         }
+        clearTimeout(_debounceTimer);
+        _debounceTimer = setTimeout(() => { _debounceTimer = null; loadAll(); }, 800);
       });
     }
     
   } catch(err) {
     document.getElementById('content').innerHTML = '<div class="empty"><h3>加载失败</h3><p>无法读取反馈数据。请刷新页面重试。</p></div>';
     console.error(err);
+  } finally {
+    _isLoading = false;
+    // If another load was queued during this one, run it now
+    if (_pendingLoad) {
+      _pendingLoad = false;
+      setTimeout(() => loadAll(), 100);
+    }
   }
 }
 
@@ -583,6 +597,9 @@ async function pushLocalToSupabase(event) {
   const origText = btn ? btn.textContent : '';
   if (btn) { btn.textContent = `☁ 推送中 (0/${rows.length})...`; btn.disabled = true; }
   
+  // Suppress realtime subscription triggers during bulk push
+  _bulkPushing = true;
+  
   let ok = 0, fail = 0;
   for (let i = 0; i < rows.length; i++) {
     const r = rows[i];
@@ -592,6 +609,9 @@ async function pushLocalToSupabase(event) {
     } catch(e) { fail++; console.warn('Upsert failed:', r, e); }
     if (btn) btn.textContent = `☁ 推送中 (${i+1}/${rows.length})...`;
   }
+  
+  // Re-enable realtime and do ONE clean reload
+  _bulkPushing = false;
   
   if (btn) { btn.textContent = origText; btn.disabled = false; }
   alert(`✓ 推送完成：${ok} 条成功，${fail} 条失败。正在刷新...`);

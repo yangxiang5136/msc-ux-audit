@@ -55,9 +55,33 @@
 <div class="main">
 
 <!-- V5 -->
+<div class="ver" id="v7.3.1">
+  <div class="ver-head open" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')">
+    <span class="ver-tag latest">v7.3.1</span>
+    <span class="ver-title">修复批量推送时的 UI 重复渲染</span>
+    <span class="ver-date">2026-04-16</span>
+    <span class="ver-arrow">▼</span>
+  </div>
+  <div class="ver-body show">
+    <div class="ch-stats"><span class="ch-stat fix-stat">3项修复</span></div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">竞态条件修复</div>
+      <div class="ch-item"><span class="ch-type fix">修</span><div class="ch-content"><strong>loadAll 不可重入</strong>：加 _isLoading 锁。已在跑就排队，避免并发 loadAll 往 ALL_ITEMS 数组互相 push 导致的 UI 重复</div></div>
+      <div class="ch-item"><span class="ch-type fix">修</span><div class="ch-content"><strong>Realtime 回调防抖</strong>：800ms 内多次变更只触发一次 loadAll（之前每次订阅事件都 setTimeout(loadAll, 400) → 批量推送时 59 个事件触发 59 次 loadAll 并发）</div></div>
+      <div class="ch-item"><span class="ch-type fix">修</span><div class="ch-content"><strong>批量推送时暂停订阅</strong>：pushLocalToSupabase 跑完前设置 _bulkPushing=true，订阅回调跳过；结束后手动 loadAll 一次</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">已验证</div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content">Supabase 数据库层面无重复（composite unique constraint 生效，59 行 0 重复）。之前看到的"很多重复"纯粹是 UI 渲染 bug</div></div>
+    </div>
+  </div>
+</div>
+
 <div class="ver" id="v7.3">
   <div class="ver-head open" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')">
-    <span class="ver-tag latest">v7.3</span>
+    <span class="ver-tag prev">v7.3</span>
     <span class="ver-title">Supabase 实时后端（秒级跨设备同步）</span>
     <span class="ver-date">2026-04-16</span>
     <span class="ver-arrow">▼</span>
