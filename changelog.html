@@ -54,10 +54,60 @@
 
 <div class="main">
 
+<!-- V7.5.0 -->
+<div class="ver" id="v7.5.0">
+  <div class="ver-head open" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')">
+    <span class="ver-tag latest" style="background:#F9CA24;color:#000">v7.5.0</span>
+    <span class="ver-title">🎯 里程碑版本：产品规格同步 CEO 最新决策</span>
+    <span class="ver-date">2026-04-16</span>
+    <span class="ver-arrow">▼</span>
+  </div>
+  <div class="ver-body show">
+    <div class="ch-stats"><span class="ch-stat new-stat">6 项内容更新</span><span class="ch-stat mod-stat">3 项 CEO 新决策记录</span></div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">这是一个里程碑版本</div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content">v7.4.x 全是 UI bug 修复。v7.5.0 是<strong>内容规范化</strong>—— product-spec 文档过时内容清零，开发拿到的字段/流程/定价跟 CEO 已确认决策一致</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">product-spec 6 处过时内容已更新</div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>平台抽成 0.1~0.5%</strong> → 三层收入（¥699 押金 + ¥240 运营服务费 + 1-3% 交易手续费，最低 ¥100/笔）</div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>白版/金版 命名废止</strong> → 三级定价架构：首个免费 · ¥99/周 · ¥349/月 · ¥699 一次性可退押金</div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>AI 资产字段表重写</strong>：tier 枚举改为 4 值，新增 tier_price / tier_start_at / tier_expires_at / deposit_refundable 字段</div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>bonus_fund 用途明确</strong>：¥699 方案赠送的 ¥699 基金 — 仅限发任务使用，不可提现（CEO 2026-04-16 确认）</div></div>
+      <div class="ch-item"><span class="ch-type fix">删</span><div class="ch-content"><strong>reclaim_deadline 字段 + "收回" 机制</strong> → 删除。三级定价里没有"收回"概念（租赁到期 = status=expired；押金方案长期有效）</div></div>
+      <div class="ch-item"><span class="ch-type fix">删</span><div class="ch-content"><strong>Lv.1-4 成长阶梯整块</strong> → 替换为 placeholder "成长体系 · 待 CEO 新方向确定"。保留原因：开发需要知道这个字段将来会复活</div></div>
+      <div class="ch-item"><span class="ch-type mod">标</span><div class="ch-content"><strong>提现手续费数字</strong>（每月 N 次免费、¥X/次）→ 保留规则但标"待 CEO 确认（Q6）"</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">决策汇总从 7 项扩到 10 项</div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content">原 7 项架构投票决策保留。新增 3 项 2026-04-15/16 的 CEO 确认：三级定价架构 ✅ / ¥699 基金仅限发任务 ✅ / Lv.1-4 成长阶梯否决 ❌</div></div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content">决策汇总模块默认展开（mod.open），新用户一眼能看到 v7.5.0 更新标签</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">标识 / 版本</div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content">product-spec header badge：<code>工程视角 v1</code> → <code>工程视角 v2 · 2026-04-16</code></div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">技术验证</div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content">标签配对 100% 平衡（section/div/ul/li/table 全部 open=close）；product-spec 折叠开关正常（20 个 mod）；nav sticky + 点击 active 正常；全站 8 页面折叠可见性无回归</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">下一步（方向 2）</div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content">v7.5.0 关上了"内容过时"这道门。下一步是<strong>后端存储架构</strong>：把内容 + 版本 + 反馈历史存到 Supabase，页面从数据渲染。这是架构级改造，另起 chat 专门讨论设计方案</div></div>
+    </div>
+  </div>
+</div>
+
 <!-- V7.4.8 -->
 <div class="ver" id="v7.4.8">
   <div class="ver-head open" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')">
-    <span class="ver-tag latest">v7.4.8</span>
+    <span class="ver-tag prev">v7.4.8</span>
     <span class="ver-title">architecture.html 折叠修复（第三种 CSS 模式）</span>
     <span class="ver-date">2026-04-16</span>
     <span class="ver-arrow">▼</span>

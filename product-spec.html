@@ -116,7 +116,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',sans-seri
 <!-- MSC NAV --><div style="position:sticky;top:0;z-index:9999;background:rgba(10,12,16,.95);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.08);padding:8px 16px;display:flex;align-items:center;gap:12px;font-family:Noto Sans SC,sans-serif;font-size:12px;overflow-x:auto;scrollbar-width:none"><a href="index.html" style="color:#34d399;text-decoration:none;font-weight:700;white-space:nowrap;display:flex;align-items:center;gap:4px"><span style="display:inline-flex;width:20px;height:20px;background:linear-gradient(135deg,#34d399,#60a5fa);border-radius:5px;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:#000">M</span>首页</a><span style="color:#5a6478">│</span><a href="chatA.html" style="color:#8b95a8;text-decoration:none;white-space:nowrap;padding:3px 8px;border-radius:4px">1·信任</a><a href="chatB.html" style="color:#8b95a8;text-decoration:none;white-space:nowrap;padding:3px 8px;border-radius:4px">2+3·空状态</a><a href="chatC.html" style="color:#8b95a8;text-decoration:none;white-space:nowrap;padding:3px 8px;border-radius:4px">4+5·卡片金额</a><a href="chatD.html" style="color:#8b95a8;text-decoration:none;white-space:nowrap;padding:3px 8px;border-radius:4px">6+7+8·确认留存</a><a href="architecture.html" style="color:#8b95a8;text-decoration:none;white-space:nowrap;padding:3px 8px;border-radius:4px">架构方案</a><a href="product-spec.html" style="color:#e8923d;text-decoration:none;white-space:nowrap;padding:3px 8px;border-radius:4px;background:rgba(232,146,61,.08);border:1px solid rgba(232,146,61,.2)">产品规格</a></div>
 <div id="g-tip"></div>
 
-<div class="header"><span class="header-title">MSC.AI · 产品规格文档</span><span class="header-badge">工程视角 v1</span></div>
+<div class="header"><span class="header-title">MSC.AI · 产品规格文档</span><span class="header-badge">工程视角 v2 · 2026-04-16</span></div>
 <nav class="nav">
 <a href="#decisions" class="active">决策汇总</a>
 <a href="#sitemap">全局页面地图</a>
@@ -136,8 +136,11 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',sans-seri
 <div class="sec-title">项目背景</div>
 
 <div class="mod">
-<div class="mod-head" onclick="modToggle(this)"><div class="mod-icon" style="background:rgba(232,146,61,.12)">📋</div><span class="mod-name">CEO决策汇总（7项已确认）</span><span class="mod-count">点击展开</span><span class="mod-arrow">▼</span></div>
-<div class="mod-body"><div class="mod-inner">
+<div class="mod-head open" onclick="modToggle(this)"><div class="mod-icon" style="background:rgba(232,146,61,.12)">📋</div><span class="mod-name">CEO 决策汇总（10 项已确认）</span><span class="mod-count">点击展开</span><span class="mod-arrow">▼</span></div>
+<div class="mod-body show"><div class="mod-inner">
+<div style="padding:10px 12px;background:rgba(0,184,148,.08);border-left:3px solid var(--green);border-radius:0 6px 6px 0;font-size:12px;color:var(--t2);margin-bottom:12px">
+<strong style="color:var(--green)">v7.5.0 更新（2026-04-16）</strong>：本文档已同步 CEO 最新决策 —— 三级定价架构确认、¥699 基金仅限发任务、Lv.1-4 成长阶梯被否决（暂缓）。6 处过时内容已清理。
+</div>
 <div class="decision"><strong>架构方案：方案C（中置发布）确认</strong><br>底部Tab栏：任务广场 | 中间"+"发布 | 我的。发布入口在Tab中间，任务广场纯接单。<div class="src">来源：架构投票 f-vC</div></div>
 <div class="decision"><strong>发任务流程经过AI资产确权</strong><br>发任务 → AI资产创建/选择 → 确权 → 发任务配置。首次用户的AI资产确权需做到"丝滑无负担"。<div class="src">来源：架构投票 f-vA</div></div>
 <div class="decision"><strong>新手引导：任务驱动为主 + 卡点提醒</strong><br>不用全屏蒙版教程。以新手挑战任务驱动引导，在数据显示的特定卡点再添加提示。<div class="src">来源：架构投票 f-tutorial</div></div>
@@ -145,6 +148,9 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',sans-seri
 <div class="decision"><strong>AI生态任务实时到账</strong><br>AI生态任务是否可以实时结算？用户押金15天期限后是否及时到账？——待产品侧确认规则。<div class="src">来源：维度1 a-1.5</div></div>
 <div class="decision"><strong>任务类别可扩展</strong><br>当前4种任务类型只是初始集，筛选/分类系统需设计为可扩展。<div class="src">来源：维度4 c-4.2</div></div>
 <div class="decision"><strong>方案B（4Tab经典分离）否决</strong><div class="src">来源：架构投票 f-vB</div></div>
+<div class="decision" style="border-left-color:var(--green)"><strong>三级定价架构确认</strong><br>首个 AI 资产免费；第 2+ 起选 ¥99/周租赁 · ¥349/月租赁（均不可退）· ¥699 一次性押金（可退+送 ¥699 基金）。取消白版/金版命名。<div class="src">来源：2026-04-15 CEO 确认</div></div>
+<div class="decision" style="border-left-color:var(--green)"><strong>¥699 方案赠送的基金用途</strong><br>¥699 押金方案赠送 ¥699 任务基金 — <strong>仅限发任务使用，不可提现</strong>。<div class="src">来源：2026-04-16 CEO 确认</div></div>
+<div class="decision" style="border-left-color:var(--red)"><strong>Lv.1-4 成长阶梯否决（暂缓）</strong><br>原设计的四级成长阶梯（新手/能手/达人/金牌）被 CEO 否决 — "限制任务数 = 限制用户赚钱 = 用户流失"。CEO 新方向：每日活动基金（细节待确认）。前端暂不实现等级 UI。<div class="src">来源：2026-04-15 CEO 反馈</div></div>
 </div></div></div>
 
 <div class="mod open">
@@ -164,7 +170,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',sans-seri
   <ul>
     <li><span class="tn tn-data">接单（零门槛）→ 赚钱 → 流量入口</span></li>
     <li><span class="tn tn-data">发任务（需绑定AI资产）→ 从接单者升级为发布者</span></li>
-    <li><span class="tn tn-data">平台抽成 0.1~0.5%</span></li>
+    <li><span class="tn tn-data">平台收入 = 确权押金 ¥699（可退） + 运营服务费 ¥240/笔 + 交易手续费 1-3%（最低 ¥100/笔）</span></li>
   </ul></li>
   <li><span class="tn tn-func">③ AI交易与排行榜</span> <span class="tn-label" style="background:rgba(212,160,74,.1);color:var(--amber)">需确认设计</span>
   <ul>
@@ -188,7 +194,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',sans-seri
         <div style="font-size:10px;color:var(--t3);margin-top:2px">核心用户 · 待确认设计</div>
       </div>
       <div style="font-size:11px;color:var(--t2);line-height:1.6;text-align:center">
-        交易AI资产（二级市场）· 排行榜 · Lv.4建团队<br>
+        交易AI资产（二级市场）· 排行榜<br>
         <span style="font-size:10px;color:var(--t3)">→ BP第二阶段：AI资本市场重构</span>
       </div>
     </div>
@@ -350,8 +356,8 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',sans-seri
     <li><span class="tree-toggle tn tn-page" onclick="treeToggle(this)">Step 1 · AI资产确权（一键） <a href="#m-asset" class="tn-jump" style="font-size:9px;color:var(--t3);margin-left:4px">→ AI资产模块</a></span>
     <ul>
       <li><span class="tn tn-func">已有资产 → 跳过，直接进入Step 2</span></li>
-      <li><span class="tn tn-func">无资产 → 弹出✓确认 → 系统自动生成白版AI资产（免费）</span></li>
-      <li><span class="tn tn-gray">确权后 → 阶梯提醒引导交押金（见AI资产模块详解）</span></li>
+      <li><span class="tn tn-func">无资产 → 弹出✓确认 → 系统自动生成<strong>首个免费 AI 资产</strong>（仅限首个，后续资产需选择付费方案）</span></li>
+      <li><span class="tn tn-gray">有资产需新增 → 引导选择三级定价方案（见 AI 资产模块详解）</span></li>
     </ul></li>
     <li><span class="tree-toggle tn tn-page" onclick="treeToggle(this)">Step 2 · 选择任务类型</span>
     <ul>
@@ -415,13 +421,13 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',sans-seri
         <span class="ref">信任提示行<span class="ref-tip"><strong>参考「信任」· 1.1</strong><br>"资金由平台托管" + 展开三重保障面板</span></span>
       ）</span></li>
     </ul></li>
-    <li><span class="tree-toggle tn tn-func" onclick="treeToggle(this)">等级与成就 <a href="#m-user" class="tn-jump" style="font-size:9px;color:var(--t3);margin-left:4px">→ 用户模块</a></span>
+    <li><span class="tree-toggle tn tn-func" onclick="treeToggle(this)">成长体系 <span class="tn-label" style="background:rgba(253,203,110,.1);color:var(--amber);font-size:9px">暂缓</span></span>
     <ul>
-      <li><span class="tn tn-data">
-        <span class="ref">4级等级体系<span class="ref-tip"><strong>参考「确认留存」· 7.1</strong><br>新手→能手→达人→金牌，含进度条+权益阶梯</span></span>
+      <li><span class="tn tn-gray">
+        <span class="ref">Lv.1-4 四级体系<span class="ref-tip"><strong>CEO 已否决</strong><br>原设计：新手/能手/达人/金牌。否决理由：限制任务数 = 限制用户赚钱</span></span>
       </span></li>
-      <li><span class="tn tn-data">
-        <span class="ref">成就徽章<span class="ref-tip"><strong>参考「确认留存」· 7.3原chatD</strong><br>月入过千/AI先锋/助力50家/万元户</span></span>
+      <li><span class="tn tn-gray">
+        <span class="ref">成就徽章<span class="ref-tip"><strong>依赖成长体系新方向</strong><br>CEO 新方向（每日活动基金）确定后重新设计</span></span>
       </span></li>
     </ul></li>
     <li><span class="tree-toggle tn tn-func" onclick="treeToggle(this)">AI中心（资产+自动赚钱） <a href="#m-asset" class="tn-jump" style="font-size:9px;color:var(--t3);margin-left:4px">→ AI资产模块</a></span>
@@ -644,63 +650,69 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',sans-seri
 <tr><td class="fname">audience</td><td>string</td><td>受众群体</td></tr>
 <tr><td class="fname">is_verified</td><td>boolean</td><td>是否已确权（✓勾选即为true）</td></tr>
 <tr><td class="fname">verified_at</td><td>datetime</td><td>确权时间</td></tr>
-<tr><td class="fname">tier</td><td>enum</td><td>white（白版·免费）/ deposited（已交押金）</td></tr>
-<tr><td class="fname">deposit_amount</td><td>decimal</td><td>押金金额（0=白版）<span style="color:var(--t3);font-size:10px"> · 待确认：是否分档</span></td></tr>
-<tr><td class="fname">deposit_paid_at</td><td>datetime</td><td>押金缴纳时间</td></tr>
-<tr><td class="fname">bonus_fund</td><td>decimal</td><td>1:1匹配的任务基金余额 <span style="color:var(--t3);font-size:10px"> · 待确认：仅发任务用还是通用</span></td></tr>
-<tr><td class="fname">reclaim_deadline</td><td>datetime</td><td>白版资产收回截止日 <span style="color:var(--t3);font-size:10px"> · 待确认：宽限期长度</span></td></tr>
+<tr><td class="fname">tier</td><td>enum</td><td>free（首个免费）/ rental_week（¥99/周）/ rental_month（¥349/月）/ deposit_once（¥699 押金可退）</td></tr>
+<tr><td class="fname">tier_price</td><td>decimal</td><td>当前方案的价格（0/99/349/699）</td></tr>
+<tr><td class="fname">tier_start_at</td><td>datetime</td><td>当前方案开始时间（租赁方案用于计算到期）</td></tr>
+<tr><td class="fname">tier_expires_at</td><td>datetime</td><td>租赁方案的到期时间；deposit_once 方案为 null（长期有效）</td></tr>
+<tr><td class="fname">deposit_refundable</td><td>boolean</td><td>是否可退押金（仅 deposit_once 方案=true；租赁方案=false）</td></tr>
+<tr><td class="fname">bonus_fund</td><td>decimal</td><td>¥699 押金方案赠送的 ¥699 任务基金余额 <span style="color:var(--green);font-size:10px"> · 仅限发任务使用，不可提现</span></td></tr>
 <tr><td class="fname">total_earned</td><td>decimal</td><td>该资产累计产生的收益（增值可视化）</td></tr>
 <tr><td class="fname">estimated_value</td><td>decimal</td><td>资产估值（收益+信用+数据积累 → 计算）</td></tr>
 <tr><td class="fname">total_tasks_published</td><td>int</td><td>通过该资产发布的任务总数</td></tr>
 <tr><td class="fname">total_spent</td><td>decimal</td><td>通过该资产累计支出</td></tr>
-<tr><td class="fname">status</td><td>enum</td><td>active / pending_reclaim（待收回提醒期）/ frozen / deleted</td></tr>
+<tr><td class="fname">status</td><td>enum</td><td>active / expired（租赁到期）/ refunded（押金已退）/ frozen / deleted</td></tr>
 <tr><td class="fname">created_at</td><td>datetime</td><td>创建时间</td></tr>
 </table>
 </div></div></div>
 
 <div class="mod">
-<div class="mod-head" onclick="modToggle(this)"><div class="mod-icon" style="background:rgba(155,109,255,.12)">🔀</div><span class="mod-name">AI资产确权策略（三步走）</span><span class="mod-arrow">▼</span></div>
+<div class="mod-head" onclick="modToggle(this)"><div class="mod-icon" style="background:rgba(155,109,255,.12)">🔀</div><span class="mod-name">AI资产确权策略（三级定价架构）</span><span class="mod-arrow">▼</span></div>
 <div class="mod-body"><div class="mod-inner">
-<div class="decision"><strong>CEO最新方向：</strong>先免费给白版资产 → 阶梯引导交押金 → 资产自然增值。核心逻辑是"先给再收"。<div class="src">来源：CEO最新反馈</div></div>
+<div class="decision"><strong>CEO 已确认方向：</strong>首个 AI 资产免费 → 第 2 个起三级定价架构（¥99/周 · ¥349/月 · ¥699 一次性可退押金）→ 资产自然增值。<div class="src">来源：2026-04-15 CEO 确认</div></div>
 
-<div class="tree"><ul><li><span class="tn tn-root">三步走策略</span>
+<div class="tree"><ul><li><span class="tn tn-root">三级定价架构</span>
 <ul>
-  <li><span class="tree-toggle tn tn-func" onclick="treeToggle(this)">Step 1 · 零摩擦确权（发布时一键完成）</span>
+  <li><span class="tree-toggle tn tn-func" onclick="treeToggle(this)">首个 AI 资产 · 免费（零摩擦确权）</span>
   <ul>
-    <li><span class="tn tn-action">用户点"+"发布 → 勾选✓"同意创建AI资产" → 系统自动生成白版资产</span></li>
-    <li><span class="tn tn-data">白版资产：免费、基础功能、用户几乎无感知即完成确权</span></li>
+    <li><span class="tn tn-action">用户点 "+" 发布 → 勾选 ✓"同意创建 AI 资产" → 系统自动生成首个免费资产</span></li>
+    <li><span class="tn tn-data">tier=free，几乎无感知完成确权</span></li>
     <li><span class="tn tn-func">确权后直接进入任务类型选择 → 继续发布流程</span></li>
-    <li><span class="tn tn-gray">已有资产的用户跳过此步</span></li>
-    <li><span class="tn tn-gray" style="font-size:11px">待确认：白版资产是否有名称/类型？纯接单用户是否也有获得途径？</span></li>
+    <li><span class="tn tn-gray">仅限首个。已有免费资产的用户要新增资产，必须选下面三级付费方案之一</span></li>
   </ul></li>
 
-  <li><span class="tree-toggle tn tn-func" onclick="treeToggle(this)">Step 2 · 阶梯式引导交押金</span>
+  <li><span class="tree-toggle tn tn-func" onclick="treeToggle(this)">第 2+ 个资产 · 三级定价选择</span>
   <ul>
-    <li><span class="tn tn-action">(a) 利益驱动 · 活动提醒</span>
-    <ul>
-      <li><span class="tn tn-data">"押金1:1匹配任务基金"——交¥100押金，送¥100任务基金</span></li>
-      <li><span class="tn tn-gray" style="font-size:11px">待确认：基金仅限发任务使用，还是等同余额？押金金额是否分档？</span></li>
-    </ul></li>
-    <li><span class="tn tn-alert">(b) 损失厌恶 · AI资产收回提醒</span>
-    <ul>
-      <li><span class="tn tn-data">"你的AI资产将在X天后收回"——用户已产生数据/收益，害怕失去</span></li>
-      <li><span class="tn tn-gray" style="font-size:11px">待确认：收回=删除还是冻结？宽限期多长？进行中任务如何处理？</span></li>
-    </ul></li>
-    <li><span class="tn tn-action">(c) 功能解锁 · 优化提醒</span>
-    <ul>
-      <li><span class="tn tn-data">"交押金解锁更多功能"——更高效自动接单、更多任务类型、优先匹配</span></li>
-    </ul></li>
-    <li><span class="tn tn-gray">(a)(b)(c)为阶梯式触发，非同时出现</span></li>
-    <li><span class="tn tn-gray" style="font-size:11px">待确认：各阶段触发时机（按天数？按行为？）。提醒形式（弹窗/通知/页面卡片？）。押金是否可退、是否有锁定期？</span></li>
+    <li><span class="tn tn-data">
+      <strong style="color:var(--blue)">方案 A · ¥99/周租赁</strong>
+      <ul>
+        <li><span class="tn tn-gray">不可退款，到期资产失效（status=expired）</span></li>
+        <li><span class="tn tn-gray">适合短期高强度项目的用户</span></li>
+      </ul>
+    </span></li>
+    <li><span class="tn tn-data">
+      <strong style="color:var(--amber)">方案 B · ¥349/月租赁</strong>
+      <ul>
+        <li><span class="tn tn-gray">不可退款，按月续费</span></li>
+        <li><span class="tn tn-gray">Break-even 约 7 周（比 ¥99/周 更划算的临界点）</span></li>
+      </ul>
+    </span></li>
+    <li><span class="tn tn-data">
+      <strong style="color:var(--green)">方案 C · ¥699 一次性（推荐）</strong>
+      <ul>
+        <li><span class="tn tn-gray">性质：<strong>可退押金</strong>，不是服务费</span></li>
+        <li><span class="tn tn-gray">赠送 ¥699 任务基金（<strong>仅限发任务使用</strong>，不可提现）</span></li>
+        <li><span class="tn tn-gray">资产长期有效，用户退出时可退还 ¥699 押金</span></li>
+      </ul>
+    </span></li>
   </ul></li>
 
-  <li><span class="tree-toggle tn tn-func" onclick="treeToggle(this)">Step 3 · AI资产自然增值（digital me）</span>
+  <li><span class="tree-toggle tn tn-func" onclick="treeToggle(this)">资产自然增值（所有 tier 通用）</span>
   <ul>
     <li><span class="tn tn-data">接任务 → 资产积累完成记录和信用</span></li>
-    <li><span class="tn tn-data">AI自动赚钱 → 资产产生被动收益</span></li>
-    <li><span class="tn tn-data">优化AI资产 → 更高效、更值钱</span></li>
-    <li><span class="tn tn-func">资产价值可视化 → "你的AI资产已价值¥XXX"</span></li>
-    <li><span class="tn tn-func">为AI交易（第三营收支柱）打基础 → 有价值才值得交易</span></li>
+    <li><span class="tn tn-data">AI 自动赚钱 → 资产产生被动收益</span></li>
+    <li><span class="tn tn-data">优化 AI 资产 → 更高效、更值钱</span></li>
+    <li><span class="tn tn-func">资产价值可视化 → "你的 AI 资产已价值 ¥XXX"</span></li>
+    <li><span class="tn tn-func">为 AI 交易（第三营收支柱）打基础 → 有价值才值得交易</span></li>
   </ul></li>
 </ul>
 </li></ul></div>
@@ -758,15 +770,14 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',sans-seri
 </div></div></div>
 
 <div class="mod">
-<div class="mod-head" onclick="modToggle(this)"><div class="mod-icon" style="background:rgba(76,175,125,.12)">📈</div><span class="mod-name">等级升级条件与权益</span><span class="mod-arrow">▼</span></div>
+<div class="mod-head" onclick="modToggle(this)"><div class="mod-icon" style="background:rgba(139,149,168,.12)">🚧</div><span class="mod-name">成长体系 · 待 CEO 新方向确定</span><span class="mod-arrow">▼</span></div>
 <div class="mod-body"><div class="mod-inner">
-<table class="fields">
-<tr><th>等级</th><th>升级条件</th><th>功能权益</th><th>身份权益</th></tr>
-<tr><td class="fname">🌱 Lv.1 新手</td><td>注册即得</td><td>基础任务</td><td>—</td></tr>
-<tr><td class="fname">⚡ Lv.2 能手</td><td>完成10单 + 信用4.5+</td><td>中级任务 · 接单上限+5</td><td>蓝色头像框 · ⚡标识</td></tr>
-<tr><td class="fname">🔥 Lv.3 达人</td><td>完成50单 + 信用4.8+</td><td>高价任务 · 优先推荐</td><td>自定义头像框色 · 称号</td></tr>
-<tr><td class="fname">👑 Lv.4 金牌</td><td>完成200单 + 30天连续</td><td>全任务 · 费率优惠 · 专属客服</td><td>金色高亮 · 达人榜 · 可建团队</td></tr>
-</table>
+<div style="padding:16px;background:rgba(253,203,110,.06);border-left:3px solid var(--amber);border-radius:0 6px 6px 0;font-size:13px;line-height:1.7;color:var(--t2)">
+<strong style="color:var(--amber)">⏸ 设计暂缓</strong><br>
+原 Lv.1-4（新手/能手/达人/金牌）四级成长阶梯 <strong>已被 CEO 否决</strong>。核心理由：任务数量上限与分级 = 限制用户赚钱 = 用户流失。<br><br>
+<strong>CEO 提出的替代方向</strong>：每日活动基金 — 用户每天来领免费基金 → 用基金发任务 → 体验"发布者"角色 → 产生平台粘性。具体金额、规则、是否可累积等细节待 CEO 确认。<br><br>
+<strong>对数据模型的影响</strong>：<code style="background:var(--bg3);padding:2px 6px;border-radius:4px">user.level</code>、<code style="background:var(--bg3);padding:2px 6px;border-radius:4px">user.tasks_completed_at_level</code> 等字段<strong>暂不实现</strong>。当 CEO 确认新方向后，此模块重新设计。前端暂时不做"等级图标/进度条/升级提示"等相关 UI。
+</div>
 </div></div></div>
 
 
@@ -790,8 +801,6 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',sans-seri
 <tr><td class="fname">冻结金额</td><td>account.frozen_balance</td><td>灰色小字"发布中任务托管"</td></tr>
 <tr><td class="fname">我接的任务数</td><td>COUNT(order) WHERE acceptor=me AND status IN (active)</td><td>点击 → 接单列表</td></tr>
 <tr><td class="fname">我发布的任务数</td><td>COUNT(task) WHERE publisher=me AND status IN (active)</td><td>点击 → 发布列表</td></tr>
-<tr><td class="fname">当前等级</td><td>user.level</td><td>等级图标 + 进度条到下一级</td></tr>
-<tr><td class="fname">等级进度</td><td>tasks_completed / next_level_threshold</td><td>"再完成8单升级为⚡能手"</td></tr>
 </table>
 <div class="p" style="margin-top:12px"><strong>AI中心区域</strong></div>
 <table class="fields">
@@ -801,7 +810,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',sans-seri
 <tr><td class="fname">AI资产总价值</td><td>SUM(ai_asset.total_spent + earnings)</td><td>估算值，探索阶段可隐藏</td></tr>
 </table>
 </div></div></div>
-<div class="fb" data-id="ps-user"><div class="fb-t">团队反馈</div><div class="fb-desc">用户模块（实体字段 + 信用分 + 等级体系）</div><div class="fb-btns"><button class="fb-b" onclick="sf(this,'a','ps-user')">✅ 接受</button><button class="fb-b" onclick="sf(this,'d','ps-user')">💬 讨论</button><button class="fb-b" onclick="sf(this,'x','ps-user')">❌ 拒绝</button></div><textarea class="fb-n" placeholder="补充说明…" onchange="sn(this,'ps-user')"></textarea></div>
+<div class="fb" data-id="ps-user"><div class="fb-t">团队反馈</div><div class="fb-desc">用户模块（实体字段 + 信用分，成长体系暂缓）</div><div class="fb-btns"><button class="fb-b" onclick="sf(this,'a','ps-user')">✅ 接受</button><button class="fb-b" onclick="sf(this,'d','ps-user')">💬 讨论</button><button class="fb-b" onclick="sf(this,'x','ps-user')">❌ 拒绝</button></div><textarea class="fb-n" placeholder="补充说明…" onchange="sn(this,'ps-user')"></textarea></div>
 </section>
 
 <hr class="sep">
@@ -962,7 +971,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',sans-seri
     <li><span class="tn tn-data">available_balance -= amount</span></li>
     <li><span class="tn tn-data">到账方式：微信零钱（默认）/ 银行卡</span></li>
     <li><span class="tn tn-data">到账时间：T+1工作日</span></li>
-    <li><span class="tn tn-data">手续费：每月3次免费，之后¥1/次</span></li>
+    <li><span class="tn tn-data">手续费：每月 N 次免费，之后 ¥X/次 <span style="color:var(--amber);font-size:10px"> · 具体数字待 CEO 确认（Q6）</span></span></li>
     <li><span class="tn tn-func">
       <span class="ref">倒计时确认<span class="ref-tip"><strong>参考「确认留存」· 6.3</strong><br>3秒冷静期 + AI收益机会成本展示</span></span>
     </span></li>
@@ -1005,7 +1014,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',sans-seri
 <tr><td class="fname">提现金额输入</td><td>用户输入</td><td>快捷按钮：全部提现 / ¥10 / ¥50 / ¥100</td></tr>
 <tr><td class="fname">到账方式</td><td>用户选择</td><td>微信零钱(默认) / 银行卡</td></tr>
 <tr><td class="fname">到账时间</td><td>静态规则</td><td>"预计T+1工作日到账"</td></tr>
-<tr><td class="fname">手续费提示</td><td>free_withdrawals_left</td><td>"本月免费提现剩余2次" 或 "手续费¥1"</td></tr>
+<tr><td class="fname">手续费提示</td><td>free_withdrawals_left</td><td>"本月免费提现剩余 N 次" 或 "手续费 ¥X" <span style="color:var(--amber);font-size:10px">· 待 CEO 确认</span></td></tr>
 <tr><td class="fname">提现记录</td><td>tx WHERE type=withdraw ORDER BY created_at DESC</td><td>状态颜色编码：处理中=琥珀/已到账=绿/失败=红</td></tr>
 <tr><td class="fname">客服入口</td><td>—</td><td>底部"提现遇到问题？联系客服"</td></tr>
 </table>
