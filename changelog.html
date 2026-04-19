@@ -56,11 +56,14 @@
 <body>
 
 <div class="header">
-  <h1>📋 更新记录 <span class="badge">v1 → v7.6.0</span></h1>
+  <h1>📋 更新记录 <span class="badge">v1 → v7.8.0</span></h1>
 </div>
 
 <div class="nav">
-  <a href="#v7.6.0" class="active">v7.6.0 <span class="milestone">里程碑</span></a>
+  <a href="#v7.8.0" class="active">v7.8.0 <span class="milestone">里程碑</span></a>
+  <a href="#v7.7.1">v7.7.1 <span class="milestone">微调</span></a>
+  <a href="#v7.7.0">v7.7.0 <span class="milestone">里程碑</span></a>
+  <a href="#v7.6.0">v7.6.0 <span class="milestone">里程碑</span></a>
   <a href="#v7.5.0">v7.5.0 <span class="milestone">里程碑</span></a>
   <a href="#v7.4.8">v7.4.8</a>
   <a href="#v7.4.7">v7.4.7</a>
@@ -84,6 +87,157 @@
 </div>
 
 <div class="main">
+
+<!-- V7.8.0 -->
+<div class="ver" id="v7.8.0">
+  <div class="ver-head open" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')">
+    <span class="ver-tag latest" style="background:#81ECEC;color:#000">v7.8.0</span>
+    <span class="ver-title">🏢 里程碑:chatK 扩展 B 端 · C+B 双端完整闭环</span>
+    <span class="ver-date">2026-04-19</span>
+    <span class="ver-arrow">▼</span>
+  </div>
+  <div class="ver-body show">
+    <div class="ch-stats"><span class="ch-stat new-stat">chatK 7 章→11 章</span><span class="ch-stat mod-stat">12 反馈块→20</span></div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">架构决策:B 端并入 chatK 而非独立 chatL</div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content">原计划 B 端作为独立 chatL。CEO 调整为并入 chatK——C 端 B 端同属"交易平台 UI",只是视角不同。一个连贯的演示页比两个割裂 chat 对投资人更有说服力</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">新增 K.8-K.11 四章(B 端视角)</div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>K.8 B 端后台形态决策</strong>:A 独立 App / B 小程序 / C Web 三方案对比 + 决策:<strong>C(Web 主)+ B(小程序辅)双形态并行</strong>。含双形态架构图 + 小程序极简 mockup</div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>K.9 企业资产总览</strong>:Web dashboard 首屏——4 KPI(资产数/部署门店/效率收益/版税收入)+ 资产组合 + 对外版税 + 员工贡献排行。总部一眼看全局</div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>K.10 员工 AI 资产 + L3 跨公司流通</strong>:<br>• K.10.1 混合视图(默认按员工分组,可切换按 A/B/C 归属模式分组)<br>• K.10.2 L3 跨公司流通管理 + <strong>三道信任防线</strong>(数据脱敏层 / 权限隔离 / 审计日志)——投资人最常问的问题 UI 直接给答案</div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>K.11 合约托管 + 财务审计</strong>:<br>• 合约列表(活跃/到期/已结)+ KPI(活跃金额/托管中/下一期到账)<br>• 合约详情(分账明细 + 版税流水 + 开票凭证)<br>• 审计报表导出(5 类报表 · Excel/PDF/API)<br>• <strong>结算中心的 UI 具象化</strong>——给 CFO 看的财务系统</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">新增决策点(4 个)</div>
+      <div class="ch-item"><span class="ch-type mod">⚡</span><div class="ch-content">K.8 B 端形态选择(Web+小程序双形态)</div></div>
+      <div class="ch-item"><span class="ch-type mod">⚡</span><div class="ch-content">K.10 员工分组视图(混合视图 · 默认按员工,可切按归属)</div></div>
+      <div class="ch-item"><span class="ch-type mod">⚡</span><div class="ch-content">K.10 跨公司信任机制展示(方案 A · UI 直接展示三道防线)</div></div>
+      <div class="ch-item"><span class="ch-type mod">⚡</span><div class="ch-content">K.11 合约详细度(方案 B · 中等 · 企业财务系统感)</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">鹿角茶贯穿故事扩展到 B 端</div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content">C 端:"鹿角茶数字化团队"作为创作者 · B 端:升级为"<strong>鹿角茶集团总部</strong>"(200 家门店)视角——同一家企业,C 端员工创作,B 端总部管理</div></div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content">投资人一次看完 chatK 就能理解:<strong>一家连锁餐饮企业的数字化团队</strong>,在平台上创作 AI 资产、持有 AI 资产、向 4 个跨行业卖出 AI 资产、管理员工归属、通过结算中心完成对公合约托管和财务审计</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">技术实现</div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content">Web dashboard mockup 样式:webmock / kpi-grid / webpanel / emp-row / asset-row / ct-tbl / trust-grid 等 10 余个新 class</div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content">B 端用绿色品牌色(#00B894)做强调 · 保留 cyan(#81ECEC)做 AIEO 和跨域标记 · 琥珀/金色做归属模式区分(A 金 · B 青 · C 绿)</div></div>
+      <div class="ch-item"><span class="ch-type mod">改</span><div class="ch-content">chatK 顶部 nav 从 7 tab 扩到 11 tab · intro 文案更新为双端表述</div></div>
+      <div class="ch-item"><span class="ch-type mod">改</span><div class="ch-content">index.html chatK landing 卡片:7章→11章 · C+B 双端标签 · 9 决策点</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">验证结果</div>
+      <div class="ch-item"><span class="ch-type mod">✓</span><div class="ch-content">11 sections · 11 nav · 无 orphan · 20 fb 块 · 19 card 全部 nextElementSibling 正确配对 · div 715/715 平衡 · 无禁用函数名</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- V7.7.1 -->
+<div class="ver" id="v7.7.1">
+  <div class="ver-head open" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')">
+    <span class="ver-tag latest" style="background:#81ECEC;color:#000">v7.7.1</span>
+    <span class="ver-title">🎨 chatK 色彩重调 + 鹿角茶案例贯穿</span>
+    <span class="ver-date">2026-04-19</span>
+    <span class="ver-arrow">▼</span>
+  </div>
+  <div class="ver-body show">
+    <div class="ch-stats"><span class="ch-stat new-stat">基于 CEO 反馈</span><span class="ch-stat mod-stat">分两层完善</span></div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">色彩分层(页面装饰 vs mockup 产品色)</div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content">CEO 反馈:"粉色扎眼 · mockup 内部应回归传统 app 设计色"</div></div>
+      <div class="ch-item"><span class="ch-type fix">改</span><div class="ch-content"><strong>页面装饰色</strong>从 dusty rose #D48BB0 切回 <strong>cyan #81ECEC</strong>(和 chatJ 统一)——header badge · nav active · section 编号 · intro banner · 决策点标签。通过 CSS 变量重定向实现,58 处自动覆盖</div></div>
+      <div class="ch-item"><span class="ch-type fix">改</span><div class="ch-content"><strong>mockup 内部色</strong>改为传统 app 配色:CTA 按钮 · 价格 · 底部 nav on 用 <strong>green #00B894</strong>(钱 = 绿 = 支付宝/微信支付风格)· 贡献度评分用 <strong>amber #FDCB6E</strong>(金融感)· 原创标签用 <strong>gold #F9CA24</strong>(稀缺金)· AIEO 推荐保留 cyan 品类标记</div></div>
+      <div class="ch-item"><span class="ch-type mod">原</span><div class="ch-content">此设计分层遵循"页面阅读颜色"和"产品呈现颜色"分开的成熟设计原则——文档页的装饰色不强加到被演示的产品上</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">案例全面替换:鹿角茶 × 4 跨域贯穿故事</div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content">CEO 反馈:"餐饮选址决策框架"太像知识付费,不够投资人 toB 视角。餐馆案例的真正优势是<strong>线下→线上颠覆(如排号系统)</strong></div></div>
+      <div class="ch-item"><span class="ch-type fix">改</span><div class="ch-content"><strong>资产粒度</strong>:从"决策框架"(方法论文档)升级为"<strong>完整 SaaS 工作流</strong>"(前端 + AI + 数据流)。价格从"¥960 单次调用"升级为"¥29,800/年 企业订阅"——直接体现 toB SaaS 估值逻辑</div></div>
+      <div class="ch-item"><span class="ch-type fix">改</span><div class="ch-content"><strong>主角案例</strong>:"餐饮选址决策框架 · 陈老师" → <strong>"鹿角茶·智能排号系统 · 鹿角茶数字化团队"</strong>。鹿角茶是虚构的连锁奶茶品牌(50-200 家店规模),数字化团队自研排号 SaaS 后在平台上架</div></div>
+      <div class="ch-item"><span class="ch-type fix">改</span><div class="ch-content"><strong>衍生跨域</strong>:从 3 个同行业衍生(夜市摊位/奶茶选址/小县城火锅)扩展为<strong>4 个真正跨行业案例</strong>——小星咖啡·取号改良版(衍生 72)· 美发店·预约叫号(衍生 68)· 社区诊所·分诊排队(衍生 64)· 健身房·器械预约(衍生 58)。直观展示"一个系统 × 跨越 4 个行业"</div></div>
+      <div class="ch-item"><span class="ch-type fix">改</span><div class="ch-content"><strong>故事链条贯穿全 7 章</strong>:K.2 列表看到 → K.3 详情研究贡献度 94 + 衍生树 → K.4 AIEO 推荐(行为/上下文/预算/稀缺 + ¥80 万自研 vs 2 周部署机会成本)→ K.5 下单(¥29,800 + ¥894 服务费 + ¥578 分成 = ¥30,694 · 对公转账)→ K.6 持仓(已部署 12 家店 · 日均节省 ¥1,200)→ K.7 创作者仪表盘(直接订阅 ¥540,000 + 追溯分成 ¥74,560 · 衍生跨域分布 42/35/28/23)</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">验证结果</div>
+      <div class="ch-item"><span class="ch-type mod">✓</span><div class="ch-content">chatK.html 66 KB · 7 sections · 12 fb 块 · 12 card · div 412/412 平衡 · 无禁用函数名自定义</div></div>
+      <div class="ch-item"><span class="ch-type mod">✓</span><div class="ch-content">"鹿角茶·智能排号系统"贯穿出现 8 次覆盖全 7 章 · 老案例(餐饮选址/陈老师/抑郁型客户/Q4 增长/夜市摊位等)全部清零</div></div>
+      <div class="ch-item"><span class="ch-type mod">✓</span><div class="ch-content">#FF79C6(原 pink)· #D48BB0(dusty rose)引用全部清零 · 唯一硬编码色是 CSS 变量定义内的 cyan/amber/gold</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- V7.7.0 -->
+<div class="ver" id="v7.7.0">
+  <div class="ver-head open" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')">
+    <span class="ver-tag latest" style="background:#D48BB0;color:#000">v7.7.0</span>
+    <span class="ver-title">🎨 里程碑版本:chatK 交易平台 UI 设计</span>
+    <span class="ver-date">2026-04-19</span>
+    <span class="ver-arrow">▼</span>
+  </div>
+  <div class="ver-body show">
+    <div class="ch-stats"><span class="ch-stat new-stat">7 章 UI 设计</span><span class="ch-stat mod-stat">12 个反馈块 · 5 决策点</span></div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">承接 chatJ 战略,落地到具体 UI</div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content">chatJ 回答"为什么做",chatK 回答"用户看到什么 · 点到哪里 · 怎么交易"。chatK 仅聚焦 toC 端,B 端独立后台放 chatL</div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content">主色 <strong>Pink #D48BB0</strong>(目前无页面独占,金融产品主流色,暗色背景下可读性强)</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">chatK 7 章结构</div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>K.1 信息架构</strong>:交易功能以嵌入式加入方案 C 4 Tab + 6 条核心设计原则</div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>K.2 资产列表页</strong>:首屏 mockup + 卡片 4 信息(标题/原创衍生标签/贡献度条/价格)+ 筛选排序 + AIEO 优先排序</div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>K.3 资产详情页</strong>:上半屏(头图+贡献度环形图+价格)+ 贡献度可视化 3 方案对比 + 衍生关系树(祖先/后代一览)</div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>K.4 AIEO 推荐卡片</strong>:透明化设计——4 条推理理由 + 机会成本对比 · 和传统黑盒推荐的核心差异</div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>K.5 下单结算</strong>:分账全透明(创作者/追溯分成/平台)+ 支付成功页 + 交付确认</div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>K.6 持仓中心</strong>:类股票账户风格 + 总价值趋势 + 持有/创作/记录三 tab</div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>K.7 创作者收益仪表盘</strong>:直接收入 + 追溯分成双线 + 衍生健康度——养成闭环的 UI 实现</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">5 个决策点(需 CEO 直接拍板)</div>
+      <div class="ch-item"><span class="ch-type mod">⚡</span><div class="ch-content"><strong>K.2 资产卡片展示信息</strong>:标题/标签/贡献度/衍生次数/价格 · 是否增减</div></div>
+      <div class="ch-item"><span class="ch-type mod">⚡</span><div class="ch-content"><strong>K.3 贡献度可视化方式</strong>:环形图 vs 横条 vs 大数字 · 建议环形图</div></div>
+      <div class="ch-item"><span class="ch-type mod">⚡</span><div class="ch-content"><strong>K.3 衍生关系树深度</strong>:上溯 1 级 + 下溯前 3 · 或更深/更浅</div></div>
+      <div class="ch-item"><span class="ch-type mod">⚡</span><div class="ch-content"><strong>K.4 AIEO 推理理由条数</strong>:4 条 + 机会成本 · 或 3 条简版 · 或动态权重</div></div>
+      <div class="ch-item"><span class="ch-type mod">⚡</span><div class="ch-content"><strong>K.5 费用分解粒度</strong>:完全透明 · 默认折叠 · 只显合计 · 建议默认折叠兼顾信任和简洁</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">mockup 设计原则</div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content">每个 mockup <strong>只突出 1 个核心设计决策</strong>——不追求视觉逼真,追求 CEO 10 秒看懂设计意图</div></div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content">手机外壳统一风格(260px 宽 · 圆角 28px · notch + status bar)· 底部 Bottom Nav 和方案 C 4 Tab 一致</div></div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content">mockup 是<strong>示意图不是最终视觉稿</strong>——后续进 Pixso 展开具体视觉和交互细节</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">技术实现</div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content">FB_KEY = msc_k_fb · FB_PAGE = chatK</div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content">本地 CSS 声明 .nav sticky(不依赖 nav.js 注入)· 遵循 v7.6.0 最新 fix</div></div>
+      <div class="ch-item"><span class="ch-type mod">改</span><div class="ch-content">nav.js: PAGES 加 chatK + pink 主色 CSS 覆盖 + v7.7.0 更新记录</div></div>
+      <div class="ch-item"><span class="ch-type mod">改</span><div class="ch-content">index.html: 侧边栏 + landing 卡片 + 两处 pages 数组 + 更新记录同步</div></div>
+      <div class="ch-item"><span class="ch-type mod">改</span><div class="ch-content">decisions.html: PAGES 数组 + 4 处 key 映射表 + exportFeedback 加 chatK</div></div>
+      <div class="ch-item"><span class="ch-type mod">改</span><div class="ch-content">changelog.html: 新增 v7.7.0 条目 + 版本 nav tab 加 v7.7.0</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">下一步</div>
+      <div class="ch-item"><span class="ch-type mod">提</span><div class="ch-content">chatK 对齐后进入 <strong>chatL · B 端独立后台</strong>(下一个独立 chat),承载 B 端后台形态决策 · 企业资产总览 · 员工 AI 资产报表 · L3 模式跨公司流通管理 · 合约托管 · 财务审计界面</div></div>
+    </div>
+  </div>
+</div>
 
 <!-- V7.6.0 -->
 <div class="ver" id="v7.6.0">

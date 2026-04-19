@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>MSC-K · 交易平台 UI 设计</title>
+<style>
+:root{--bg:#0D0F14;--bg2:#161922;--bg3:#1C1F2B;--bg4:#1E2130;--brd:#2A2D3A;--text:#E8E9ED;--text2:#9CA0B0;--text3:#6B7084;--accent:#6C5CE7;--accent-l:#A29BFE;--green:#00B894;--green-bg:rgba(0,184,148,.12);--amber:#FDCB6E;--amber-bg:rgba(253,203,110,.12);--red:#FF6B6B;--red-bg:rgba(255,107,107,.12);--blue:#74B9FF;--blue-bg:rgba(116,185,255,.12);--gold:#F9CA24;--gold-bg:rgba(249,202,36,.15);--cyan:#81ECEC;--cyan-bg:rgba(129,236,236,.12);--cyan-d:rgba(129,236,236,.25);--pink:#81ECEC;--pink-bg:rgba(129,236,236,.12);--pink-d:rgba(129,236,236,.25)}
+*{margin:0;padding:0;box-sizing:border-box}body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased}
+.header{position:sticky;top:0;z-index:100;background:#0D0F14;border-bottom:1px solid var(--brd);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.header h1{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;margin:0}
+.header .badge{font-size:11px;padding:3px 10px;background:var(--pink-bg);color:var(--pink);border:1px solid var(--pink-d);border-radius:20px}
+.header .stats{display:flex;align-items:center;gap:14px;font-size:12px;color:var(--text2);flex-shrink:0}
+.header .stats span{display:flex;align-items:center;gap:4px}
+.header .stats .s-a{color:var(--green)}
+.header .stats .s-d{color:#fbbf24}
+.header .stats .s-x{color:#f87171}
+.main{max-width:960px;margin:0 auto;padding:24px 16px 80px}
+.nav{position:sticky;top:52px;z-index:90;display:flex;gap:0;overflow-x:auto;border-bottom:1px solid var(--brd);margin-bottom:24px;background:#0D0F14;padding:0 20px;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav a{padding:8px 14px;font-size:12px;color:var(--text3);text-decoration:none;white-space:nowrap;border-bottom:2px solid transparent;transition:all .15s}
+.nav a:hover{color:var(--text)}
+.nav a.active{color:var(--pink);border-bottom-color:var(--pink)}
+.section{margin-bottom:48px}
+.section-head{font-size:20px;font-weight:700;margin-bottom:6px;padding-top:20px}
+.section-head .n{color:var(--pink);margin-right:8px}
+.section-sub{font-size:14px;color:var(--text2);margin-bottom:20px;line-height:1.6}
+.card{border:1px solid var(--brd);border-radius:12px;overflow:hidden;margin-bottom:16px}
+.card-head{padding:14px 18px;background:var(--bg2);display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
+.card-head:hover{background:var(--bg3)}
+.cn{font-size:11px;padding:3px 8px;border-radius:5px;font-weight:700}
+.cn.g{background:var(--green-bg);color:var(--green)}
+.cn.b{background:var(--blue-bg);color:var(--blue)}
+.cn.r{background:var(--red-bg);color:var(--red)}
+.cn.go{background:var(--amber-bg);color:var(--amber)}
+.cn.p{background:rgba(108,92,231,.12);color:var(--accent-l)}
+.cn.c{background:var(--cyan-bg,rgba(129,236,236,.12));color:var(--cyan)}
+.cn.pk{background:var(--pink-bg);color:var(--pink)}
+.cm{flex:1;font-size:13px;font-weight:600}
+.ca{color:var(--text3);font-size:12px;transition:transform .2s}
+.card-head.open .ca{transform:rotate(180deg)}
+.card-body{display:none;padding:18px;background:var(--bg2);border-top:1px solid var(--brd)}
+.card-body.show{display:block}
+.tip{padding:12px 14px;border-left:3px solid var(--pink);background:rgba(129,236,236,.04);border-radius:0 6px 6px 0;margin:12px 0;font-size:12px;color:var(--text2);line-height:1.8}
+.tip.warn{border-left-color:var(--amber);background:rgba(253,203,110,.04)}
+.tip.danger{border-left-color:var(--red);background:rgba(255,107,107,.04)}
+.tip.ok{border-left-color:var(--green);background:rgba(0,184,148,.04)}
+.tip.purple{border-left-color:var(--accent-l);background:rgba(108,92,231,.04)}
+.tip.cyan{border-left-color:var(--cyan);background:rgba(129,236,236,.04)}
+
+.t{width:100%;border-collapse:collapse;margin:12px 0;font-size:12px}
+.t th{background:var(--bg3);padding:8px 12px;text-align:left;font-weight:600;color:var(--text2)}
+.t td{padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:top}
+.t tr:hover td{background:rgba(255,255,255,.02)}
+.t td b{color:var(--text)}
+
+/* ═══════════════════════ 手机 mockup 样式 ═══════════════════════ */
+.mock-row{display:flex;gap:16px;margin:16px 0;flex-wrap:wrap;justify-content:center}
+.mock-col{display:flex;flex-direction:column;align-items:center;gap:8px}
+.mock-label{font-size:11px;color:var(--text3);text-align:center;max-width:260px;line-height:1.6}
+.mock-label b{color:var(--pink)}
+.phone{width:260px;background:#05070c;border-radius:28px;padding:8px;box-shadow:0 4px 20px rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.06);flex-shrink:0}
+.phone-scr{background:var(--bg);border-radius:22px;overflow:hidden;min-height:480px;position:relative}
+.phone-notch{height:18px;display:flex;align-items:center;justify-content:center;position:relative}
+.phone-notch::before{content:'';width:80px;height:14px;background:#05070c;border-radius:0 0 12px 12px;position:absolute;top:0}
+.phone-status{height:20px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;font-size:9px;color:var(--text2)}
+.phone-status .time{font-weight:700;color:var(--text)}
+.phone-body{padding:12px}
+.phone-topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 4px 14px;border-bottom:1px solid rgba(255,255,255,.04);margin-bottom:12px}
+.phone-topbar-t{font-size:14px;font-weight:700;color:var(--text)}
+.phone-topbar-s{font-size:10px;color:var(--text3);display:flex;align-items:center;gap:4px}
+.phone-bottomnav{position:absolute;bottom:0;left:0;right:0;height:52px;background:var(--bg2);border-top:1px solid var(--brd);display:flex;justify-content:space-around;align-items:center;padding:0 8px}
+.phone-bn-item{display:flex;flex-direction:column;align-items:center;gap:2px;flex:1}
+.phone-bn-i{width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:12px}
+.phone-bn-item.on .phone-bn-i{color:var(--green)}
+.phone-bn-l{font-size:9px;color:var(--text3)}
+.phone-bn-item.on .phone-bn-l{color:var(--green);font-weight:600}
+
+/* Asset card in list */
+.ac{background:var(--bg2);border:1px solid var(--brd);border-radius:10px;padding:10px 12px;margin-bottom:8px;font-size:11px;position:relative}
+.ac-top{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.ac-title{font-size:12px;font-weight:700;color:var(--text);flex:1}
+.ac-tag{font-size:8px;padding:1px 5px;border-radius:3px;font-weight:700}
+.ac-tag.orig{background:var(--gold-bg);color:var(--gold)}
+.ac-tag.deriv{background:var(--amber-bg);color:var(--amber)}
+.ac-tag.aieo{background:var(--cyan-bg);color:var(--cyan)}
+.ac-meta{display:flex;gap:10px;color:var(--text3);font-size:10px;margin-top:3px}
+.ac-meta b{color:var(--text)}
+.ac-meta .pos{color:var(--green)}
+.ac-score{display:flex;align-items:center;gap:4px;font-size:9px;margin-top:6px;padding-top:6px;border-top:1px dashed rgba(255,255,255,.06);color:var(--text3)}
+.ac-score-bar{flex:1;height:3px;background:var(--bg3);border-radius:2px;overflow:hidden}
+.ac-score-fill{height:100%;background:var(--amber);border-radius:2px}
+.ac-price{font-size:14px;font-weight:800;color:var(--green);margin-top:6px}
+.ac-price-sub{font-size:9px;color:var(--text3);font-weight:400;margin-left:4px}
+
+/* Generic mock blocks */
+.mb{background:var(--bg2);border:1px solid var(--brd);border-radius:8px;padding:10px 12px;margin-bottom:8px;font-size:11px}
+.mb-t{font-size:11px;font-weight:700;margin-bottom:4px}
+.mb-s{font-size:10px;color:var(--text3);line-height:1.5}
+.mb-pink{border-color:var(--pink-d);background:rgba(129,236,236,.04)}
+.mb-cyan{border-color:rgba(129,236,236,.25);background:rgba(129,236,236,.04)}
+.mb-amber{border-color:rgba(253,203,110,.25);background:rgba(253,203,110,.04)}
+
+/* Contribution score ring/donut */
+.cscore{display:flex;align-items:center;gap:10px;margin:6px 0}
+.cscore-ring{width:44px;height:44px;border-radius:50%;position:relative;flex-shrink:0}
+.cscore-ring svg{transform:rotate(-90deg);display:block}
+.cscore-ring-txt{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--amber)}
+.cscore-info{flex:1;font-size:10px}
+.cscore-info b{color:var(--text);font-size:11px;display:block;margin-bottom:1px}
+
+/* Tree for derivation */
+.tree{margin:8px 0;font-size:10px}
+.tree-n{display:flex;align-items:center;gap:6px;padding:6px 8px;background:var(--bg3);border-radius:6px;margin-bottom:4px}
+.tree-n.root{border-left:3px solid var(--amber)}
+.tree-n.branch{margin-left:20px;border-left:3px solid var(--text3)}
+.tree-n.leaf{margin-left:40px;border-left:3px solid var(--text3);opacity:.6}
+.tree-n-t{flex:1;font-weight:600}
+.tree-n-s{color:var(--text3);font-size:9px}
+
+/* Pricing/chart mini */
+.mini-chart{height:50px;display:flex;align-items:flex-end;gap:2px;padding:4px;background:var(--bg3);border-radius:6px;margin:6px 0}
+.mini-chart-bar{flex:1;background:var(--green);border-radius:1px;min-height:4px;opacity:.8}
+.mini-chart-bar.cold{background:var(--text3);opacity:.3}
+
+/* Toolbar mockup */
+.mock-toolbar{display:flex;gap:4px;margin-bottom:8px;overflow-x:auto;padding-bottom:4px}
+.mock-toolbar-chip{font-size:9px;padding:3px 8px;border-radius:10px;background:var(--bg3);color:var(--text3);white-space:nowrap;border:1px solid var(--brd)}
+.mock-toolbar-chip.on{background:var(--pink-bg);color:var(--pink);border-color:var(--pink-d)}
+
+/* AIEO reason row */
+.aieo-reason{display:flex;align-items:center;gap:6px;padding:5px 0;font-size:10px;color:var(--text2);border-bottom:1px dashed rgba(255,255,255,.04)}
+.aieo-reason:last-child{border-bottom:0}
+.aieo-reason-k{color:var(--cyan);font-weight:700;flex-shrink:0;width:56px}
+.aieo-reason-v{flex:1}
+
+/* Fancy action button */
+.mbtn{display:block;width:100%;padding:10px;border-radius:8px;text-align:center;font-size:12px;font-weight:700;margin:8px 0 0;background:var(--green);color:#fff;border:none;cursor:default}
+.mbtn.sec{background:transparent;color:var(--green);border:1px solid rgba(0,184,148,.3)}
+
+/* Compare/pair layout */
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.compare .col{padding:14px;border-radius:8px;background:var(--bg3);border:1px solid var(--brd)}
+.compare .col.neg{border-left:3px solid var(--red)}
+.compare .col.pos{border-left:3px solid var(--green)}
+.compare .col h5{font-size:12px;margin-bottom:8px;font-weight:700}
+.compare .col.neg h5{color:var(--red)}
+.compare .col.pos h5{color:var(--green)}
+.compare .col ul{padding-left:14px;font-size:11px;color:var(--text2);line-height:1.7}
+.compare .col li{margin-bottom:4px}
+
+/* Legend strip under a mock row */
+.mock-legend{display:flex;gap:14px;flex-wrap:wrap;padding:10px 12px;background:var(--bg3);border-radius:8px;margin:12px 0;font-size:11px;color:var(--text2)}
+.mock-legend .lg{display:flex;align-items:center;gap:6px}
+.mock-legend .lg-d{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+
+/* IA Flow diagram */
+.ia-diag{background:var(--bg3);border-radius:10px;padding:16px;margin:12px 0}
+.ia-row{display:flex;gap:8px;align-items:stretch;margin-bottom:10px;flex-wrap:wrap}
+.ia-node{flex:1;min-width:130px;padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--brd);font-size:11px}
+.ia-node.top{border-top:2px solid var(--pink)}
+.ia-node.bot{border-top:2px solid var(--cyan)}
+.ia-node-t{font-size:11px;font-weight:700;margin-bottom:3px}
+.ia-node-s{font-size:10px;color:var(--text3);line-height:1.5}
+
+/* Feedback block — same as chatJ */
+.fb{margin-top:14px;padding-top:14px;border-top:1px solid var(--brd)}
+.fb-l{font-size:11px;color:var(--text3);margin-bottom:6px}
+.fb-d{font-size:12px;color:var(--text2);margin-bottom:8px}
+.fb-row{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+.fb-b{padding:5px 14px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--brd);background:transparent;color:var(--text3);transition:all .15s}
+.fb-b:hover{background:var(--bg3);color:var(--text)}
+.fb-b.s-a{background:var(--green-bg);color:var(--green);border-color:rgba(0,184,148,.3)}
+.fb-b.s-d{background:var(--amber-bg);color:var(--amber);border-color:rgba(253,203,110,.3)}
+.fb-b.s-x{background:var(--red-bg);color:var(--red);border-color:rgba(255,107,107,.3)}
+.fb-n{width:100%;background:var(--bg3);border:1px solid var(--brd);border-radius:6px;padding:8px 10px;font-size:11px;color:var(--text2);resize:vertical;min-height:36px;font-family:inherit}
+.fb.decision{background:rgba(129,236,236,.04);border:1px solid var(--pink-d);border-radius:10px;padding:14px;margin-top:14px}
+.fb.decision .fb-l{color:var(--pink);font-weight:700}
+.fb.decision .fb-l::before{content:'⚡ 决策点 · ';color:var(--pink)}
+
+/* Intro banner */
+.intro{background:linear-gradient(135deg,rgba(129,236,236,.08),rgba(129,236,236,.04));border:1px solid var(--pink-d);border-radius:12px;padding:18px 20px;margin-bottom:28px}
+.intro h3{font-size:14px;font-weight:700;color:var(--pink);margin-bottom:8px}
+.intro p{font-size:12px;color:var(--text2);line-height:1.8}
+.intro p + p{margin-top:8px}
+
+/* Decision chips row (for K.1) */
+.chip-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:12px 0}
+.chip-item{padding:12px 14px;background:var(--bg3);border:1px solid var(--brd);border-radius:8px}
+.chip-item h5{font-size:12px;font-weight:700;color:var(--pink);margin-bottom:4px}
+.chip-item p{font-size:11px;color:var(--text2);line-height:1.6}
+
+/* ═══════════════════════ B 端 Web 后台 mockup 样式 ═══════════════════════ */
+.webmock{background:#0B0D13;border:1px solid var(--brd);border-radius:10px;overflow:hidden;margin:12px 0;box-shadow:0 4px 20px rgba(0,0,0,.3)}
+.webmock-bar{background:var(--bg2);padding:8px 12px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--brd);font-size:10px;color:var(--text3)}
+.webmock-bar .dot{width:10px;height:10px;border-radius:50%;background:var(--text3);flex-shrink:0}
+.webmock-bar .dot.r{background:#FF6B6B}
+.webmock-bar .dot.y{background:#FDCB6E}
+.webmock-bar .dot.g{background:#00B894}
+.webmock-bar .url{flex:1;padding:3px 10px;background:var(--bg3);border-radius:4px;font-family:'SF Mono',monospace;font-size:9px;color:var(--text3)}
+.webmock-body{display:grid;grid-template-columns:180px 1fr;min-height:380px}
+.webmock-side{background:var(--bg2);border-right:1px solid var(--brd);padding:12px 8px}
+.webmock-side-brand{font-size:11px;font-weight:800;color:var(--text);padding:6px 8px;margin-bottom:12px;letter-spacing:.3px}
+.webmock-side-section{font-size:9px;color:var(--text3);text-transform:uppercase;padding:8px 8px 4px;letter-spacing:.5px}
+.webmock-side-item{padding:6px 10px;font-size:11px;color:var(--text2);border-radius:6px;cursor:default;margin-bottom:2px;display:flex;align-items:center;gap:6px}
+.webmock-side-item.on{background:rgba(0,184,148,.12);color:var(--green);font-weight:600}
+.webmock-side-item i{width:12px;display:inline-flex;justify-content:center;font-style:normal;font-size:11px}
+.webmock-main{padding:18px 22px;overflow:hidden}
+.webmock-title{font-size:15px;font-weight:800;color:var(--text);margin-bottom:2px}
+.webmock-subtitle{font-size:11px;color:var(--text3);margin-bottom:16px}
+
+/* KPI 卡片 */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.kpi{background:var(--bg2);border:1px solid var(--brd);border-radius:8px;padding:10px 12px}
+.kpi-l{font-size:10px;color:var(--text3);margin-bottom:4px}
+.kpi-v{font-size:18px;font-weight:800;color:var(--text);line-height:1.2}
+.kpi-d{font-size:10px;margin-top:3px}
+.kpi-d.up{color:var(--green)}
+.kpi-d.dn{color:var(--red)}
+.kpi.green .kpi-v{color:var(--green)}
+.kpi.amber .kpi-v{color:var(--amber)}
+.kpi.cyan .kpi-v{color:var(--cyan)}
+.kpi.gold .kpi-v{color:var(--gold)}
+
+/* 2 列布局 */
+.web2col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.webpanel{background:var(--bg2);border:1px solid var(--brd);border-radius:8px;padding:14px}
+.webpanel-t{font-size:12px;font-weight:700;color:var(--text);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.webpanel-t .cnt{font-size:10px;color:var(--text3);font-weight:400;margin-left:auto}
+
+/* 员工行 */
+.emp-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed rgba(255,255,255,.04);font-size:11px}
+.emp-row:last-child{border-bottom:none}
+.emp-av{width:26px;height:26px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--text);flex-shrink:0}
+.emp-info{flex:1;min-width:0}
+.emp-name{font-size:11px;font-weight:700;color:var(--text)}
+.emp-role{font-size:9px;color:var(--text3)}
+.emp-stat{font-size:10px;color:var(--text3);text-align:right}
+.emp-stat b{color:var(--text);font-size:11px;display:block}
+.emp-badge{font-size:9px;padding:2px 6px;border-radius:3px;font-weight:700;white-space:nowrap}
+.emp-badge.a-mode{background:var(--gold-bg);color:var(--gold)}
+.emp-badge.b-mode{background:var(--cyan-bg);color:var(--cyan)}
+.emp-badge.c-mode{background:rgba(0,184,148,.15);color:var(--green)}
+
+/* 资产行 */
+.asset-row{display:grid;grid-template-columns:1fr 80px 80px 80px;gap:8px;padding:6px 0;border-bottom:1px dashed rgba(255,255,255,.04);font-size:10px;align-items:center}
+.asset-row.head{font-size:9px;color:var(--text3);font-weight:700;text-transform:uppercase;border-bottom:1px solid var(--brd);padding-bottom:5px;margin-bottom:3px}
+.asset-row b{color:var(--text)}
+.asset-name{font-size:11px;font-weight:700;color:var(--text)}
+.asset-mode{font-size:9px;padding:2px 5px;border-radius:3px;font-weight:700;width:fit-content}
+.asset-mode.a-mode{background:var(--gold-bg);color:var(--gold)}
+.asset-mode.b-mode{background:var(--cyan-bg);color:var(--cyan)}
+.asset-mode.c-mode{background:rgba(0,184,148,.15);color:var(--green)}
+
+/* 合约表 */
+.ct-tbl{width:100%;border-collapse:collapse;font-size:11px;margin-top:8px}
+.ct-tbl th{background:var(--bg3);padding:7px 10px;text-align:left;font-weight:600;color:var(--text3);font-size:10px;border-bottom:1px solid var(--brd)}
+.ct-tbl td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle}
+.ct-tbl tr.active-row{background:rgba(0,184,148,.04)}
+.ct-stat{font-size:9px;padding:2px 7px;border-radius:10px;font-weight:700}
+.ct-stat.on{background:rgba(0,184,148,.15);color:var(--green)}
+.ct-stat.soon{background:rgba(253,203,110,.15);color:var(--amber)}
+.ct-stat.done{background:rgba(255,255,255,.04);color:var(--text3)}
+
+/* 切换 tab(混合视图) */
+.vw-tabs{display:flex;gap:2px;background:var(--bg3);border-radius:6px;padding:3px;width:fit-content;margin-bottom:12px}
+.vw-tab{padding:4px 12px;font-size:10px;border-radius:4px;cursor:default;color:var(--text3)}
+.vw-tab.on{background:var(--bg);color:var(--text);font-weight:700}
+
+/* 信任三模块卡 */
+.trust-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+.trust-c{padding:10px 12px;background:var(--bg3);border:1px solid var(--brd);border-radius:8px}
+.trust-c-i{font-size:16px;margin-bottom:4px}
+.trust-c-t{font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px}
+.trust-c-d{font-size:10px;color:var(--text3);line-height:1.6}
+.trust-c.dm{border-left:3px solid var(--cyan)}
+.trust-c.pm{border-left:3px solid var(--amber)}
+.trust-c.lg{border-left:3px solid var(--green)}
+
+/* 小程序极简 mockup */
+.mini-phone{width:200px;background:#05070c;border-radius:22px;padding:6px;border:1px solid rgba(255,255,255,.06)}
+.mini-phone-scr{background:var(--bg);border-radius:18px;padding:14px 12px;min-height:320px}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>MSC-K · 交易平台 UI 设计 <span class="badge">产品</span></h1>
+  <div class="stats">
+    <span class="s-a">✓ <b id="ca2">0</b></span>
+    <span class="s-d">💬 <b id="cd2">0</b></span>
+    <span class="s-x">✗ <b id="cx2">0</b></span>
+  </div>
+</div>
+
+<div class="nav">
+  <a href="#sec-k1" class="active">K.1 信息架构</a>
+  <a href="#sec-k2">K.2 资产列表</a>
+  <a href="#sec-k3">K.3 资产详情</a>
+  <a href="#sec-k4">K.4 AIEO 推荐</a>
+  <a href="#sec-k5">K.5 下单结算</a>
+  <a href="#sec-k6">K.6 持仓中心</a>
+  <a href="#sec-k7">K.7 创作者收益</a>
+  <a href="#sec-k8">K.8 B 端形态</a>
+  <a href="#sec-k9">K.9 企业总览</a>
+  <a href="#sec-k10">K.10 员工·流通</a>
+  <a href="#sec-k11">K.11 合约·审计</a>
+</div>
+
+<div class="main">
+
+<div class="intro">
+  <h3>📌 关于本页</h3>
+  <p>chatK 承接 chatJ 战略框架,落地到<b style="color:var(--pink)">交易平台的具体 UI 设计</b>。前页 chatJ 回答"为什么做",本页回答"<b style="color:var(--text)">用户实际看到什么、点到哪里、怎么交易</b>"。</p>
+  <p>本页覆盖<b style="color:var(--cyan)">双端视角</b>——K.1-K.7 聚焦 <b style="color:var(--text)">toC 端</b>交易体验(用户浏览/购买/持仓/创作),K.8-K.11 聚焦 <b style="color:var(--text)">toB 端</b>企业后台(公司视角的资产总览、员工 AI 管理、跨公司流通、合约托管)。一个 chatK 看完整套产品闭环。</p>
+  <p><b style="color:var(--amber)">mockup 声明</b>:本页所有手机示意图是<b style="color:var(--text)">信息密度简化版</b>,每个 mockup 只突出 1 个核心设计决策,不是最终视觉稿。视觉稿和交互细节后续在 Pixso 里展开。</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- ══════════════════════ K.1 · 信息架构 ════════════════════════ -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-k1">
+  <div class="section-head"><span class="n">K.1</span>信息架构:交易平台在哪里</div>
+  <div class="section-sub">交易平台不是独立 App,是 MSC.AI 现有架构中新增的功能模块</div>
+
+  <div class="card"><div class="card-head open" onclick="tog(this)"><span class="cn pk">K.1.1</span><span class="cm">整体导航:与既有 4 Tab 的整合关系</span><span class="ca">▼</span></div><div class="card-body show">
+    <div class="ia-diag">
+      <p style="font-size:11px;color:var(--text3);margin-bottom:10px">基于方案 C 的 4 Tab 底部导航(AI 资产 / 发任务 / 接任务 / 我的任务),交易功能以<b style="color:var(--pink)">两个入口</b>并存:</p>
+      <div class="ia-row">
+        <div class="ia-node top"><div class="ia-node-t">Tab 1 · AI 资产(首页)</div><div class="ia-node-s">顶部 banner 位 · "资产市场"入口 → 直通交易列表页 K.2</div></div>
+        <div class="ia-node top"><div class="ia-node-t">Tab 4 · 我的任务(个人中心)</div><div class="ia-node-s">"我的资产"模块 → 进入持仓中心 K.6(我持有的/我创作的)</div></div>
+      </div>
+      <div class="ia-row">
+        <div class="ia-node bot"><div class="ia-node-t">列表页 K.2</div><div class="ia-node-s">浏览所有可购买资产</div></div>
+        <div class="ia-node bot"><div class="ia-node-t">详情页 K.3</div><div class="ia-node-s">单个资产完整信息</div></div>
+        <div class="ia-node bot"><div class="ia-node-t">下单页 K.5</div><div class="ia-node-s">购买流程 + 结算确认</div></div>
+        <div class="ia-node bot"><div class="ia-node-t">持仓页 K.6</div><div class="ia-node-s">我买的资产 + 收益</div></div>
+      </div>
+    </div>
+    <div class="tip"><b>为什么不单独开一个 Tab?</b>方案 C 已经是 4 Tab 饱和状态。再加会破坏现有信息架构。<b style="color:var(--pink)">交易市场通过"AI 资产"Tab 的 banner 和"我的任务"Tab 的"我的资产"模块两个入口进入</b>,是嵌入式功能不是独立导航项。</div>
+  </div></div>
+
+  <div class="card"><div class="card-head open" onclick="tog(this)"><span class="cn pk">K.1.2</span><span class="cm">核心设计原则(全局贯穿 K.2-K.7)</span><span class="ca">▼</span></div><div class="card-body show">
+    <div class="chip-grid">
+      <div class="chip-item"><h5>1 · 信息密度高</h5><p>每屏核心信息完整:资产类型 · 独立贡献度 · 价格 · 衍生关系 · 我的收益。参考股票软件不是参考电商</p></div>
+      <div class="chip-item"><h5>2 · 贡献度永远可见</h5><p>资产列表卡片 · 详情页 · 持仓页 · AIEO 推荐——所有涉及资产的地方都显示独立贡献度。这是反柠檬市场的核心</p></div>
+      <div class="chip-item"><h5>3 · 衍生关系透明</h5><p>每个资产都能一眼看到它的"祖先"和"后代"——继承自谁 / 被谁继承。这是强衍生权的信任基础</p></div>
+      <div class="chip-item"><h5>4 · AIEO 主动推荐</h5><p>不靠用户搜索,AIEO 持续基于 Principal AI 做个性化匹配推送。推荐必带"为什么推荐你"说明</p></div>
+      <div class="chip-item"><h5>5 · 结算中心隐形</h5><p>用户不需要知道"结算中心"存在。所有钱流细节(托管 / 分成 / 到账)在详情页以进度条形式展示</p></div>
+      <div class="chip-item"><h5>6 · 创作者和购买者同等 UI</h5><p>每个人都可能既是创作者也是购买者(用 A 的模式做出 A2 再卖)。UI 不强制角色切换,自然融合</p></div>
+    </div>
+  </div></div>
+
+  <div class="fb" data-id="k1" data-ver="1"><div class="fb-l">👤 CEO 快速反馈</div><div class="fb-d">信息架构:交易功能以嵌入式形式加入现有 4 Tab + 6 条核心设计原则</div><div class="fb-row"><button class="fb-b" onclick="sf(this,'a','k1')">✓ 同意</button><button class="fb-b" onclick="sf(this,'d','k1')">💬 需讨论</button><button class="fb-b" onclick="sf(this,'x','k1')">✗ 不同意</button></div><textarea class="fb-n" placeholder="备注..." onblur="sn(this,'k1')"></textarea></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- ══════════════════════ K.2 · 资产列表页 ═══════════════════════ -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-k2">
+  <div class="section-head"><span class="n">K.2</span>资产列表页</div>
+  <div class="section-sub">用户进入交易市场的首屏 · 关键决策:卡片显示什么 / 筛选怎么做 / AIEO 怎么集成</div>
+
+  <div class="card"><div class="card-head open" onclick="tog(this)"><span class="cn pk">K.2.1</span><span class="cm">首屏布局 + 卡片设计</span><span class="ca">▼</span></div><div class="card-body show">
+    <div class="mock-row">
+      <div class="mock-col">
+        <div class="phone">
+          <div class="phone-scr">
+            <div class="phone-notch"></div>
+            <div class="phone-status"><span class="time">9:41</span><span>● ● ●</span></div>
+            <div class="phone-body">
+              <div class="phone-topbar">
+                <div><div class="phone-topbar-t">资产市场</div><div class="phone-topbar-s">AIEO · 个性化推荐中 ✨</div></div>
+                <div style="font-size:16px;color:var(--text3)">🔍</div>
+              </div>
+              <!-- filter chips -->
+              <div class="mock-toolbar">
+                <span class="mock-toolbar-chip on">全部</span>
+                <span class="mock-toolbar-chip">工作流</span>
+                <span class="mock-toolbar-chip">决策框架</span>
+                <span class="mock-toolbar-chip">行业认知</span>
+                <span class="mock-toolbar-chip">AI Agent</span>
+              </div>
+              <!-- AIEO recommendation card -->
+              <div class="mb mb-cyan" style="padding:8px 10px">
+                <div style="font-size:9px;color:var(--cyan);font-weight:700;margin-bottom:3px">✨ AIEO 为你推荐</div>
+                <div class="mb-t" style="font-size:11px">鹿角茶·智能排号系统</div>
+                <div class="mb-s" style="font-size:9px">适配度 94% · 你浏览过 5 个连锁管理资产</div>
+              </div>
+              <!-- asset cards -->
+              <div class="ac">
+                <div class="ac-top">
+                  <span class="ac-title">鹿角茶·智能排号系统</span>
+                  <span class="ac-tag orig">原创</span>
+                </div>
+                <div class="ac-meta"><span>连锁运营 SaaS</span><span>·</span><span><b>衍生 128 次</b></span></div>
+                <div class="ac-score">
+                  <span>贡献度</span>
+                  <div class="ac-score-bar"><div class="ac-score-fill" style="width:94%"></div></div>
+                  <span><b style="color:var(--amber)">94</b></span>
+                </div>
+                <div class="ac-price">¥29,800<span class="ac-price-sub">/ 年 · 企业订阅</span></div>
+              </div>
+              <div class="ac">
+                <div class="ac-top">
+                  <span class="ac-title">会员分层营销工作流</span>
+                  <span class="ac-tag deriv">衍生 · 基于鹿角茶 CRM</span>
+                </div>
+                <div class="ac-meta"><span>营销自动化</span><span>·</span><span>衍生 23 次</span></div>
+                <div class="ac-score">
+                  <span>贡献度</span>
+                  <div class="ac-score-bar"><div class="ac-score-fill" style="width:68%;background:var(--amber)"></div></div>
+                  <span><b style="color:var(--amber)">68</b></span>
+                </div>
+                <div class="ac-price">¥9,800<span class="ac-price-sub">/ 年</span></div>
+              </div>
+              <div class="ac">
+                <div class="ac-top">
+                  <span class="ac-title">智能员工排班 SaaS</span>
+                  <span class="ac-tag aieo">✨ AIEO 精选</span>
+                </div>
+                <div class="ac-meta"><span>HR 连锁</span><span>·</span><span>衍生 <b>47</b> 次</span></div>
+                <div class="ac-score">
+                  <span>贡献度</span>
+                  <div class="ac-score-bar"><div class="ac-score-fill" style="width:88%"></div></div>
+                  <span><b style="color:var(--amber)">88</b></span>
+                </div>
+                <div class="ac-price">¥19,800<span class="ac-price-sub">/ 年</span></div>
+              </div>
+            </div>
+            <div class="phone-bottomnav">
+              <div class="phone-bn-item on"><div class="phone-bn-i">◆</div><div class="phone-bn-l">AI 资产</div></div>
+              <div class="phone-bn-item"><div class="phone-bn-i">◐</div><div class="phone-bn-l">发任务</div></div>
+              <div class="phone-bn-item"><div class="phone-bn-i">○</div><div class="phone-bn-l">接任务</div></div>
+              <div class="phone-bn-item"><div class="phone-bn-i">◉</div><div class="phone-bn-l">我的</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="mock-label"><b>核心一览</b>:卡片上 4 个信息——<b style="color:var(--pink)">标题 · 原创/衍生标签 · 贡献度条 · 价格</b>。"衍生 N 次"是活跃度信号,不是负面</div>
+      </div>
+    </div>
+
+    <div class="mock-legend">
+      <div class="lg"><span class="lg-d" style="background:var(--pink)"></span>原创(贡献度 60+,粉色)</div>
+      <div class="lg"><span class="lg-d" style="background:var(--amber)"></span>衍生(贡献度 30-60,琥珀色)</div>
+      <div class="lg"><span class="lg-d" style="background:var(--text3)"></span>低贡献(贡献度 &lt;30,灰色)</div>
+      <div class="lg"><span class="lg-d" style="background:var(--cyan)"></span>AIEO 精选(个性化推荐)</div>
+    </div>
+  </div></div>
+
+  <div class="card"><div class="card-head" onclick="tog(this)"><span class="cn pk">K.2.2</span><span class="cm">筛选与排序机制</span><span class="ca">▼</span></div><div class="card-body">
+    <table class="t">
+      <tr><th>筛选维度</th><th>具体选项</th><th>默认值</th></tr>
+      <tr><td><b>品类</b></td><td>工作流 / 决策框架 / 行业认知 / AI Agent / 沟通模板 / ...</td><td>全部</td></tr>
+      <tr><td><b>贡献度</b></td><td>原创(90+)· 高衍生(60-90)· 广泛衍生(30-60)· 全部</td><td>全部</td></tr>
+      <tr><td><b>价格区间</b></td><td>¥0-100 · ¥100-500 · ¥500-2000 · ¥2000+</td><td>全部</td></tr>
+      <tr><td><b>流行度</b></td><td>衍生次数 · 最近 7 天热门 · 新上架</td><td>AIEO 适配度</td></tr>
+      <tr><td><b>排序</b></td><td>AIEO 适配度 · 最新 · 最热 · 价格低→高 · 贡献度高→低</td><td>AIEO 适配度</td></tr>
+    </table>
+    <div class="tip"><b>默认排序是 AIEO 适配度</b>——这和传统电商"综合排序"本质不同。用户刷到的第一条永远是"为 ta 而选"的最匹配项,而不是商家竞价排名。<b style="color:var(--pink)">这是 AIEO 产品哲学在 UI 上的直接体现</b>。</div>
+  </div></div>
+
+  <div class="fb decision" data-id="k2-card-info" data-ver="1"><div class="fb-l">资产卡片展示哪些信息</div><div class="fb-d">当前方案:标题 · 原创/衍生标签 · 贡献度条(带数字) · 衍生次数 · 价格。是否需要增减?比如要不要加:"创作者头像/昵称"?"上架时长"?"我的适配度"?——信息加得越多卡片越长,列表浏览效率越低</div><div class="fb-row"><button class="fb-b" onclick="sf(this,'a','k2-card-info')">✓ 按当前方案</button><button class="fb-b" onclick="sf(this,'d','k2-card-info')">💬 需讨论(加/减)</button><button class="fb-b" onclick="sf(this,'x','k2-card-info')">✗ 重新设计</button></div><textarea class="fb-n" placeholder="想加/删什么..." onblur="sn(this,'k2-card-info')"></textarea></div>
+
+  <div class="fb" data-id="k2" data-ver="1"><div class="fb-l">👤 CEO 快速反馈</div><div class="fb-d">资产列表页整体方向:AIEO 优先排序 + 贡献度透明 + 原创/衍生视觉区分</div><div class="fb-row"><button class="fb-b" onclick="sf(this,'a','k2')">✓ 同意</button><button class="fb-b" onclick="sf(this,'d','k2')">💬 需讨论</button><button class="fb-b" onclick="sf(this,'x','k2')">✗ 不同意</button></div><textarea class="fb-n" placeholder="备注..." onblur="sn(this,'k2')"></textarea></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- ══════════════════════ K.3 · 资产详情页 ═══════════════════════ -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-k3">
+  <div class="section-head"><span class="n">K.3</span>资产详情页</div>
+  <div class="section-sub">平台最关键的一屏——用户在这里做购买决策</div>
+
+  <div class="card"><div class="card-head open" onclick="tog(this)"><span class="cn pk">K.3.1</span><span class="cm">详情页上半屏(头图 + 贡献度 + 核心指标)</span><span class="ca">▼</span></div><div class="card-body show">
+    <div class="mock-row">
+      <div class="mock-col">
+        <div class="phone">
+          <div class="phone-scr">
+            <div class="phone-notch"></div>
+            <div class="phone-status"><span class="time">9:41</span><span>● ● ●</span></div>
+            <div class="phone-body" style="padding-bottom:60px">
+              <div style="display:flex;align-items:center;gap:8px;padding:4px 0 10px">
+                <span style="font-size:14px;color:var(--pink)">←</span>
+                <div style="flex:1;font-size:12px;color:var(--text3)">资产详情</div>
+                <span style="font-size:12px;color:var(--text3)">⋯</span>
+              </div>
+              <!-- title block -->
+              <div style="padding:8px 0 12px;border-bottom:1px solid rgba(255,255,255,.05)">
+                <div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:6px">鹿角茶·智能排号系统</div>
+                <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap">
+                  <span class="ac-tag orig">原创</span>
+                  <span class="ac-tag" style="background:var(--bg3);color:var(--text3)">连锁运营 SaaS</span>
+                  <span class="ac-tag aieo">✨ 适配度 94%</span>
+                </div>
+                <div style="font-size:10px;color:var(--text3);line-height:1.6">创作者 鹿角茶数字化团队 · 2026-02-17 上架<br>已部署 186 家连锁店 · 衍生 128 次</div>
+              </div>
+              <!-- contribution score ring -->
+              <div class="cscore" style="margin-top:14px">
+                <div class="cscore-ring">
+                  <svg width="44" height="44"><circle cx="22" cy="22" r="18" fill="none" stroke="var(--bg3)" stroke-width="4"/><circle cx="22" cy="22" r="18" fill="none" stroke="var(--amber)" stroke-width="4" stroke-dasharray="106.2" stroke-dashoffset="6.4" stroke-linecap="round"/></svg>
+                  <div class="cscore-ring-txt">94</div>
+                </div>
+                <div class="cscore-info">
+                  <b>独立贡献度</b>
+                  <div>全网扫描:本系统 94% 为原创结构<br>已通过 4 层判定 · <span style="color:var(--gold)">原创认证</span></div>
+                </div>
+              </div>
+              <!-- price block -->
+              <div class="mb mb-pink" style="margin-top:12px;padding:10px 12px">
+                <div style="display:flex;align-items:baseline;gap:6px">
+                  <span style="font-size:22px;font-weight:800;color:var(--green)">¥29,800</span>
+                  <span style="font-size:10px;color:var(--text3)">/ 年 · 企业订阅</span>
+                </div>
+                <div style="font-size:10px;color:var(--text3);margin-top:4px">• 包含完整 SaaS(小程序 + AI 后端 + 数据面板)<br>• 衍生创作授权(可基于此改良后二次销售)</div>
+              </div>
+              <button class="mbtn">立即订阅 · ¥29,800/年</button>
+              <button class="mbtn sec">先试单店版(¥299/月)</button>
+            </div>
+          </div>
+        </div>
+        <div class="mock-label"><b>上半屏 3 个信息锚点</b>:标题 + <b style="color:var(--pink)">贡献度环形图</b> + 价格块。贡献度用 SVG 环形,一眼就能感知"这是原创还是衍生"</div>
+      </div>
+    </div>
+  </div></div>
+
+  <div class="card"><div class="card-head open" onclick="tog(this)"><span class="cn pk">K.3.2</span><span class="cm">独立贡献度可视化(决策:环形 vs 横条 vs 分数)</span><span class="ca">▼</span></div><div class="card-body show">
+    <div class="mock-row">
+      <div class="mock-col">
+        <div class="phone" style="width:200px">
+          <div class="phone-scr" style="min-height:240px">
+            <div class="phone-body" style="padding:20px">
+              <div class="cscore">
+                <div class="cscore-ring">
+                  <svg width="44" height="44"><circle cx="22" cy="22" r="18" fill="none" stroke="var(--bg3)" stroke-width="4"/><circle cx="22" cy="22" r="18" fill="none" stroke="var(--amber)" stroke-width="4" stroke-dasharray="106.2" stroke-dashoffset="6.4" stroke-linecap="round"/></svg>
+                  <div class="cscore-ring-txt">94</div>
+                </div>
+                <div class="cscore-info"><b>环形图方案</b><div>单屏信息密度低,视觉焦点强</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mock-label">方案 A · <b>环形进度图</b><br>优:视觉冲击力强 · 劣:占空间</div>
+      </div>
+      <div class="mock-col">
+        <div class="phone" style="width:200px">
+          <div class="phone-scr" style="min-height:240px">
+            <div class="phone-body" style="padding:20px">
+              <div style="font-size:11px;color:var(--text3);margin-bottom:4px">独立贡献度</div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <div style="flex:1;height:8px;background:var(--bg3);border-radius:4px;overflow:hidden"><div style="height:100%;width:94%;background:var(--amber)"></div></div>
+                <b style="color:var(--amber);font-size:14px">94</b>
+              </div>
+              <div style="font-size:9px;color:var(--text3);margin-top:6px">原创认证(80+)</div>
+            </div>
+          </div>
+        </div>
+        <div class="mock-label">方案 B · <b>横条方案</b><br>优:扫描性最强 · 劣:视觉份量轻</div>
+      </div>
+      <div class="mock-col">
+        <div class="phone" style="width:200px">
+          <div class="phone-scr" style="min-height:240px">
+            <div class="phone-body" style="padding:20px">
+              <div style="padding:14px;background:var(--amber-bg);border:2px solid var(--amber);border-radius:10px;text-align:center">
+                <div style="font-size:32px;font-weight:900;color:var(--amber);line-height:1">94</div>
+                <div style="font-size:9px;color:var(--text3);margin-top:4px">独立贡献度</div>
+                <div style="font-size:9px;color:var(--gold);font-weight:700;margin-top:2px">✓ 原创认证</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mock-label">方案 C · <b>大数字卡片</b><br>优:最醒目 · 劣:太硬</div>
+      </div>
+    </div>
+    <div class="tip"><b>我的推荐:方案 A(环形图)</b>。理由:贡献度是定性 + 定量的复合信号,不只是一个百分比。环形图的"完整度"视觉隐喻和"原创完整性"契合,比横条或裸数字都更能让用户直觉理解。同时能和详情页的其他信息和谐并列,不会抢走购买 CTA 的焦点。</div>
+  </div></div>
+
+  <div class="fb decision" data-id="k3-score-viz" data-ver="1"><div class="fb-l">贡献度可视化方式</div><div class="fb-d">三种方案中选一个。我推荐 A(环形图),理由上方已述</div><div class="fb-row"><button class="fb-b" onclick="sf(this,'a','k3-score-viz')">✓ A 环形图</button><button class="fb-b" onclick="sf(this,'d','k3-score-viz')">💬 B 横条</button><button class="fb-b" onclick="sf(this,'x','k3-score-viz')">✗ C 大数字</button></div><textarea class="fb-n" placeholder="理由/其他想法..." onblur="sn(this,'k3-score-viz')"></textarea></div>
+
+  <div class="card"><div class="card-head open" onclick="tog(this)"><span class="cn pk">K.3.3</span><span class="cm">衍生关系树(祖先 + 后代一览)</span><span class="ca">▼</span></div><div class="card-body show">
+    <div class="mock-row">
+      <div class="mock-col">
+        <div class="phone">
+          <div class="phone-scr">
+            <div class="phone-notch"></div>
+            <div class="phone-status"><span class="time">9:42</span><span>● ● ●</span></div>
+            <div class="phone-body">
+              <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:10px">衍生关系</div>
+              <div style="font-size:10px;color:var(--text3);margin-bottom:6px">📜 继承自:</div>
+              <div class="tree">
+                <div class="tree-n root"><span class="tree-n-t">连锁零售峰值管理框架 · 鹿角茶产品委员会</span><span class="tree-n-s">贡献度 98</span></div>
+              </div>
+              <div style="font-size:10px;color:var(--text3);margin:10px 0 6px">📍 本资产:</div>
+              <div class="tree">
+                <div class="tree-n root" style="border-left-color:var(--pink)"><span class="tree-n-t" style="color:var(--pink)">鹿角茶·智能排号系统</span><span class="tree-n-s">贡献度 94</span></div>
+              </div>
+              <div style="font-size:10px;color:var(--text3);margin:10px 0 6px">🌱 被衍生 128 次 · 展示 4 个典型跨域:</div>
+              <div class="tree">
+                <div class="tree-n branch"><span class="tree-n-t">小星咖啡·取号改良版</span><span class="tree-n-s">衍生 · 72</span></div>
+                <div class="tree-n branch"><span class="tree-n-t">美发店·预约叫号系统</span><span class="tree-n-s">衍生 · 68</span></div>
+                <div class="tree-n branch"><span class="tree-n-t">社区诊所·分诊排队</span><span class="tree-n-s">衍生 · 64</span></div>
+                <div class="tree-n branch"><span class="tree-n-t">健身房·器械预约系统</span><span class="tree-n-s">衍生 · 58</span></div>
+                <div style="margin-left:20px;font-size:10px;color:var(--cyan);padding:6px">查看全部 128 个衍生 →</div>
+              </div>
+              <div class="tip cyan" style="font-size:10px;margin-top:10px">💰 追溯分成机制:本资产创作者鹿角茶从所有 128 个下游衍生的每次交易中获得 2% 版税(AI 自动执行)</div>
+            </div>
+          </div>
+        </div>
+        <div class="mock-label"><b>一眼看清"家族谱"</b>:继承自谁(粉色根) · 本资产(突出) · 被谁继承(琥珀/灰色阶梯)。追溯分成机制直接写在底部</div>
+      </div>
+    </div>
+  </div></div>
+
+  <div class="fb decision" data-id="k3-tree-depth" data-ver="1"><div class="fb-l">衍生关系树默认展示深度</div><div class="fb-d">当前:上溯 1 级祖先 + 下溯前 3 个衍生(热门优先)+ "查看全部"链接。是否要展示更多?比如上溯 2-3 级展示完整血统?深度越大信任感越强但占屏幅</div><div class="fb-row"><button class="fb-b" onclick="sf(this,'a','k3-tree-depth')">✓ 当前深度(1 上 + 3 下)</button><button class="fb-b" onclick="sf(this,'d','k3-tree-depth')">💬 更深</button><button class="fb-b" onclick="sf(this,'x','k3-tree-depth')">✗ 更浅</button></div><textarea class="fb-n" placeholder="具体..." onblur="sn(this,'k3-tree-depth')"></textarea></div>
+
+  <div class="fb" data-id="k3" data-ver="1"><div class="fb-l">👤 CEO 快速反馈</div><div class="fb-d">详情页整体方向:上半屏核心信息 + 贡献度环形图 + 衍生关系树透明化</div><div class="fb-row"><button class="fb-b" onclick="sf(this,'a','k3')">✓ 同意</button><button class="fb-b" onclick="sf(this,'d','k3')">💬 需讨论</button><button class="fb-b" onclick="sf(this,'x','k3')">✗ 不同意</button></div><textarea class="fb-n" placeholder="备注..." onblur="sn(this,'k3')"></textarea></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- ══════════════════════ K.4 · AIEO 推荐 ═══════════════════════ -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-k4">
+  <div class="section-head"><span class="n">K.4</span>AIEO 推荐卡片</div>
+  <div class="section-sub">MSC.AI 最差异化的 UI 模块——AIEO 不是隐形算法,而是显性告知"为什么推荐你"</div>
+
+  <div class="card"><div class="card-head open" onclick="tog(this)"><span class="cn pk">K.4.1</span><span class="cm">推荐卡片透明度设计</span><span class="ca">▼</span></div><div class="card-body show">
+    <div class="mock-row">
+      <div class="mock-col">
+        <div class="phone" style="width:280px">
+          <div class="phone-scr" style="min-height:400px">
+            <div class="phone-notch"></div>
+            <div class="phone-status"><span class="time">9:41</span><span>● ● ●</span></div>
+            <div class="phone-body">
+              <div style="font-size:12px;color:var(--cyan);font-weight:700;margin:4px 0 10px">✨ 你的 AI 为你挑选的</div>
+              <div class="mb mb-cyan" style="padding:12px">
+                <div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:4px">鹿角茶·智能排号系统</div>
+                <div style="font-size:10px;color:var(--text3);margin-bottom:10px">鹿角茶数字化团队 · 贡献度 94 · ¥29,800/年</div>
+                <div style="font-size:10px;color:var(--cyan);font-weight:700;margin-bottom:4px">为什么推荐你:</div>
+                <div class="aieo-reason"><span class="aieo-reason-k">行为</span><span class="aieo-reason-v">近 30 天浏览连锁店管理类资产 12 次</span></div>
+                <div class="aieo-reason"><span class="aieo-reason-k">上下文</span><span class="aieo-reason-v">最近对话 8 次提到"排队""等位""峰值"</span></div>
+                <div class="aieo-reason"><span class="aieo-reason-k">预算</span><span class="aieo-reason-v">近期企业订阅采购在 ¥3-5 万区间</span></div>
+                <div class="aieo-reason"><span class="aieo-reason-k">稀缺度</span><span class="aieo-reason-v">贡献度 90+ 的同类 SaaS 全网仅 3 个</span></div>
+                <div style="margin-top:10px;padding:8px;background:var(--bg);border-radius:6px;font-size:10px">
+                  <div style="color:var(--amber);font-weight:700;margin-bottom:3px">⚖ 机会成本参考</div>
+                  <div style="color:var(--text3);line-height:1.6">不买 · 自研 6-9 个月 · 人力成本 ¥80 万+<br>买 · 2 周部署,省 95% 自研成本</div>
+                </div>
+                <button class="mbtn" style="margin-top:10px">查看详情</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mock-label"><b>AIEO 透明化三要素</b>:为什么推荐(4 条)+ 机会成本对比 + 稀缺度信号。<b style="color:var(--cyan)">用户能看懂 AI 的推理过程</b>,不是黑盒</div>
+      </div>
+    </div>
+
+    <div class="tip cyan"><b>对比传统推荐</b>:淘宝/京东的"猜你喜欢"是黑盒——为什么推荐这个永远不告诉你。<b style="color:var(--pink)">AIEO 的定义是"每个人有自己的 AI 引擎适配人"</b>,那 UI 就必须让用户感受到"我的 AI 正在为我做决策",而不是"某个黑盒算法"。这个透明化设计是 AIEO 产品哲学的最直接体现。</div>
+  </div></div>
+
+  <div class="fb decision" data-id="k4-reason-count" data-ver="1"><div class="fb-l">"为什么推荐你"展示几条理由</div><div class="fb-d">当前:4 条(行为/上下文/预算/稀缺度)+ 机会成本对比。理由条数越多透明度越高但信息噪音越大。3 条 / 4 条 / 5 条 / 按权重动态?</div><div class="fb-row"><button class="fb-b" onclick="sf(this,'a','k4-reason-count')">✓ 4 条 + 机会成本</button><button class="fb-b" onclick="sf(this,'d','k4-reason-count')">💬 3 条(更简)</button><button class="fb-b" onclick="sf(this,'x','k4-reason-count')">✗ 动态(按权重)</button></div><textarea class="fb-n" placeholder="..." onblur="sn(this,'k4-reason-count')"></textarea></div>
+
+  <div class="fb" data-id="k4" data-ver="1"><div class="fb-l">👤 CEO 快速反馈</div><div class="fb-d">AIEO 推荐卡片的透明化设计(4 条推理理由 + 机会成本对比)</div><div class="fb-row"><button class="fb-b" onclick="sf(this,'a','k4')">✓ 同意</button><button class="fb-b" onclick="sf(this,'d','k4')">💬 需讨论</button><button class="fb-b" onclick="sf(this,'x','k4')">✗ 不同意</button></div><textarea class="fb-n" placeholder="备注..." onblur="sn(this,'k4')"></textarea></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- ══════════════════════ K.5 · 下单结算 ══════════════════════ -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-k5">
+  <div class="section-head"><span class="n">K.5</span>下单与结算</div>
+  <div class="section-sub">用户点击"立即购买"后的完整流程 · 结算中心对用户隐形</div>
+
+  <div class="card"><div class="card-head open" onclick="tog(this)"><span class="cn pk">K.5.1</span><span class="cm">下单确认页</span><span class="ca">▼</span></div><div class="card-body show">
+    <div class="mock-row">
+      <div class="mock-col">
+        <div class="phone">
+          <div class="phone-scr">
+            <div class="phone-notch"></div>
+            <div class="phone-status"><span class="time">9:43</span><span>● ● ●</span></div>
+            <div class="phone-body">
+              <div style="display:flex;align-items:center;gap:8px;padding:4px 0 14px">
+                <span style="font-size:14px;color:var(--pink)">←</span>
+                <div style="flex:1;font-size:13px;font-weight:700">确认订单</div>
+              </div>
+              <div class="mb" style="padding:10px 12px">
+                <div style="font-size:12px;font-weight:700;margin-bottom:4px">鹿角茶·智能排号系统</div>
+                <div style="font-size:10px;color:var(--text3)">鹿角茶数字化团队 · 贡献度 94 · 原创认证</div>
+              </div>
+              <div class="mb mb-pink" style="padding:10px 12px">
+                <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:8px">费用分解</div>
+                <div style="display:flex;justify-content:space-between;font-size:10px;padding:3px 0"><span style="color:var(--text3)">年度订阅费</span><span>¥29,800</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:10px;padding:3px 0"><span style="color:var(--text3)">平台服务费 · 3%</span><span>¥894</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:10px;padding:3px 0;color:var(--text3)"><span>  ↳ 创作者鹿角茶</span><span>¥28,906</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:10px;padding:3px 0;color:var(--text3)"><span>  ↳ 追溯分成 · 第 1 代祖先(2%)</span><span>¥578</span></div>
+                <div style="border-top:1px dashed rgba(255,255,255,.1);margin-top:6px;padding-top:6px;display:flex;justify-content:space-between;font-size:13px;font-weight:800"><span>合计</span><span style="color:var(--green)">¥30,694</span></div>
+              </div>
+              <div class="mb" style="padding:10px 12px">
+                <div style="font-size:11px;font-weight:700;margin-bottom:4px">支付方式</div>
+                <div style="display:flex;align-items:center;gap:8px;padding:6px 0;font-size:11px"><span style="width:20px">💚</span>微信支付(企业) <span style="margin-left:auto;color:var(--green)">●</span></div>
+                <div style="display:flex;align-items:center;gap:8px;padding:6px 0;font-size:11px;color:var(--text3)"><span style="width:20px">💙</span>支付宝(企业)</div>
+                <div style="display:flex;align-items:center;gap:8px;padding:6px 0;font-size:11px;color:var(--text3)"><span style="width:20px">🏦</span>对公转账 · 可开发票</div>
+              </div>
+              <button class="mbtn">确认支付 ¥30,694</button>
+            </div>
+          </div>
+        </div>
+        <div class="mock-label"><b>费用完全透明</b>:创作者拿多少 · 追溯分成给谁 · 平台收多少,都明示。用户看到的是<b style="color:var(--pink)">完整分账流</b>,不是"黑盒结算"</div>
+      </div>
+    </div>
+  </div></div>
+
+  <div class="card"><div class="card-head" onclick="tog(this)"><span class="cn pk">K.5.2</span><span class="cm">支付成功 + 交付确认</span><span class="ca">▼</span></div><div class="card-body">
+    <div class="mock-row">
+      <div class="mock-col">
+        <div class="phone" style="width:240px">
+          <div class="phone-scr" style="min-height:380px">
+            <div class="phone-body" style="padding:40px 20px;text-align:center">
+              <div style="font-size:40px;color:var(--green);margin-bottom:12px">✓</div>
+              <div style="font-size:14px;font-weight:800;margin-bottom:4px">订阅成功</div>
+              <div style="font-size:10px;color:var(--text3);margin-bottom:20px">SaaS 已加入你的企业工作台</div>
+              <div class="mb mb-pink" style="padding:10px 12px;text-align:left">
+                <div style="font-size:11px;font-weight:700;margin-bottom:4px">💎 已获得:</div>
+                <div style="font-size:10px;color:var(--text2);line-height:1.7">• 完整 SaaS 调用权(1 年)<br>• 衍生创作授权(可基于此二次销售)<br>• 鹿角茶团队技术支持 · 6 次<br>• 工作台后台访问凭证</div>
+              </div>
+              <button class="mbtn" style="margin-top:12px">立即部署到门店</button>
+              <button class="mbtn sec">查看我的资产</button>
+            </div>
+          </div>
+        </div>
+        <div class="mock-label">支付成功页只做一件事:<b>告诉用户 ta 买到了什么</b>。不是空洞的"感谢惠顾"</div>
+      </div>
+    </div>
+  </div></div>
+
+  <div class="fb decision" data-id="k5-fee-detail" data-ver="1"><div class="fb-l">费用分解显示粒度</div><div class="fb-d">当前方案展示全部分账(创作者 + 追溯分成 + 平台)。可选:(A) 完全透明(当前)(B) 只显示合计(C) 默认隐藏,点击"查看明细"展开——C 方案兼顾信任和简洁</div><div class="fb-row"><button class="fb-b" onclick="sf(this,'a','k5-fee-detail')">✓ A 完全透明</button><button class="fb-b" onclick="sf(this,'d','k5-fee-detail')">💬 C 默认折叠</button><button class="fb-b" onclick="sf(this,'x','k5-fee-detail')">✗ B 只合计</button></div><textarea class="fb-n" placeholder="..." onblur="sn(this,'k5-fee-detail')"></textarea></div>
+
+  <div class="fb" data-id="k5" data-ver="1"><div class="fb-l">👤 CEO 快速反馈</div><div class="fb-d">下单结算流程:分账全透明 + 结算中心对用户隐形 + 交付明确</div><div class="fb-row"><button class="fb-b" onclick="sf(this,'a','k5')">✓ 同意</button><button class="fb-b" onclick="sf(this,'d','k5')">💬 需讨论</button><button class="fb-b" onclick="sf(this,'x','k5')">✗ 不同意</button></div><textarea class="fb-n" placeholder="备注..." onblur="sn(this,'k5')"></textarea></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- ══════════════════════ K.6 · 持仓中心 ══════════════════════ -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-k6">
+  <div class="section-head"><span class="n">K.6</span>持仓中心 · "我持有的资产"</div>
+  <div class="section-sub">我的资产组合 + 使用记录 + 增值情况</div>
+
+  <div class="card"><div class="card-head open" onclick="tog(this)"><span class="cn pk">K.6.1</span><span class="cm">持仓总览页</span><span class="ca">▼</span></div><div class="card-body show">
+    <div class="mock-row">
+      <div class="mock-col">
+        <div class="phone">
+          <div class="phone-scr">
+            <div class="phone-notch"></div>
+            <div class="phone-status"><span class="time">9:44</span><span>● ● ●</span></div>
+            <div class="phone-body">
+              <div class="phone-topbar">
+                <div><div class="phone-topbar-t">我的资产</div><div class="phone-topbar-s">持有 7 项 · 价值 ¥68,500</div></div>
+              </div>
+              <!-- headline stats -->
+              <div class="mb mb-pink" style="padding:14px 12px">
+                <div style="font-size:10px;color:var(--text3)">资产组合总价值</div>
+                <div style="font-size:22px;font-weight:800;color:var(--green);margin:2px 0">¥68,500</div>
+                <div style="font-size:10px;color:var(--green)">+¥5,200 · 本月 +8.2% ↑</div>
+                <div class="mini-chart" style="margin-top:8px">
+                  <div class="mini-chart-bar cold" style="height:30%"></div>
+                  <div class="mini-chart-bar cold" style="height:40%"></div>
+                  <div class="mini-chart-bar" style="height:50%"></div>
+                  <div class="mini-chart-bar" style="height:45%"></div>
+                  <div class="mini-chart-bar" style="height:60%"></div>
+                  <div class="mini-chart-bar" style="height:72%"></div>
+                  <div class="mini-chart-bar" style="height:90%"></div>
+                </div>
+              </div>
+              <!-- tab switch -->
+              <div style="display:flex;gap:12px;padding:8px 0;font-size:11px;border-bottom:1px solid var(--brd);margin-bottom:8px">
+                <span style="color:var(--pink);font-weight:700;border-bottom:2px solid var(--pink);padding-bottom:4px">持有(7)</span>
+                <span style="color:var(--text3)">创作(3)</span>
+                <span style="color:var(--text3)">记录</span>
+              </div>
+              <!-- asset item -->
+              <div class="mb" style="padding:8px 10px">
+                <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+                  <span style="font-size:11px;font-weight:700">鹿角茶·智能排号系统</span>
+                  <span class="ac-tag orig" style="margin-left:auto">原创</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3)">
+                  <span>已部署 12 家店 · 日均节省 ¥1,200</span>
+                  <span style="color:var(--green)">+¥3,200</span>
+                </div>
+              </div>
+              <div class="mb" style="padding:8px 10px">
+                <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+                  <span style="font-size:11px;font-weight:700">会员分层营销工作流</span>
+                  <span class="ac-tag deriv" style="margin-left:auto">衍生</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3)">
+                  <span>已部署 · 转化率 +22%</span>
+                  <span style="color:var(--green)">+¥1,800</span>
+                </div>
+              </div>
+              <div class="mb" style="padding:8px 10px">
+                <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+                  <span style="font-size:11px;font-weight:700">智能选品决策引擎</span>
+                  <span class="ac-tag deriv" style="margin-left:auto">衍生</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3)">
+                  <span>待部署(订阅 3 天)</span>
+                  <span>¥12,000</span>
+                </div>
+              </div>
+            </div>
+            <div class="phone-bottomnav">
+              <div class="phone-bn-item"><div class="phone-bn-i">◆</div><div class="phone-bn-l">AI 资产</div></div>
+              <div class="phone-bn-item"><div class="phone-bn-i">◐</div><div class="phone-bn-l">发任务</div></div>
+              <div class="phone-bn-item"><div class="phone-bn-i">○</div><div class="phone-bn-l">接任务</div></div>
+              <div class="phone-bn-item on"><div class="phone-bn-i">◉</div><div class="phone-bn-l">我的</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="mock-label"><b>类股票账户风格</b>:总价值 + 趋势图在顶部(高信息密度),下面是持仓列表。右上角 +11.0% 让用户看到"AI 资产是增值资产"</div>
+      </div>
+    </div>
+  </div></div>
+
+  <div class="fb" data-id="k6" data-ver="1"><div class="fb-l">👤 CEO 快速反馈</div><div class="fb-d">持仓中心设计:类股票账户风格 + 总价值趋势 + 持有/创作/记录三 tab</div><div class="fb-row"><button class="fb-b" onclick="sf(this,'a','k6')">✓ 同意</button><button class="fb-b" onclick="sf(this,'d','k6')">💬 需讨论</button><button class="fb-b" onclick="sf(this,'x','k6')">✗ 不同意</button></div><textarea class="fb-n" placeholder="备注..." onblur="sn(this,'k6')"></textarea></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- ══════════════════════ K.7 · 创作者收益 ═══════════════════════ -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-k7">
+  <div class="section-head"><span class="n">K.7</span>创作者收益仪表盘</div>
+  <div class="section-sub">养成类游戏的"成长可视化"——看着自己的资产被越多人使用,获得越多被动收入</div>
+
+  <div class="card"><div class="card-head open" onclick="tog(this)"><span class="cn pk">K.7.1</span><span class="cm">追溯分成仪表盘</span><span class="ca">▼</span></div><div class="card-body show">
+    <div class="mock-row">
+      <div class="mock-col">
+        <div class="phone">
+          <div class="phone-scr">
+            <div class="phone-notch"></div>
+            <div class="phone-status"><span class="time">9:45</span><span>● ● ●</span></div>
+            <div class="phone-body">
+              <div class="phone-topbar">
+                <div><div class="phone-topbar-t">我的创作</div><div class="phone-topbar-s">鹿角茶数字化团队 · 3 项</div></div>
+              </div>
+              <div class="mb mb-pink" style="padding:14px 12px">
+                <div style="font-size:10px;color:var(--text3)">本月收益</div>
+                <div style="font-size:22px;font-weight:800;color:var(--green);margin:2px 0">¥48,200</div>
+                <div style="font-size:10px;color:var(--green)">+¥6,480 · 比上月 +15.5% ↑</div>
+              </div>
+              <!-- asset card with more detail -->
+              <div class="mb" style="padding:10px 12px">
+                <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+                  <span style="font-size:12px;font-weight:800;color:var(--text)">鹿角茶·智能排号系统</span>
+                </div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:9px;color:var(--text3);margin-bottom:8px">
+                  <span>上架 62 天</span>
+                  <span>·</span>
+                  <span><b style="color:var(--text)">企业订阅 186 家</b></span>
+                  <span>·</span>
+                  <span><b style="color:var(--text)">衍生 128 次</b></span>
+                </div>
+                <!-- 4 跨域分布 -->
+                <div style="padding:6px 0 8px;border-top:1px dashed rgba(255,255,255,.06);border-bottom:1px dashed rgba(255,255,255,.06);margin-bottom:8px">
+                  <div style="font-size:9px;color:var(--cyan);font-weight:700;margin-bottom:4px">🌍 衍生跨域分布</div>
+                  <div style="display:flex;justify-content:space-between;font-size:10px;padding:2px 0"><span>☕ 咖啡连锁</span><span style="color:var(--text3)">42 次</span></div>
+                  <div style="display:flex;justify-content:space-between;font-size:10px;padding:2px 0"><span>✂️ 美发连锁</span><span style="color:var(--text3)">35 次</span></div>
+                  <div style="display:flex;justify-content:space-between;font-size:10px;padding:2px 0"><span>🏥 社区诊所</span><span style="color:var(--text3)">28 次</span></div>
+                  <div style="display:flex;justify-content:space-between;font-size:10px;padding:2px 0"><span>💪 健身房</span><span style="color:var(--text3)">23 次</span></div>
+                </div>
+                <div style="font-size:10px;line-height:1.8">
+                  <div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">直接订阅收入</span><span><b>¥540,000</b></span></div>
+                  <div style="display:flex;justify-content:space-between"><span style="color:var(--cyan)">↳ 追溯分成(下游衍生 2%)</span><span style="color:var(--cyan)"><b>¥74,560</b></span></div>
+                  <div style="display:flex;justify-content:space-between;padding-top:4px;margin-top:4px;border-top:1px dashed rgba(255,255,255,.06);font-weight:700"><span>累计</span><span style="color:var(--green)">¥614,560</span></div>
+                </div>
+                <div style="margin-top:10px;padding:8px 10px;background:var(--bg3);border-radius:6px;font-size:10px">
+                  <div style="color:var(--amber);font-weight:700;margin-bottom:4px">🌱 衍生健康度</div>
+                  <div style="color:var(--text3);line-height:1.6">128 个衍生跨越 4 个行业,平均贡献度 58——<b style="color:var(--amber)">健康跨域扩散</b>,未被稀释</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mock-label"><b>核心叙事</b>:"直接收入 + 追溯分成"两条线清楚呈现。<b style="color:var(--cyan)">追溯分成是被动收入</b>——即使你不再更新,下游衍生越多你赚越多</div>
+      </div>
+    </div>
+
+    <div class="tip"><b>为什么这个页面是"养成"闭环的关键?</b>用户每次看到这一屏,就看到:"我创作的东西 → 被 X 人使用 → 给 Y 人启发(衍生)→ 我还在持续被动获利"。这正是 J.4.3 养成类游戏隐喻的 UI 实现——<b style="color:var(--pink)">看着自己贡献的模式被多少人使用,是用户持续使用平台的最强动机</b>。</div>
+  </div></div>
+
+  <div class="fb" data-id="k7" data-ver="1"><div class="fb-l">👤 CEO 快速反馈</div><div class="fb-d">创作者仪表盘:直接收入 + 追溯分成双线 + 衍生健康度</div><div class="fb-row"><button class="fb-b" onclick="sf(this,'a','k7')">✓ 同意</button><button class="fb-b" onclick="sf(this,'d','k7')">💬 需讨论</button><button class="fb-b" onclick="sf(this,'x','k7')">✗ 不同意</button></div><textarea class="fb-n" placeholder="备注..." onblur="sn(this,'k7')"></textarea></div>
+
+  <div style="margin-top:20px;padding:14px 16px;background:var(--bg3);border-radius:8px;font-size:12px;color:var(--text2);line-height:1.8">
+    <b style="color:var(--cyan)">📌 承上启下</b>:K.1-K.7 完成了 <b>C 端用户视角</b>的完整体验演示。接下来 K.8-K.11 切换到 <b>B 端企业视角</b>——同一个鹿角茶集团,总部后台怎么管理这些资产、怎么看员工贡献、怎么处理跨公司流通、怎么做财务审计。
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- ══════════════════ K.8 · B 端后台形态决策 ═══════════════════ -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-k8">
+  <div class="section-head"><span class="n">K.8</span>B 端后台形态决策</div>
+  <div class="section-sub">B 端不是独立产品,而是 C 端交易平台的"公司视角"。形态选择决定后续 K.9-K.11 的设计走向</div>
+
+  <div class="card"><div class="card-head open" onclick="tog(this)"><span class="cn pk">K.8.1</span><span class="cm">三种形态对比</span><span class="ca">▼</span></div><div class="card-body show">
+    <table class="t">
+      <tr><th style="width:100px">方案</th><th>适用场景</th><th>优势</th><th>劣势</th></tr>
+      <tr><td><b>A · 独立 App</b><br>(Mac / Windows)</td><td>千人以上大客户 · 数据量极大的后台操作</td><td>性能最好 · 离线可用 · 多屏支持</td><td>开发成本高 · 下载门槛 · 企业 IT 管控</td></tr>
+      <tr><td><b>B · 微信小程序</b>(B 端)</td><td>店长 / 运营经理的移动场景</td><td>免安装 · 和 C 端同技术栈 · 分享方便</td><td>屏幕小限制数据展示 · 企业场景笨拙</td></tr>
+      <tr><td style="border-bottom:3px solid var(--cyan)"><b style="color:var(--cyan)">C · Web 后台</b><br>(浏览器)</td><td>总部管理员 · 总经理 / CFO / HR 总监</td><td>最常见 · 迭代最快 · 跨设备 · URL 分享</td><td>需要网络 · 性能受浏览器限制</td></tr>
+    </table>
+
+    <div class="tip"><b>CEO 已决策:C(Web 后台主形态)+ B(小程序极简版)双形态并行</b><br>Web 后台 → 总部管理员的办公场景(信息密度大、多面板并列、数据导出)<br>小程序 → 店长的移动场景(快速查看本店情况、收到异常通知)<br><br>A 独立 App <b>暂不做</b>,未来大客户有需要时再补。</div>
+  </div></div>
+
+  <div class="card"><div class="card-head open" onclick="tog(this)"><span class="cn pk">K.8.2</span><span class="cm">双形态分工架构</span><span class="ca">▼</span></div><div class="card-body show">
+    <div class="ia-diag">
+      <div class="ia-row">
+        <div class="ia-node top" style="border-top-color:var(--cyan)"><div class="ia-node-t">💻 Web 后台(主)</div><div class="ia-node-s">总经理 · CFO · HR 总监 · 数字化负责人<br>企业资产总览 · 员工 AI 报表 · 跨公司流通 · 合约托管</div></div>
+        <div class="ia-node top" style="border-top-color:var(--green)"><div class="ia-node-t">📱 小程序(辅)</div><div class="ia-node-s">连锁店长 · 区域经理<br>本店数据 / 异常告警 / 快速审批</div></div>
+      </div>
+      <div class="ia-row">
+        <div class="ia-node bot" style="flex:1"><div class="ia-node-t">⚙️ 共享后端(Supabase + 结算中心)</div><div class="ia-node-s">同一套数据层 · 权限按角色分配 · 移动端是 Web 的精简读视图,不重复开发</div></div>
+      </div>
+    </div>
+
+    <div class="mock-row">
+      <div class="mock-col">
+        <div class="mini-phone">
+          <div class="mini-phone-scr">
+            <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px">鹿角茶总部 · 小程序</div>
+            <div style="font-size:9px;color:var(--text3);margin-bottom:14px">王店长 · 中关村店</div>
+            <div class="kpi" style="padding:8px;margin-bottom:8px"><div class="kpi-l">本店今日节省</div><div class="kpi-v" style="font-size:14px;color:var(--green)">¥1,280</div></div>
+            <div class="kpi" style="padding:8px;margin-bottom:8px"><div class="kpi-l">排号系统调用</div><div class="kpi-v" style="font-size:14px">186 <span style="font-size:9px;color:var(--text3);font-weight:400">次</span></div></div>
+            <div style="padding:8px;background:var(--red-bg);border-radius:6px;margin-bottom:8px;font-size:10px;color:var(--red)">⚠️ 设备 3 号叫号异常(2 分钟前)</div>
+            <div style="font-size:10px;color:var(--cyan);padding:8px 0">查看完整报表 →</div>
+          </div>
+        </div>
+        <div class="mock-label"><b>小程序:极简读视图</b><br>店长手机场景 · 本店 KPI + 异常告警 + 简单审批</div>
+      </div>
+    </div>
+  </div></div>
+
+  <div class="fb decision" data-id="k8-form" data-ver="1"><div class="fb-l">B 端形态最终决策</div><div class="fb-d">当前方案:C(Web 主)+ B(小程序辅)双形态。未来 A 独立 App 看大客户需求再补</div><div class="fb-row"><button class="fb-b" onclick="sf(this,'a','k8-form')">✓ 按当前方案</button><button class="fb-b" onclick="sf(this,'d','k8-form')">💬 需讨论</button><button class="fb-b" onclick="sf(this,'x','k8-form')">✗ 重新考虑</button></div><textarea class="fb-n" placeholder="..." onblur="sn(this,'k8-form')"></textarea></div>
+
+  <div class="fb" data-id="k8" data-ver="1"><div class="fb-l">👤 CEO 快速反馈</div><div class="fb-d">B 端后台形态:Web 主 + 小程序辅 + 共享后端</div><div class="fb-row"><button class="fb-b" onclick="sf(this,'a','k8')">✓ 同意</button><button class="fb-b" onclick="sf(this,'d','k8')">💬 需讨论</button><button class="fb-b" onclick="sf(this,'x','k8')">✗ 不同意</button></div><textarea class="fb-n" placeholder="备注..." onblur="sn(this,'k8')"></textarea></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- ══════════════════ K.9 · 企业资产总览 ═════════════════════ -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-k9">
+  <div class="section-head"><span class="n">K.9</span>企业资产总览(Web 后台首页)</div>
+  <div class="section-sub">总部管理员登录第一屏 · 鹿角茶集团 · 全景数据仪表盘</div>
+
+  <div class="card"><div class="card-head open" onclick="tog(this)"><span class="cn pk">K.9.1</span><span class="cm">总部管理员 dashboard</span><span class="ca">▼</span></div><div class="card-body show">
+
+    <div class="webmock">
+      <div class="webmock-bar">
+        <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+        <div class="url">console.msc.ai/enterprise/overview</div>
+      </div>
+      <div class="webmock-body">
+        <div class="webmock-side">
+          <div class="webmock-side-brand">🦌 鹿角茶集团</div>
+          <div class="webmock-side-section">总览</div>
+          <div class="webmock-side-item on"><i>📊</i>企业总览</div>
+          <div class="webmock-side-item"><i>💎</i>资产组合</div>
+          <div class="webmock-side-item"><i>🏪</i>门店部署</div>
+          <div class="webmock-side-section">管理</div>
+          <div class="webmock-side-item"><i>👥</i>员工 AI 资产</div>
+          <div class="webmock-side-item"><i>🔄</i>跨公司流通</div>
+          <div class="webmock-side-item"><i>📜</i>合约托管</div>
+          <div class="webmock-side-item"><i>💰</i>财务审计</div>
+        </div>
+        <div class="webmock-main">
+          <div class="webmock-title">企业总览 · 鹿角茶集团</div>
+          <div class="webmock-subtitle">200 家门店 · 数字化团队 18 人 · 2026-04 月度数据</div>
+
+          <div class="kpi-grid">
+            <div class="kpi green"><div class="kpi-l">持有 AI 资产</div><div class="kpi-v">23</div><div class="kpi-d up">+3 · 本月</div></div>
+            <div class="kpi amber"><div class="kpi-l">已部署门店</div><div class="kpi-v">186 / 200</div><div class="kpi-d up">部署率 93%</div></div>
+            <div class="kpi green"><div class="kpi-l">月度效率收益</div><div class="kpi-v">¥284,000</div><div class="kpi-d up">+12.4%</div></div>
+            <div class="kpi cyan"><div class="kpi-l">版税收入(月)</div><div class="kpi-v">¥74,560</div><div class="kpi-d up">+¥8,200</div></div>
+          </div>
+
+          <div class="web2col">
+            <div class="webpanel">
+              <div class="webpanel-t">💎 资产组合 <span class="cnt">23 项 · 持有 ¥680,500</span></div>
+              <div class="asset-row head">
+                <span>资产</span><span>类型</span><span>使用</span><span>收益</span>
+              </div>
+              <div class="asset-row">
+                <span class="asset-name">鹿角茶·智能排号系统</span>
+                <span class="asset-mode c-mode">自创</span>
+                <span>186 店</span>
+                <span style="color:var(--green)">+¥128k</span>
+              </div>
+              <div class="asset-row">
+                <span class="asset-name">智能员工排班 SaaS</span>
+                <span class="asset-mode c-mode">自创</span>
+                <span>200 店</span>
+                <span style="color:var(--green)">+¥86k</span>
+              </div>
+              <div class="asset-row">
+                <span class="asset-name">会员分层营销工作流</span>
+                <span class="asset-mode a-mode">采购</span>
+                <span>部署中</span>
+                <span style="color:var(--green)">+¥22k</span>
+              </div>
+              <div class="asset-row">
+                <span class="asset-name">供应链动态定价模型</span>
+                <span class="asset-mode a-mode">采购</span>
+                <span>已部署</span>
+                <span style="color:var(--green)">+¥48k</span>
+              </div>
+            </div>
+            <div class="webpanel">
+              <div class="webpanel-t">🌍 对外版税 <span class="cnt">4 个跨域 · 月收 ¥74k</span></div>
+              <div style="padding:8px 0;font-size:11px">
+                <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dashed rgba(255,255,255,.04)"><span>☕ 小星咖啡(排号改)</span><span style="color:var(--green)">¥24,200</span></div>
+                <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dashed rgba(255,255,255,.04)"><span>✂️ 美发连锁(预约系统)</span><span style="color:var(--green)">¥20,160</span></div>
+                <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dashed rgba(255,255,255,.04)"><span>🏥 社区诊所(分诊排队)</span><span style="color:var(--green)">¥16,480</span></div>
+                <div style="display:flex;justify-content:space-between;padding:4px 0"><span>💪 健身房(器械预约)</span><span style="color:var(--green)">¥13,720</span></div>
+              </div>
+              <div style="padding:8px;background:var(--cyan-bg);border-radius:6px;margin-top:8px;font-size:10px;color:var(--cyan);font-weight:700">💡 AIEO 预测:本季度版税收入有望突破 ¥300k(8 个新行业询价)</div>
+            </div>
+          </div>
+
+          <div class="webpanel" style="margin-bottom:0">
+            <div class="webpanel-t">👥 员工 AI 贡献排行 <span class="cnt">Top 5 · 本月</span></div>
+            <div class="emp-row"><div class="emp-av">张</div><div class="emp-info"><div class="emp-name">张工 · 技术部</div><div class="emp-role">创作 4 项 · 被采用 186 次</div></div><div class="emp-stat"><b>¥42,000</b>员工分成</div><span class="emp-badge c-mode">C · 员工独占</span></div>
+            <div class="emp-row"><div class="emp-av">李</div><div class="emp-info"><div class="emp-name">李经理 · 运营部</div><div class="emp-role">创作 3 项 · 被采用 128 次</div></div><div class="emp-stat"><b>¥28,400</b>员工分成</div><span class="emp-badge b-mode">B · 共享</span></div>
+            <div class="emp-row"><div class="emp-av">王</div><div class="emp-info"><div class="emp-name">王总监 · HR 部</div><div class="emp-role">创作 2 项 · 被采用 87 次</div></div><div class="emp-stat"><b>¥0</b>公司独享</div><span class="emp-badge a-mode">A · 公司独占</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tip cyan"><b>一屏看全局</b>:鹿角茶总部登录后第一眼看到——<b>我持有多少资产 · 部署到哪些店 · 赚了多少钱 · 哪些员工贡献大</b>。这是 B 端产品最核心的"首屏价值"。</div>
+  </div></div>
+
+  <div class="fb" data-id="k9" data-ver="1"><div class="fb-l">👤 CEO 快速反馈</div><div class="fb-d">企业总览 dashboard:4 KPI + 资产组合 + 对外版税 + 员工排行</div><div class="fb-row"><button class="fb-b" onclick="sf(this,'a','k9')">✓ 同意</button><button class="fb-b" onclick="sf(this,'d','k9')">💬 需讨论</button><button class="fb-b" onclick="sf(this,'x','k9')">✗ 不同意</button></div><textarea class="fb-n" placeholder="备注..." onblur="sn(this,'k9')"></textarea></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- ══════ K.10 · 员工 AI 资产报表 + L3 跨公司流通 ═══════ -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-k10">
+  <div class="section-head"><span class="n">K.10</span>员工 AI 资产管理 + L3 跨公司流通</div>
+  <div class="section-sub">MSC.AI 最差异化的 B 端能力——员工 AI 资产归属 + 跨公司流通机制</div>
+
+  <div class="card"><div class="card-head open" onclick="tog(this)"><span class="cn pk">K.10.1</span><span class="cm">员工 AI 资产报表(混合视图)</span><span class="ca">▼</span></div><div class="card-body show">
+
+    <div class="webmock">
+      <div class="webmock-bar">
+        <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+        <div class="url">console.msc.ai/enterprise/employees</div>
+      </div>
+      <div class="webmock-body">
+        <div class="webmock-side">
+          <div class="webmock-side-brand">🦌 鹿角茶集团</div>
+          <div class="webmock-side-section">总览</div>
+          <div class="webmock-side-item"><i>📊</i>企业总览</div>
+          <div class="webmock-side-item"><i>💎</i>资产组合</div>
+          <div class="webmock-side-item"><i>🏪</i>门店部署</div>
+          <div class="webmock-side-section">管理</div>
+          <div class="webmock-side-item on"><i>👥</i>员工 AI 资产</div>
+          <div class="webmock-side-item"><i>🔄</i>跨公司流通</div>
+          <div class="webmock-side-item"><i>📜</i>合约托管</div>
+          <div class="webmock-side-item"><i>💰</i>财务审计</div>
+        </div>
+        <div class="webmock-main">
+          <div class="webmock-title">员工 AI 资产</div>
+          <div class="webmock-subtitle">数字化团队 18 人 · 累计创作 31 项 · 月度分成 ¥128,400</div>
+
+          <!-- 混合视图切换 -->
+          <div class="vw-tabs">
+            <span class="vw-tab on">👥 按员工分组(默认)</span>
+            <span class="vw-tab">🏷 按归属模式分组</span>
+          </div>
+
+          <div class="webpanel" style="margin-bottom:10px">
+            <div class="emp-row" style="padding:10px 0">
+              <div class="emp-av" style="background:rgba(0,184,148,.2);color:var(--green)">张</div>
+              <div class="emp-info">
+                <div class="emp-name">张工 · 技术部负责人</div>
+                <div class="emp-role">入职 3 年 · 创作 4 项 · 本月分成 ¥42,000</div>
+              </div>
+            </div>
+            <div class="asset-row head"><span>资产名</span><span>归属模式</span><span>贡献度</span><span>被使用</span></div>
+            <div class="asset-row"><span class="asset-name">鹿角茶·智能排号系统</span><span class="asset-mode c-mode">C · 员工独占</span><span>94</span><span>186 次</span></div>
+            <div class="asset-row"><span class="asset-name">会员系统 API 接入</span><span class="asset-mode b-mode">B · 共享</span><span>76</span><span>24 次</span></div>
+
+            <div class="emp-row" style="padding:10px 0;margin-top:10px;border-top:1px solid var(--brd)">
+              <div class="emp-av" style="background:rgba(129,236,236,.2);color:var(--cyan)">李</div>
+              <div class="emp-info">
+                <div class="emp-name">李经理 · 运营部</div>
+                <div class="emp-role">入职 5 年 · 创作 3 项 · 本月分成 ¥28,400</div>
+              </div>
+            </div>
+            <div class="asset-row"><span class="asset-name">智能员工排班 SaaS</span><span class="asset-mode b-mode">B · 共享</span><span>88</span><span>200 次</span></div>
+            <div class="asset-row"><span class="asset-name">峰值调度算法</span><span class="asset-mode c-mode">C · 员工独占</span><span>72</span><span>12 次</span></div>
+
+            <div class="emp-row" style="padding:10px 0;margin-top:10px;border-top:1px solid var(--brd)">
+              <div class="emp-av" style="background:rgba(249,202,36,.2);color:var(--gold)">王</div>
+              <div class="emp-info">
+                <div class="emp-name">王总监 · HR 部</div>
+                <div class="emp-role">入职 6 年 · 创作 2 项 · 本月分成 ¥0(A 模式)</div>
+              </div>
+            </div>
+            <div class="asset-row"><span class="asset-name">员工绩效评估模型</span><span class="asset-mode a-mode">A · 公司独占</span><span>82</span><span>54 次</span></div>
+            <div class="asset-row"><span class="asset-name">门店选址决策系统</span><span class="asset-mode a-mode">A · 公司独占</span><span>77</span><span>33 次</span></div>
+          </div>
+
+          <div class="tip ok" style="font-size:10px">💡 <b>三种归属模式</b>:<b style="color:var(--gold)">A · 公司独占</b>(员工职务作品 · 公司持有所有权益)· <b style="color:var(--cyan)">B · 共享</b>(员工自主创作 · 按约定比例分成)· <b style="color:var(--green)">C · 员工独占</b>(员工完全拥有 · 公司按使用付费)。详见 chatJ J.9</div>
+        </div>
+      </div>
+    </div>
+
+  </div></div>
+
+  <div class="fb decision" data-id="k10-hybrid" data-ver="1"><div class="fb-l">员工 AI 资产的分组视图</div><div class="fb-d">当前方案:混合视图(默认按员工分组,可切换按归属模式 A/B/C 分 tab)。既看到"谁在贡献",也能看到"公司 vs 员工 vs 共享各占多少"</div><div class="fb-row"><button class="fb-b" onclick="sf(this,'a','k10-hybrid')">✓ 混合视图</button><button class="fb-b" onclick="sf(this,'d','k10-hybrid')">💬 只按员工</button><button class="fb-b" onclick="sf(this,'x','k10-hybrid')">✗ 只按模式</button></div><textarea class="fb-n" placeholder="..." onblur="sn(this,'k10-hybrid')"></textarea></div>
+
+  <div class="card"><div class="card-head open" onclick="tog(this)"><span class="cn pk">K.10.2</span><span class="cm">L3 跨公司流通管理</span><span class="ca">▼</span></div><div class="card-body show">
+
+    <div class="webmock">
+      <div class="webmock-bar">
+        <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+        <div class="url">console.msc.ai/enterprise/cross-company</div>
+      </div>
+      <div class="webmock-body">
+        <div class="webmock-side">
+          <div class="webmock-side-brand">🦌 鹿角茶集团</div>
+          <div class="webmock-side-item"><i>📊</i>企业总览</div>
+          <div class="webmock-side-item"><i>💎</i>资产组合</div>
+          <div class="webmock-side-item"><i>🏪</i>门店部署</div>
+          <div class="webmock-side-item"><i>👥</i>员工 AI 资产</div>
+          <div class="webmock-side-item on"><i>🔄</i>跨公司流通</div>
+          <div class="webmock-side-item"><i>📜</i>合约托管</div>
+          <div class="webmock-side-item"><i>💰</i>财务审计</div>
+        </div>
+        <div class="webmock-main">
+          <div class="webmock-title">跨公司流通管理</div>
+          <div class="webmock-subtitle">本公司资产被 4 家外部公司采购 · 累计版税 ¥298,400</div>
+
+          <!-- 被采购列表 -->
+          <div class="webpanel" style="margin-bottom:14px">
+            <div class="webpanel-t">🔄 本公司资产被外部采购 <span class="cnt">4 家公司 · 128 次</span></div>
+            <div class="asset-row head"><span>采购方 / 用途</span><span>原资产</span><span>交易额</span><span>本公司</span></div>
+            <div class="asset-row"><span class="asset-name">☕ 小星咖啡连锁(42 家店)<br><span style="font-size:9px;color:var(--text3);font-weight:400">改良版 · 取号叫号</span></span><span>智能排号</span><span>¥42,000/年</span><span style="color:var(--green)">¥8,400</span></div>
+            <div class="asset-row"><span class="asset-name">✂️ 美发连锁品牌(35 店)<br><span style="font-size:9px;color:var(--text3);font-weight:400">衍生 · 预约叫号</span></span><span>智能排号</span><span>¥28,000/年</span><span style="color:var(--green)">¥5,600</span></div>
+            <div class="asset-row"><span class="asset-name">🏥 社区诊所网络(28 家)<br><span style="font-size:9px;color:var(--text3);font-weight:400">衍生 · 分诊排队</span></span><span>智能排号</span><span>¥22,400/年</span><span style="color:var(--green)">¥4,480</span></div>
+            <div class="asset-row"><span class="asset-name">💪 健身房(23 家)<br><span style="font-size:9px;color:var(--text3);font-weight:400">衍生 · 器械预约</span></span><span>智能排号</span><span>¥18,400/年</span><span style="color:var(--green)">¥3,680</span></div>
+          </div>
+
+          <!-- 信任三模块 -->
+          <div class="webpanel">
+            <div class="webpanel-t">🛡️ 跨公司数据信任机制 <span class="cnt">三道防线</span></div>
+            <div class="trust-grid">
+              <div class="trust-c dm">
+                <div class="trust-c-i">🔒</div>
+                <div class="trust-c-t">数据脱敏层</div>
+                <div class="trust-c-d">外部公司只能看到资产的<b>接口 + 能力</b>,看不到鹿角茶的具体门店数据 / 客户信息 / 菜单细节。敏感数据由结算中心代为处理</div>
+              </div>
+              <div class="trust-c pm">
+                <div class="trust-c-i">🗝️</div>
+                <div class="trust-c-t">权限隔离</div>
+                <div class="trust-c-d">跨公司访问必须通过结算中心的代理 API,不直连数据库。每次调用带<b>签名 + 限流 + 用途声明</b>,违规立即冻结权限</div>
+              </div>
+              <div class="trust-c lg">
+                <div class="trust-c-i">📋</div>
+                <div class="trust-c-t">审计日志</div>
+                <div class="trust-c-d">所有跨公司调用记录<b>实时同步链上存证</b>,鹿角茶和采购方双方可随时调取完整审计报告,发生争议有法定证据</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tip"><b>投资人最常问的问题</b>:"A 公司员工创作的 AI 资产,B 公司买了之后,谁控制?怎么防止数据泄露?"——答案不在 PPT,而在这个面板。<b style="color:var(--cyan)">UI 直接展示三道信任防线</b>,让投资人 10 秒看完就放心。</div>
+  </div></div>
+
+  <div class="fb decision" data-id="k10-trust" data-ver="1"><div class="fb-l">跨公司数据信任机制怎么展示</div><div class="fb-d">当前方案 A:直接在跨公司流通面板里展示"数据脱敏层 / 权限隔离 / 审计日志"三模块。投资人会问 → UI 直接有答案</div><div class="fb-row"><button class="fb-b" onclick="sf(this,'a','k10-trust')">✓ A 直接展示</button><button class="fb-b" onclick="sf(this,'d','k10-trust')">💬 C 折叠展示</button><button class="fb-b" onclick="sf(this,'x','k10-trust')">✗ B 不展示(文档)</button></div><textarea class="fb-n" placeholder="..." onblur="sn(this,'k10-trust')"></textarea></div>
+
+  <div class="fb" data-id="k10" data-ver="1"><div class="fb-l">👤 CEO 快速反馈</div><div class="fb-d">员工 AI 资产混合视图 + 跨公司流通 + 三道信任防线</div><div class="fb-row"><button class="fb-b" onclick="sf(this,'a','k10')">✓ 同意</button><button class="fb-b" onclick="sf(this,'d','k10')">💬 需讨论</button><button class="fb-b" onclick="sf(this,'x','k10')">✗ 不同意</button></div><textarea class="fb-n" placeholder="备注..." onblur="sn(this,'k10')"></textarea></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- ══════════════ K.11 · 合约托管 + 财务审计 ════════════════ -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-k11">
+  <div class="section-head"><span class="n">K.11</span>合约托管 + 财务审计</div>
+  <div class="section-sub">结算中心的 UI 落地——合约状态 / 分账明细 / 版税流水 / 开票凭证</div>
+
+  <div class="card"><div class="card-head open" onclick="tog(this)"><span class="cn pk">K.11.1</span><span class="cm">合约托管中心</span><span class="ca">▼</span></div><div class="card-body show">
+
+    <div class="webmock">
+      <div class="webmock-bar">
+        <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+        <div class="url">console.msc.ai/enterprise/contracts</div>
+      </div>
+      <div class="webmock-body">
+        <div class="webmock-side">
+          <div class="webmock-side-brand">🦌 鹿角茶集团</div>
+          <div class="webmock-side-item"><i>📊</i>企业总览</div>
+          <div class="webmock-side-item"><i>💎</i>资产组合</div>
+          <div class="webmock-side-item"><i>🏪</i>门店部署</div>
+          <div class="webmock-side-item"><i>👥</i>员工 AI 资产</div>
+          <div class="webmock-side-item"><i>🔄</i>跨公司流通</div>
+          <div class="webmock-side-item on"><i>📜</i>合约托管</div>
+          <div class="webmock-side-item"><i>💰</i>财务审计</div>
+        </div>
+        <div class="webmock-main">
+          <div class="webmock-title">合约托管</div>
+          <div class="webmock-subtitle">共 12 份合约 · 8 活跃 / 2 续签中 / 2 已结案</div>
+
+          <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr)">
+            <div class="kpi green"><div class="kpi-l">活跃合约金额</div><div class="kpi-v">¥428,000</div><div class="kpi-d up">本年累计</div></div>
+            <div class="kpi cyan"><div class="kpi-l">托管中资金</div><div class="kpi-v">¥62,400</div><div class="kpi-d">平台结算中</div></div>
+            <div class="kpi amber"><div class="kpi-l">下一期到账</div><div class="kpi-v">¥18,200</div><div class="kpi-d">5 月 15 日</div></div>
+          </div>
+
+          <table class="ct-tbl">
+            <tr><th>合约编号</th><th>类型</th><th>对方</th><th>金额</th><th>状态</th><th></th></tr>
+            <tr class="active-row">
+              <td><b>#HJC-2026-047</b></td>
+              <td>对外授权</td>
+              <td>小星咖啡连锁</td>
+              <td>¥42,000/年</td>
+              <td><span class="ct-stat on">● 活跃</span></td>
+              <td style="color:var(--cyan);font-size:10px">查看 →</td>
+            </tr>
+            <tr>
+              <td>#HJC-2026-043</td>
+              <td>对外授权</td>
+              <td>美发连锁 · 丝琳</td>
+              <td>¥28,000/年</td>
+              <td><span class="ct-stat on">● 活跃</span></td>
+              <td style="color:var(--text3);font-size:10px">查看 →</td>
+            </tr>
+            <tr>
+              <td>#HJC-2026-031</td>
+              <td>采购(会员系统)</td>
+              <td>创思科技</td>
+              <td>¥36,000/年</td>
+              <td><span class="ct-stat soon">● 30 天后到期</span></td>
+              <td style="color:var(--text3);font-size:10px">查看 →</td>
+            </tr>
+            <tr>
+              <td>#HJC-2026-022</td>
+              <td>对外授权</td>
+              <td>社区诊所网络</td>
+              <td>¥22,400/年</td>
+              <td><span class="ct-stat on">● 活跃</span></td>
+              <td style="color:var(--text3);font-size:10px">查看 →</td>
+            </tr>
+          </table>
+
+          <!-- 选中合约详情 -->
+          <div class="webpanel" style="margin-top:14px">
+            <div class="webpanel-t">📋 合约 #HJC-2026-047 详情 <span class="cnt">小星咖啡 · 排号系统授权</span></div>
+            <div class="web2col">
+              <div>
+                <div style="font-size:10px;color:var(--text3);margin-bottom:6px;font-weight:700">分账明细(单次结算)</div>
+                <div style="font-size:10px;line-height:1.8">
+                  <div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">订阅金额</span><span><b>¥42,000</b></span></div>
+                  <div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">平台服务费 · 3%</span><span>¥1,260</span></div>
+                  <div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">追溯分成 · 2%</span><span>¥840</span></div>
+                  <div style="display:flex;justify-content:space-between;padding-top:6px;margin-top:6px;border-top:1px dashed rgba(255,255,255,.06);font-weight:700"><span>本公司实收</span><span style="color:var(--green)">¥39,900</span></div>
+                  <div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">  ↳ 员工张工分成(C 模式 · 20%)</span><span style="color:var(--cyan)">¥7,980</span></div>
+                </div>
+              </div>
+              <div>
+                <div style="font-size:10px;color:var(--text3);margin-bottom:6px;font-weight:700">版税流水</div>
+                <div class="mini-chart" style="height:60px;margin-bottom:4px">
+                  <div class="mini-chart-bar cold" style="height:35%"></div>
+                  <div class="mini-chart-bar" style="height:50%"></div>
+                  <div class="mini-chart-bar" style="height:62%"></div>
+                  <div class="mini-chart-bar" style="height:70%"></div>
+                  <div class="mini-chart-bar" style="height:75%"></div>
+                  <div class="mini-chart-bar" style="height:85%"></div>
+                  <div class="mini-chart-bar" style="height:90%"></div>
+                  <div class="mini-chart-bar" style="height:95%"></div>
+                </div>
+                <div style="font-size:9px;color:var(--text3);text-align:center">过去 8 个月 · 月均 ¥3,325</div>
+                <div style="margin-top:8px;padding:6px 8px;background:var(--bg3);border-radius:4px;font-size:10px;display:flex;justify-content:space-between;align-items:center">
+                  <span>📄 开票凭证</span><span style="color:var(--cyan);font-size:9px">12 张 · 已出 →</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tip cyan"><b>结算中心的 UI 具象化</b>:chatJ J.2 讲的"结算中心 = 新型金融基础设施",在这个面板里可视化落地——<b>合约状态 · 分账明细 · 版税流水 · 开票凭证</b>。给 CFO 看的时候,他能立刻理解"这不是黑盒结算,是专业财务系统"。</div>
+  </div></div>
+
+  <div class="card"><div class="card-head" onclick="tog(this)"><span class="cn pk">K.11.2</span><span class="cm">审计报表导出</span><span class="ca">▼</span></div><div class="card-body">
+    <table class="t">
+      <tr><th>报表类型</th><th>用途</th><th>频率</th></tr>
+      <tr><td><b>资产组合报表</b></td><td>CFO 月度财务审计</td><td>月 / 季 / 年</td></tr>
+      <tr><td><b>对外版税流水</b></td><td>税务申报 · 跨域收入证明</td><td>月 / 年</td></tr>
+      <tr><td><b>员工分成台账</b></td><td>工资核算 · HR 合规</td><td>月</td></tr>
+      <tr><td><b>跨公司审计报告</b></td><td>对采购方披露 · 信任建立</td><td>按需</td></tr>
+      <tr><td><b>合约履约凭证</b></td><td>法律档案 · 争议处置</td><td>按需</td></tr>
+    </table>
+    <div class="tip"><b>导出格式</b>:Excel · PDF · 对接企业财务系统 API。<b>不做数据分析</b>——企业已经有专业 BI 工具,MSC.AI 只负责<b>准确的原始数据</b>。</div>
+  </div></div>
+
+  <div class="fb decision" data-id="k11-detail" data-ver="1"><div class="fb-l">合约托管详细度</div><div class="fb-d">当前方案 B:中等详细(合约状态 + 分账明细 + 版税流水 + 开票凭证查询)。看起来像企业财务系统,不是轻量订单列表也不是完整 SaaS 财务中台</div><div class="fb-row"><button class="fb-b" onclick="sf(this,'a','k11-detail')">✓ B 中等</button><button class="fb-b" onclick="sf(this,'d','k11-detail')">💬 A 极简</button><button class="fb-b" onclick="sf(this,'x','k11-detail')">✗ C 完整</button></div><textarea class="fb-n" placeholder="..." onblur="sn(this,'k11-detail')"></textarea></div>
+
+  <div class="fb" data-id="k11" data-ver="1"><div class="fb-l">👤 CEO 快速反馈</div><div class="fb-d">合约托管 + 财务审计:企业财务系统感 · 结算中心 UI 落地</div><div class="fb-row"><button class="fb-b" onclick="sf(this,'a','k11')">✓ 同意</button><button class="fb-b" onclick="sf(this,'d','k11')">💬 需讨论</button><button class="fb-b" onclick="sf(this,'x','k11')">✗ 不同意</button></div><textarea class="fb-n" placeholder="备注..." onblur="sn(this,'k11')"></textarea></div>
+
+  <div style="margin-top:20px;padding:14px 16px;background:var(--bg3);border-radius:8px;font-size:12px;color:var(--text2);line-height:1.8">
+    <b style="color:var(--cyan)">📌 chatK 全景收尾</b>:C 端 7 章 + B 端 4 章 = 完整交易平台 UI 闭环。鹿角茶贯穿故事让投资人一次看清:<b>一家连锁餐饮企业的数字化团队</b>,在平台上创作 AI 资产、持有 AI 资产、向 4 个跨行业卖出 AI 资产、管理员工归属、通过结算中心完成对公合约托管和财务审计。这是 MSC.AI 产品的完整价值演示。
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<script>window.FB_KEY='msc_k_fb';window.FB_PAGE='chatK'</script>
+<script type="module" src="/sb.js"></script>
+<script src="/fb.js"></script>
+<script src="/nav.js"></script>
+</body>
+</html>
