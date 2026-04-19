@@ -8,6 +8,13 @@
 :root{--bg:#0D0F14;--bg2:#161922;--bg3:#1C1F2B;--bg4:#1E2130;--brd:#2A2D3A;--text:#E8E9ED;--text2:#9CA0B0;--text3:#6B7084;--accent:#6C5CE7;--accent-l:#A29BFE;--green:#00B894;--green-bg:rgba(0,184,148,.12);--amber:#FDCB6E;--amber-bg:rgba(253,203,110,.12);--red:#FF6B6B;--red-bg:rgba(255,107,107,.12);--blue:#74B9FF;--blue-bg:rgba(116,185,255,.12);--gold:#F9CA24;--gold-bg:rgba(249,202,36,.12);--chain:#00CEC9;--chain-bg:rgba(0,206,201,.10)}
 *{margin:0;padding:0;box-sizing:border-box}body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased}
 .header{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--brd);padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+.nav{position:sticky;top:52px;z-index:90;display:flex;gap:0;overflow-x:auto;border-bottom:1px solid var(--brd);background:#0D0F14;padding:0 20px;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav a{padding:8px 12px;font-size:12px;color:var(--text3);text-decoration:none;white-space:nowrap;border-bottom:2px solid transparent;transition:all .15s;display:inline-flex;align-items:center;gap:4px}
+.nav a:hover{color:var(--text)}
+.nav a.active{color:#81ECEC;border-bottom-color:#81ECEC}
+.nav a .milestone{font-size:9px;padding:1px 4px;border-radius:3px;background:rgba(249,202,36,.15);color:#F9CA24;font-weight:700}
+.ver[id]{scroll-margin-top:110px}
 .header h1{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}.header .badge{font-size:11px;padding:3px 10px;background:rgba(108,92,231,.12);color:var(--accent-l);border:1px solid rgba(108,92,231,.25);border-radius:20px}
 .main{max-width:900px;margin:0 auto;padding:24px 16px 80px}
 
@@ -49,10 +56,111 @@
 <body>
 
 <div class="header">
-  <h1>📋 更新记录 <span class="badge">v1 → v5</span></h1>
+  <h1>📋 更新记录 <span class="badge">v1 → v7.6.0</span></h1>
+</div>
+
+<div class="nav">
+  <a href="#v7.6.0" class="active">v7.6.0 <span class="milestone">里程碑</span></a>
+  <a href="#v7.5.0">v7.5.0 <span class="milestone">里程碑</span></a>
+  <a href="#v7.4.8">v7.4.8</a>
+  <a href="#v7.4.7">v7.4.7</a>
+  <a href="#v7.4.6">v7.4.6</a>
+  <a href="#v7.4.5">v7.4.5</a>
+  <a href="#v7.4.4">v7.4.4</a>
+  <a href="#v7.4.3">v7.4.3</a>
+  <a href="#v7.4.2">v7.4.2</a>
+  <a href="#v7.4.1">v7.4.1</a>
+  <a href="#v7.3.1">v7.3.1</a>
+  <a href="#v7.3">v7.3</a>
+  <a href="#v7.2">v7.2</a>
+  <a href="#v7.1">v7.1</a>
+  <a href="#v7">v7</a>
+  <a href="#v6">v6</a>
+  <a href="#v5">v5</a>
+  <a href="#v4">v4</a>
+  <a href="#v3">v3</a>
+  <a href="#v2">v2</a>
+  <a href="#v1">v1</a>
 </div>
 
 <div class="main">
+
+<!-- V7.6.0 -->
+<div class="ver" id="v7.6.0">
+  <div class="ver-head open" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')">
+    <span class="ver-tag latest" style="background:#81ECEC;color:#000">v7.6.0</span>
+    <span class="ver-title">💎 里程碑版本：chatJ 资产交易结算中心战略</span>
+    <span class="ver-date">2026-04-19</span>
+    <span class="ver-arrow">▼</span>
+  </div>
+  <div class="ver-body show">
+    <div class="ch-stats"><span class="ch-stat new-stat">11 章战略内容</span><span class="ch-stat mod-stat">15 个反馈块 · 4 个决策点</span></div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">这是第一个面向投资人逻辑的交付物</div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content">前 A-H 服务于 CEO 产品设计反馈。chatJ 从"产品细节"升级到"战略框架"——为什么做 / 逻辑怎么通 / 合规边界在哪 / 估值如何撑起来</div></div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content">战略内容和交易平台 UI 故意分离：chatJ 只承载战略，交易平台 UI 放下一个 chat（chatK）独立承载,避免战略反馈和 UI 反馈互相干扰</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">本次修复(基于 CEO 反馈)</div>
+      <div class="ch-item"><span class="ch-type fix">修</span><div class="ch-content"><strong>顶部 nav 跟随滑动问题</strong>:chatJ 本地 CSS 直接声明 .nav 的 position:sticky + top:52px + z-index + 背景色,不再完全依赖 nav.js 的注入(历史上多次因注入时序或权重踩雷)。所有 chatJ 滚动时 nav 始终贴在 header 下方</div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>changelog 页内版本导航栏</strong>:在 header 和内容之间加入 21 个版本的横向滚动 tab 栏,每条指向对应版本的 ver div。用 class="nav" 复用 nav.js 的 scroll-spy(当前版本自动高亮 cyan)。支持直接通过 URL 的 #v7.6.0 等锚点跳转,带正确的 110px 顶部偏移</div></div>
+      <div class="ch-item"><span class="ch-type mod">改</span><div class="ch-content">nav.js 加 <code>body.page-changelog .nav a.active</code> cyan 主色覆盖,保持和 chatJ 一致的视觉语言</div></div>
+      <div class="ch-item"><span class="ch-type mod">改</span><div class="ch-content">changelog 原 DOMContentLoaded 脚本:scrollIntoView 改为带 110px offset 的 window.scrollTo,避免首次加载带 hash 时目标被 header+nav 遮挡</div></div>
+      <div class="ch-item"><span class="ch-type fix">改</span><div class="ch-content">J.10.1 卡片标题去掉"给 CEO 语言版本"冒犯性标签。三种叙事升级为"专业主体(对标+估值模型+核心指标+投资人画像)+一句话类比辅助"双层结构。J.10.3 "新手/成熟/有远见投资人" 改为中性的投资风格分类</div></div>
+      <div class="ch-item"><span class="ch-type mod">标</span><div class="ch-content"><strong>待 Sean 后续确认</strong>:changelog 有两个 id="v7.2"(v7.5.0 遗留),nav 点击 #v7.2 只会跳到第一个。需 Sean 决定是否合并/改名其中之一</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">chatJ 11 章结构</div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>J.1 战略转折</strong>：v6 → v6.1 定位升级，三层蒸馏飞轮全景图</div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>J.2 实体资产与结算中心</strong>：42 号文合规边界对比（RWA ❌ vs MSC.AI ✅）</div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>J.3 AI 能力层</strong>：b→c→d 先后次序 + b 阶段数据埋点规划</div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>J.4 三层蒸馏飞轮</strong>：个性化 vs 泛化矛盾的解决方案 + 心理咨询师类比</div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>J.5 AIEO 协议架构</strong>：SEO→GEO→AIEO 范式 + MCP/A2A 底座 + 自研语义层</div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>J.6 跨领域泛化</strong>：餐馆 → 公司 → 游戏 跨域示例 · 万亿级估值想象空间</div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>J.7 衍生权与市场定价</strong>：强衍生权 + AIEO 个性化做市 + 独立贡献度四层判定 + 追溯分成 1-3%</div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>J.8 toB 产品三层</strong>：L1/L2/L3 架构 + 痛点清单 + toB 不做自动赚</div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>J.9 员工 AI 三层归属</strong>：A/B/C 模式 + MSC.AI 自用 C 模式 + 防御设计</div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>J.10 估值路径</strong>：三种叙事对比（金融基础设施 / 知识产权二级市场 / AI-Native SaaS）+ 三段式讲故事法 · 里程碑占位待 CEO 财务假设</div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>J.11 合规与风险</strong>：42 号文允许/禁止清单 + IP 法律演进 + 三级风险防御</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">4 个决策点（需 CEO 直接拍板）</div>
+      <div class="ch-item"><span class="ch-type mod">⚡</span><div class="ch-content"><strong>J.6 跨域泛化作为投资人核心卖点</strong>：故事更大但教育成本高，需 CEO 判断</div></div>
+      <div class="ch-item"><span class="ch-type mod">⚡</span><div class="ch-content"><strong>J.7.3 独立贡献度阈值</strong>：爬虫对比阈值（建议 70%）+ 人工抽查阈值（建议 80 分）</div></div>
+      <div class="ch-item"><span class="ch-type mod">⚡</span><div class="ch-content"><strong>J.8.4 toB 定价结构</strong>：沿用 toC 定价 / 单独按席位 / 作为 toC 延伸</div></div>
+      <div class="ch-item"><span class="ch-type mod">⚡</span><div class="ch-content"><strong>J.9.2 MSC.AI 自用 C 模式确认</strong>：员工 AI 完全可携带</div></div>
+      <div class="ch-item"><span class="ch-type mod">⚡</span><div class="ch-content"><strong>J.10.2 74 亿估值底层测算</strong>：对标倍数 / Pre-A 乘 X / 目标倒推</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">技术实现</div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content">主色 Cyan #81ECEC（原无页面独占，专业冷静调性贴合 B 端交易平台）</div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content">FB_KEY = msc_j_fb · FB_PAGE = chatJ</div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content">data-ver=1 版本标记（未来内容改动时升级）</div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content">决策点反馈块独立样式（.fb.decision 类 · cyan 底色 + "⚡ 决策点" 前缀）</div></div>
+      <div class="ch-item"><span class="ch-type mod">改</span><div class="ch-content">nav.js PAGES 数组商业机制类目加 chatJ + 主色 CSS 覆盖</div></div>
+      <div class="ch-item"><span class="ch-type mod">改</span><div class="ch-content">index.html 侧边栏 + landing 卡片 + 两处 pages 数组 + 更新记录都同步 chatJ</div></div>
+      <div class="ch-item"><span class="ch-type mod">改</span><div class="ch-content">decisions.html PAGES 数组 + 4 处 key 映射表 + exportFeedback 都加 chatJ</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">遵循 style-guide-v7.4.8</div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content">按 style guide 10 步新页面清单落地：HTML 骨架 + fb 块 + nav tab + per-page 主色 CSS + FB_KEY + decisions 聚合 + index 入口 + changelog 记录</div></div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content">踩雷防御：未定义禁用函数名（tog/setActive 等全局使用 fb.js 版本）;所有 nav href 指向真实 id;脚本加载顺序固定（nav.js → FB_KEY → sb.js → fb.js）</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">部署后建议</div>
+      <div class="ch-item"><span class="ch-type mod">提</span><div class="ch-content">硬刷新清除浏览器缓存（Cmd+Shift+R / Ctrl+Shift+R）</div></div>
+      <div class="ch-item"><span class="ch-type mod">提</span><div class="ch-content">CEO 反馈直接在 chatJ 页面内给即可,sb.js 实时同步到 Supabase,decisions.html 会自动聚合</div></div>
+      <div class="ch-item"><span class="ch-type mod">提</span><div class="ch-content">4 个决策点反馈回来后,Sean 可进入 chatK 交易平台 UI 设计</div></div>
+    </div>
+  </div>
+</div>
 
 <!-- V7.5.0 -->
 <div class="ver" id="v7.5.0">
@@ -759,7 +867,17 @@ document.addEventListener('DOMContentLoaded', () => {
         head.classList.add('open');
         body.classList.add('show');
       }
-      setTimeout(() => target.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+      // Use offset to clear sticky header (52px) + nav (~40px) + margin
+      setTimeout(() => {
+        const headerOffset = 110;
+        const rect = target.getBoundingClientRect();
+        const targetY = rect.top + window.pageYOffset - headerOffset;
+        window.scrollTo({ top: targetY, behavior: 'smooth' });
+        // Also set active nav tab
+        document.querySelectorAll('.nav a').forEach(a => {
+          a.classList.toggle('active', a.getAttribute('href') === '#' + hash);
+        });
+      }, 100);
     }
   }
 });

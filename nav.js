@@ -17,12 +17,14 @@ const PAGES = [
     { href: 'chatF.html', label: 'F · 裂变增长·任务体系', badge: '已更新', badgeColor: '#fbbf24' },
     { href: 'chatG.html', label: 'G · 任务品类·UI规范', badge: '新', badgeColor: '#34d399' },
     { href: 'chatH.html', label: 'H · AI自动审核流程', badge: '提案', badgeColor: '#A29BFE' },
+    { href: 'chatJ.html', label: 'J · 资产交易结算中心', badge: '战略', badgeColor: '#81ECEC' },
   ]},
   { cat: '工程交付', icon: '📐', items: [
     { href: 'architecture.html', label: '🏗️ 界面架构方案', badge: '已定', badgeColor: '#34d399' },
     { href: 'product-spec.html', label: '📦 产品规格文档' },
   ]},
   { cat: '更新记录', icon: '📋', items: [
+    { href: 'changelog.html#v7.6.0', label: 'v7.6.0 · chatJ 结算中心战略', badge: '里程碑', badgeColor: '#81ECEC' },
     { href: 'changelog.html#v7.5.0', label: 'v7.5.0 · 产品规格同步', badge: '里程碑', badgeColor: '#F9CA24' },
     { href: 'changelog.html#v7.4.8', label: 'v7.4.8 · architecture 折叠修复' },
     { href: 'changelog.html#v7.4.7', label: 'v7.4.7 · E nav + 孤儿防御' },
@@ -174,6 +176,8 @@ style.textContent = `
   body.page-chatF .nav a.active { color: #34d399 !important; border-bottom-color: #34d399 !important; }
   body.page-chatG .nav a.active { color: #34d399 !important; border-bottom-color: #34d399 !important; }
   body.page-chatH .nav a.active { color: #A29BFE !important; border-bottom-color: #A29BFE !important; }
+  body.page-chatJ .nav a.active { color: #81ECEC !important; border-bottom-color: #81ECEC !important; }
+  body.page-changelog .nav a.active { color: #81ECEC !important; border-bottom-color: #81ECEC !important; }
   body.page-architecture .nav a.active { color: #5CE7C8 !important; border-bottom-color: #5CE7C8 !important; }
   body.page-product-spec .nav a.active { color: #e8923d !important; border-bottom-color: #e8923d !important; }
 

@@ -150,6 +150,7 @@ const PAGES = [
   { key:'chatF', letter:'F', name:'裂变增长·任务体系', url:'chatF.html' },
   { key:'chatG', letter:'G', name:'任务品类·UI规范', url:'chatG.html' },
   { key:'chatH', letter:'H', name:'AI自动审核流程', url:'chatH.html' },
+  { key:'chatJ', letter:'J', name:'资产交易结算中心', url:'chatJ.html' },
   { key:'architecture', letter:'架', name:'界面架构方案', url:'architecture.html' },
   { key:'product-spec', letter:'规', name:'产品规格文档', url:'product-spec.html' },
 ];
@@ -234,7 +235,7 @@ async function loadAll() {
       const PAGE_KEY_MAP = {
         chatA: 'msc_ceo_feedback', chatB: 'msc_b_fb', chatC: 'msc_c_fb',
         chatD: 'msc_d_fb', chatE: 'msc_e_fb', chatF: 'msc_f_fb',
-        chatG: 'msc_g_fb', chatH: 'msc_h_fb',
+        chatG: 'msc_g_fb', chatH: 'msc_h_fb', chatJ: 'msc_j_fb',
         architecture: 'msc_arch_fb', 'product-spec': 'msc_ps_fb'
       };
       
@@ -296,7 +297,7 @@ async function loadAll() {
           const pageKeys = {
             chatA: 'msc_ceo_feedback', chatB: 'msc_b_fb', chatC: 'msc_c_fb',
             chatD: 'msc_d_fb', chatE: 'msc_e_fb', chatF: 'msc_f_fb',
-            chatG: 'msc_g_fb', chatH: 'msc_h_fb',
+            chatG: 'msc_g_fb', chatH: 'msc_h_fb', chatJ: 'msc_j_fb',
             architecture: 'msc_arch_fb', 'product-spec': 'msc_ps_fb'
           };
           const byPage = {};
@@ -498,7 +499,7 @@ function exportFeedback() {
   const pages = [
     ['chatA','msc_ceo_feedback'],['chatB','msc_b_fb'],['chatC','msc_c_fb'],
     ['chatD','msc_d_fb'],['chatE','msc_e_fb'],['chatF','msc_f_fb'],
-    ['chatG','msc_g_fb'],['chatH','msc_h_fb'],
+    ['chatG','msc_g_fb'],['chatH','msc_h_fb'],['chatJ','msc_j_fb'],
     ['architecture','msc_arch_fb'],['product-spec','msc_ps_fb']
   ];
   const all = { _exported: new Date().toISOString(), pages: {} };
@@ -533,7 +534,7 @@ function importFeedback() {
       const pageKeys = {
         chatA: 'msc_ceo_feedback', chatB: 'msc_b_fb', chatC: 'msc_c_fb',
         chatD: 'msc_d_fb', chatE: 'msc_e_fb', chatF: 'msc_f_fb',
-        chatG: 'msc_g_fb', chatH: 'msc_h_fb',
+        chatG: 'msc_g_fb', chatH: 'msc_h_fb', chatJ: 'msc_j_fb',
         architecture: 'msc_arch_fb', 'product-spec': 'msc_ps_fb'
       };
       let merged = 0;
@@ -563,7 +564,7 @@ async function pushLocalToSupabase(event) {
   const pageKeys = {
     chatA: 'msc_ceo_feedback', chatB: 'msc_b_fb', chatC: 'msc_c_fb',
     chatD: 'msc_d_fb', chatE: 'msc_e_fb', chatF: 'msc_f_fb',
-    chatG: 'msc_g_fb', chatH: 'msc_h_fb',
+    chatG: 'msc_g_fb', chatH: 'msc_h_fb', chatJ: 'msc_j_fb',
     architecture: 'msc_arch_fb', 'product-spec': 'msc_ps_fb'
   };
   
