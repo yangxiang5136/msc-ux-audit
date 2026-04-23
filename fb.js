@@ -302,7 +302,8 @@ if (typeof window.startCountdown === 'undefined') {
     var data = load();
     if (!data[id]) data[id] = {};
     var existing = data[id][ver] || {};
-    existing.c = choice;
+    // v7.9.1: click same button again to toggle off (deselect)
+    existing.c = (existing.c === choice) ? null : choice;
     existing.t = new Date().toISOString();
     if (!existing.n) existing.n = '';
     data[id][ver] = existing;
@@ -311,7 +312,7 @@ if (typeof window.startCountdown === 'undefined') {
     updateStats(data);
     // Push to Supabase (non-blocking, fires and forgets)
     if (window.MSC_SB) {
-      window.MSC_SB.upsert(PAGE, id, ver, choice, existing.n);
+      window.MSC_SB.upsert(PAGE, id, ver, existing.c, existing.n);
     }
   }
 

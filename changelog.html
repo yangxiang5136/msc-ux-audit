@@ -56,11 +56,12 @@
 <body>
 
 <div class="header">
-  <h1>📋 更新记录 <span class="badge">v1 → v7.8.0</span></h1>
+  <h1>📋 更新记录 <span class="badge">v1 → v7.9.0</span></h1>
 </div>
 
 <div class="nav">
-  <a href="#v7.8.0" class="active">v7.8.0 <span class="milestone">里程碑</span></a>
+  <a href="#v7.9.0" class="active">v7.9.0 <span class="milestone">战略重写</span></a>
+  <a href="#v7.8.0">v7.8.0 <span class="milestone">里程碑</span></a>
   <a href="#v7.7.1">v7.7.1 <span class="milestone">微调</span></a>
   <a href="#v7.7.0">v7.7.0 <span class="milestone">里程碑</span></a>
   <a href="#v7.6.0">v7.6.0 <span class="milestone">里程碑</span></a>
@@ -88,15 +89,83 @@
 
 <div class="main">
 
+<!-- V7.9.0 -->
+<div class="ver" id="v7.9.0">
+  <div class="ver-head open" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')">
+    <span class="ver-tag latest" style="background:#81ECEC;color:#000">v7.9.0</span>
+    <span class="ver-title">📐 战略重写:chatJ 从 11 章扩展到 14 章 · 全面重构战略叙事</span>
+    <span class="ver-date">2026-04-23</span>
+    <span class="ver-arrow">▼</span>
+  </div>
+  <div class="ver-body show">
+    <div class="ch-stats"><span class="ch-stat new-stat">chatJ 11 章→14 章</span><span class="ch-stat mod-stat">fb 块 12→21 · 决策点 4</span></div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">战略叙事升级:从"战略框架"到"激励机制底座"</div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content">v6.1 版本的 chatJ 把 MSC.AI 定位为"战略框架"——结算中心 + 蒸馏飞轮 + AI 能力层。v7.9.0 往上走一层,将定位升级为"<strong>AI 时代的激励机制底座</strong>"——解决创造能力过剩 · 创造激励稀缺的时代级矛盾</div></div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content">14 章按"根本问题 → 核心基础设施 → 商业机制 → 合规与技术"分层,构成完整自包含的投资人叙事</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">新增章节(3 章)</div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>J.0 根本问题定义</strong>:开篇章 · AI 时代的创造过剩 · 激励稀缺 · MSC.AI 作为激励机制底座的核心定位</div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>J.12 双层交易与结算中心协同</strong>:AI 资产(小额高频 · 流动性)+ 实体资产(大额低频 · 沉淀)互补对冲 · 核心财务优势</div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content"><strong>J.13 技术底座</strong>:当前架构(PostgreSQL/Supabase + Gitea)+ 分层结算体系(大客户强制平台结算阈值:单笔≥10 万 · 年度≥100 万 · 战略合作)+ 区块链三阶段路径 + "不是区块链公司"定位</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">完整替换章节(2 章)</div>
+      <div class="ch-item"><span class="ch-type fix">改</span><div class="ch-content"><strong>J.1 替换:战略转折 → 多语境叙事矩阵</strong>。六语境(技术 VC/产业 VC/趋势 VC/大 B 客户/董事会/朋友)× 三段式口径(一句话/三句话/深度版)· 三超级原则为内心北极星(降低摩擦/奖励创造/AI 替代人性负担)</div></div>
+      <div class="ch-item"><span class="ch-type fix">改</span><div class="ch-content"><strong>J.7 替换:衍生权+追溯分成 → 买断机制 8 小节</strong>。¥699 押金可退 + GitHub 式鸣谢 + 三种退出机制(转让/归平台/下架)+ "归属平台"战略价值 + 平台作为特殊买家 + 原创者标签治理。<strong>合规风险大幅降低</strong>(从多代链式分成简化为一次性买断,避免"分销行为"监管归类)</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">扩展章节(6 章)</div>
+      <div class="ch-item"><span class="ch-type mod">改</span><div class="ch-content"><strong>J.2 加 J.2.0 结算中心核心战略定位</strong>——大客户强制平台结算作为现金流基础设施 · 参照支付宝/京东物流的沉淀资金模型</div></div>
+      <div class="ch-item"><span class="ch-type mod">改</span><div class="ch-content"><strong>J.4 加 J.4.4 反向众包入口引擎</strong>——用户提需求 → 平台给奖励 · 飞轮外的入口引擎 · 同时激励需求侧和供给侧</div></div>
+      <div class="ch-item"><span class="ch-type mod">改</span><div class="ch-content"><strong>J.6 加 J.6.4 跨域价值归属分层</strong>——资产归下游用户 · 平台收手续费 · 原创者得声誉 · 衔接 J.7 买断逻辑</div></div>
+      <div class="ch-item"><span class="ch-type mod">改</span><div class="ch-content"><strong>J.9 扩展 J.9.4/5/6 三节</strong>——MSC.AI 自我运营作为 Day-1 客户 · AI 作为组织协作润滑剂(从"人和人关系网"转为"人和 AI 再到人关系网")· 公司 AI 化卡点四分类(执行/沟通/决策/心理)</div></div>
+      <div class="ch-item"><span class="ch-type mod">改</span><div class="ch-content"><strong>J.10 估值叙事调整</strong>——方案 A 加入"MSC.AI 硬支撑"(大客户强制结算 + 实体资产沉淀)· 方案 B 从"股票交易所"调整为"国家版权中心 + 资产登记转让交易所"(去股票化)</div></div>
+      <div class="ch-item"><span class="ch-type mod">改</span><div class="ch-content"><strong>J.11 加 J.11.2 资金托管合规路径</strong>——支付牌照路径 + 银行存管 + 反洗钱 + 70-80% 银行存管硬红线 · 原 J.11.2/.3 重编号为 J.11.3/.4</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">反馈块结构变化</div>
+      <div class="ch-item"><span class="ch-type mod">⚡</span><div class="ch-content">保留 4 个决策点:j6(跨域泛化作为卖点)· j8-pricing(toB 定价)· j9-c-mode(C 模式确认)· j10-numbers(74 亿估值测算逻辑)</div></div>
+      <div class="ch-item"><span class="ch-type mod">删</span><div class="ch-content">删除决策点 j7-threshold(独立贡献度阈值)——因为 J.7 完整替换为买断机制,独立贡献度不再是核心决策点</div></div>
+      <div class="ch-item"><span class="ch-type new">新</span><div class="ch-content">新增普通 fb:j0 · j6-attribution · j12 · j13 共 4 个</div></div>
+      <div class="ch-item"><span class="ch-type mod">改</span><div class="ch-content">data-ver 升级(反馈 outdated):j1 v1→v2 · j2 v1→v2 · j4 v1→v2 · j7 v1→v2 · j9 v1→v2 · j10 v2→v3 · j11 v1→v2</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">部署基础设施变化</div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content">Railway 部署模式从 nixpacks 静态托管变为 <strong>Node/Express 容器</strong>(2026-04-19 Railway 自动 PR 合并)。server.js serve repo 根目录静态文件 · 端口 process.env.PORT · 访客地理追踪写 /data/visitors.json</div></div>
+      <div class="ch-item"><span class="ch-type fix">改</span><div class="ch-content">Dockerfile 修复:从 <code>RUN npm ci --omit=dev</code> 改为 <code>RUN npm install --omit=dev</code>——因为 repo 无 package-lock.json,npm ci 会失败</div></div>
+      <div class="ch-item"><span class="ch-type mod">说</span><div class="ch-content">对日常工作流无影响:推新 .html 到 main 即可,Express 自动 serve</div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">Bug 修复(发布后补)</div>
+      <div class="ch-item"><span class="ch-type fix">改</span><div class="ch-content"><strong>fb.js 反馈按钮支持 toggle 取消选择</strong>:再次点击当前选中的 ✓/💬/✗ 按钮,会把选择重置为"未选中"状态(Supabase 记录 choice=NULL)· 修复了之前"误点了无法取消"的问题 · 备注内容保留不动 · <strong>影响所有 chat 页面</strong></div></div>
+    </div>
+
+    <div class="ch-section">
+      <div class="ch-section-title">验证结果</div>
+      <div class="ch-item"><span class="ch-type mod">✓</span><div class="ch-content">14 sections · 14 nav href 一一对应 · 18 个 data-id 全唯一(14 普通 + 4 决策点)· 骨架字节零改动(基于 v7.8.0 源码精确 str_replace)· 脚本加载尾部和 v7.8.0 完全一致</div></div>
+      <div class="ch-item"><span class="ch-type mod">✓</span><div class="ch-content">chatJ.html 从 730 行扩展到 1042 行(75 KB → 121 KB)· 其他 17 个文件字节未动</div></div>
+    </div>
+  </div>
+</div>
+
 <!-- V7.8.0 -->
 <div class="ver" id="v7.8.0">
-  <div class="ver-head open" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')">
+  <div class="ver-head" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')">
     <span class="ver-tag latest" style="background:#81ECEC;color:#000">v7.8.0</span>
     <span class="ver-title">🏢 里程碑:chatK 扩展 B 端 · C+B 双端完整闭环</span>
     <span class="ver-date">2026-04-19</span>
     <span class="ver-arrow">▼</span>
   </div>
-  <div class="ver-body show">
+  <div class="ver-body">
     <div class="ch-stats"><span class="ch-stat new-stat">chatK 7 章→11 章</span><span class="ch-stat mod-stat">12 反馈块→20</span></div>
 
     <div class="ch-section">
