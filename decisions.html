@@ -471,7 +471,7 @@ async function loadAll() {
 function updateDiagnostic() {
   const diag = document.getElementById('diag-panel');
   if (!diag) return;
-  const keys = ['msc_ceo_feedback','msc_a_fb','msc_b_fb','msc_c_fb','msc_d_fb','msc_e_fb','msc_f_fb','msc_g_fb','msc_h_fb','msc_arch_fb','msc_ps_fb'];
+  const keys = ['msc_ceo_feedback','msc_a_fb','msc_b_fb','msc_c_fb','msc_d_fb','msc_e_fb','msc_f_fb','msc_g_fb','msc_h_fb','msc_j_fb','msc_k_fb','msc_arch_fb','msc_ps_fb'];
   let html = '';
   let totalEntries = 0;
   keys.forEach(k => {
@@ -620,9 +620,13 @@ async function pushLocalToSupabase(event) {
   loadAll();
 }
 
-function clearAllFeedback() {
+async function clearAllFeedback() {
   if (!confirm('确认清空所有反馈？此操作不可撤销。建议先导出备份。')) return;
-  const keys = ['msc_ceo_feedback','msc_b_fb','msc_c_fb','msc_d_fb','msc_e_fb','msc_f_fb','msc_g_fb','msc_h_fb','msc_arch_fb','msc_ps_fb'];
+  if (window.MSC_SB && typeof window.MSC_SB.clearAll === 'function') {
+    const clearedRemote = await window.MSC_SB.clearAll();
+    if (!clearedRemote && !confirm('云端反馈清空失败。只清空本机后，刷新可能会从云端恢复。仍要继续吗？')) return;
+  }
+  const keys = ['msc_ceo_feedback','msc_a_fb','msc_b_fb','msc_c_fb','msc_d_fb','msc_e_fb','msc_f_fb','msc_g_fb','msc_h_fb','msc_j_fb','msc_k_fb','msc_arch_fb','msc_ps_fb'];
   keys.forEach(k => localStorage.removeItem(k));
   location.reload();
 }

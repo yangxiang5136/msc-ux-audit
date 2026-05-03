@@ -8,10 +8,23 @@ const path    = require('path');
 const app  = express();
 const PORT = process.env.PORT || 8080;
 
+app.use(express.json({ limit: '64kb' }));
+
 // ── Persistent log file ──────────────────────────────────────────────────────
 // Railway mounts the /data volume here; fall back to a local file in dev.
 const DATA_DIR  = process.env.DATA_DIR || '/data';
 const LOG_FILE  = path.join(DATA_DIR, 'visitors.json');
+
+// ── Feedback sync backend ────────────────────────────────────────────────────
+const SUPABASE_URL = (process.env.SUPABASE_URL || 'https://ajfmoyvqevnayugxljkw.supabase.co').replace(/\/$/, '');
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+const FEEDBACK_READ_TOKEN = process.env.FEEDBACK_READ_TOKEN || '';
+const FEEDBACK_WRITE_TOKEN = process.env.FEEDBACK_WRITE_TOKEN || '';
+const FEEDBACK_COLUMNS = 'page_key,section_id,version,choice,note,updated_at';
+const FEEDBACK_PAGE_KEYS = [
+  'chatA', 'chatB', 'chatC', 'chatD', 'chatE', 'chatF',
+  'chatG', 'chatH', 'chatJ', 'chatK', 'architecture', 'product-spec'
+];
 
 function ensureDataDir() {
   try {
@@ -39,6 +52,153 @@ function appendVisitor(record) {
     console.error('[geo] failed to write visitor log:', err.message);
   }
 }
+
+function feedbackHeaders(extra = {}) {
+  return {
+    apikey: SUPABASE_SERVICE_ROLE_KEY,
+    Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+    ...extra,
+  };
+}
+
+function ensureSupabaseConfigured(res) {
+  if (SUPABASE_SERVICE_ROLE_KEY) return true;
+  res.status(503).json({ error: 'Supabase service role key is not configured' });
+  return false;
+}
+
+function requireFeedbackReadToken(req, res, next) {
+  const token = req.get('x-feedback-token') || '';
+  const readEnabled = FEEDBACK_READ_TOKEN || FEEDBACK_WRITE_TOKEN;
+  const allowed = token && (
+    (FEEDBACK_READ_TOKEN && token === FEEDBACK_READ_TOKEN) ||
+    (FEEDBACK_WRITE_TOKEN && token === FEEDBACK_WRITE_TOKEN)
+  );
+  if (!readEnabled) {
+    res.status(503).json({ error: 'Feedback reads are disabled until FEEDBACK_READ_TOKEN or FEEDBACK_WRITE_TOKEN is configured' });
+    return;
+  }
+  if (!allowed) {
+    res.status(401).json({ error: 'Invalid feedback read token' });
+    return;
+  }
+  next();
+}
+
+function requireFeedbackWriteToken(req, res, next) {
+  if (!FEEDBACK_WRITE_TOKEN) {
+    res.status(503).json({ error: 'Feedback writes are disabled until FEEDBACK_WRITE_TOKEN is configured' });
+    return;
+  }
+  const token = req.get('x-feedback-token') || '';
+  if (token !== FEEDBACK_WRITE_TOKEN) {
+    res.status(401).json({ error: 'Invalid feedback write token' });
+    return;
+  }
+  next();
+}
+
+function cleanString(value, maxLen) {
+  return String(value || '').trim().slice(0, maxLen);
+}
+
+function normalizeFeedbackRow(body) {
+  const choice = body.choice === null || body.choice === '' ? null : body.choice;
+  if (choice !== null && !['a', 'd', 'x'].includes(choice)) {
+    throw new Error('choice must be one of a, d, x, or null');
+  }
+  const row = {
+    page_key: cleanString(body.page_key, 64),
+    section_id: cleanString(body.section_id, 128),
+    version: cleanString(body.version || '1', 32),
+    choice,
+    note: cleanString(body.note, 5000),
+  };
+  if (!row.page_key || !row.section_id || !row.version) {
+    throw new Error('page_key, section_id, and version are required');
+  }
+  if (!FEEDBACK_PAGE_KEYS.includes(row.page_key)) {
+    throw new Error('unknown page_key');
+  }
+  return row;
+}
+
+app.get('/api/feedback', requireFeedbackReadToken, async (req, res) => {
+  if (!ensureSupabaseConfigured(res)) return;
+  try {
+    const params = new URLSearchParams({ select: FEEDBACK_COLUMNS });
+    if (req.query.page_key) {
+      const pageKey = cleanString(req.query.page_key, 64);
+      if (!FEEDBACK_PAGE_KEYS.includes(pageKey)) {
+        res.status(400).json({ error: 'unknown page_key' });
+        return;
+      }
+      params.set('page_key', `eq.${pageKey}`);
+    }
+    params.set('order', 'updated_at.asc');
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/feedback?${params}`, {
+      headers: feedbackHeaders(),
+    });
+    const payload = await response.json().catch(() => null);
+    if (!response.ok) {
+      res.status(response.status).json({ error: payload?.message || 'Supabase fetch failed' });
+      return;
+    }
+    res.json(payload || []);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/feedback', requireFeedbackWriteToken, async (req, res) => {
+  if (!ensureSupabaseConfigured(res)) return;
+  let row;
+  try {
+    row = normalizeFeedbackRow(req.body || {});
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+    return;
+  }
+
+  try {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/feedback?on_conflict=page_key,section_id,version`, {
+      method: 'POST',
+      headers: feedbackHeaders({
+        'Content-Type': 'application/json',
+        Prefer: 'resolution=merge-duplicates,return=representation',
+      }),
+      body: JSON.stringify(row),
+    });
+    const payload = await response.json().catch(() => null);
+    if (!response.ok) {
+      res.status(response.status).json({ error: payload?.message || 'Supabase upsert failed' });
+      return;
+    }
+    res.json(Array.isArray(payload) ? payload[0] || null : payload);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete('/api/feedback', requireFeedbackWriteToken, async (req, res) => {
+  if (!ensureSupabaseConfigured(res)) return;
+  try {
+    for (const pageKey of FEEDBACK_PAGE_KEYS) {
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/feedback?page_key=eq.${encodeURIComponent(pageKey)}`, {
+        method: 'DELETE',
+        headers: feedbackHeaders({ Prefer: 'return=minimal' }),
+      });
+      if (!response.ok) {
+        const payload = await response.json().catch(() => null);
+        res.status(response.status).json({ error: payload?.message || `Supabase delete failed for ${pageKey}` });
+        return;
+      }
+    }
+    res.status(204).end();
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // ── IP geolocation middleware ────────────────────────────────────────────────
 // Only fires on HTML page requests so that asset fetches (js/css/ico) don't
@@ -85,7 +245,15 @@ app.use((req, res, next) => {
 });
 
 // ── Static file serving ──────────────────────────────────────────────────────
-// Serve everything in the project root (html, js, docs/, etc.).
+// Serve site assets from the project root, but block internal project files.
+app.use((req, res, next) => {
+  const pathname = decodeURIComponent(req.path);
+  if (/^\/(?:\.|[^/]+\.md|Dockerfile|package(?:-lock)?\.json|server\.js|docs(?:\/|$)|ai-bridge(?:\/|$)|telegram-agent-bridge(?:\/|$)|scripts(?:\/|$)|node_modules(?:\/|$)|data(?:\/|$))/i.test(pathname)) {
+    res.status(404).send('Not found');
+    return;
+  }
+  next();
+});
 app.use(express.static(path.join(__dirname), {
   index : 'index.html',
   etag  : true,

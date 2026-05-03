@@ -1,8 +1,8 @@
 # MSC.AI · 工作 TODO
 
-> Last updated: **2026-04-28 02:01 UTC** by chat 「chatJ v7.9.0 + 反馈分析」
+> Last updated: **2026-05-02** by Codex 「review fixes」
 > Maintainer: Sean(co-founder · Product/UX/CTO)
-> 用法:任何 chat 开场先 web_fetch 这个文件,即可对齐当前战场
+> 用法:任何 AI 工具开场先读 `AI_CONTEXT.md`,再读这个文件和 `changelog.html` 最新版本块,即可对齐当前战场
 
 ---
 
@@ -101,16 +101,18 @@
 
 ## 📝 最近重要决策(滚动 5 条)
 
+- **2026-05-02** · Codex 本地修复 5 个 P1/P2 review finding · 待本地浏览器验证后再决定是否 merge
 - **2026-04-28** · 启用 TODO.md 工作流 · 替代记忆碎片化 · 每个 chat 开场 fetch + 结尾 update
 - **2026-04-24** · 辛总反馈 13 条到位 · 战略需要 v7.10 重写 · 不是局部调整是世界观修正
 - **2026-04-23** · chatJ v7.9.0 上线 · 14 章 · 21 反馈点 · 4 决策点 · 同时修复 fb.js toggle bug
 - **2026-04-23** · Railway 部署模式确认为 Node/Express 容器(不是静态托管)· server.js + Dockerfile 已知 · 推送时注意 server.js 防御
-- **2026-04-19** · Railway 通过自动 PR 加了 Express server + IP geolocation 访客追踪 · /data/visitors.json
 
 ---
 
 ## 📚 关键参考文档
 
+- **AI 交接入口**:repo 根目录 `AI_CONTEXT.md`(任何 AI 工具先读)
+- **多 AI 协作流程**:repo 内 `docs/ai-workflow.md`
 - **战略主线**:Claude 项目知识库 → MSC_AI_产品战略全景文档.md
 - **项目背景**:Claude 项目知识库 → MSC_AI_项目简报.md
 - **chatJ 战略素材**:Claude 项目知识库 → MSC_AI_chatJ_第二批交接文档.md
@@ -122,7 +124,11 @@
 
 ## 🔄 怎么用这个文档
 
-**每个 chat 开场**:让 Claude `web_fetch` 这个文件,自动获得当前战场全景。
+**每个 AI chat 开场**:
+1. 先读 `AI_CONTEXT.md`
+2. 再读这个 `TODO.md`
+3. 再读 `changelog.html` 最新版本块
+4. 如果要改页面骨架,再读 `docs/style-guide.md`
 
 **chat 进行中**:Claude 看到任务进展时,可以建议你"我做完了 X,可以勾掉"或"我们应该加一条 Y"。
 

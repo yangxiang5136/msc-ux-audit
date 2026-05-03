@@ -5,8 +5,9 @@
 | 文件 | 说明 |
 |------|------|
 | style-guide.md | 新页面建设指南（v7.4.8 基准）—— 做新 tab 时参考 |
+| ai-workflow.md | 多 AI 协作工作流：开场读取、版本同步、交接规范 |
+| architecture-understanding.md | Codex 对网站架构的理解，供 Claude/原规划 AI 审阅纠偏 |
+| ai-dialogue.md | Codex 与 Claude 等 AI 工具的异步对话协议和记录 |
 
-注意：这些文件仍在 Express 静态文件服务的目录树里，
-理论上可通过 `/docs/{filename}` URL 访问。我们选择不严格屏蔽
-（"不宣传但也不刻意隐藏"）。若将来需要严格屏蔽，改 server.js
-加 `app.use('/docs', (req,res) => res.status(404).end())` 即可。
+注意：这些文件是内部参考资料。生产服务已在 `server.js` 屏蔽
+`/docs/*` 访问，避免内部规范和项目上下文被公开暴露。

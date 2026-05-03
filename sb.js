@@ -1,28 +1,94 @@
 /*
- * MSC.AI Supabase Client
- * - Wraps supabase-js v2 with feedback-specific helpers
- * - Exposes window.MSC_SB (Promise that resolves to client)
- * - Graceful degradation: if CDN blocked or Supabase down, fb.js falls back to localStorage
+ * MSC.AI Feedback Client
+ * - Talks to the same-origin /api/feedback proxy in server.js
+ * - Does not expose Supabase credentials in the browser
+ * - Preserves the old MSC_SB interface used by fb.js and decisions.html
  */
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0'
 
-const SUPABASE_URL = 'https://ajfmoyvqevnayugxljkw.supabase.co'
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFqZm1veXZxZXZuYXl1Z3hsamt3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyOTk4NzcsImV4cCI6MjA5MTg3NTg3N30.-qbxexQ6Xmf9AHicPo6Kl1IsqFMn87ruk-ssQ38SW9c'
-
-const client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-  realtime: { params: { eventsPerSecond: 10 } }
-})
+const WRITE_TOKEN_KEY = 'msc_feedback_write_token'
+const POLL_MS = 5000
 
 const listeners = new Set()
-let channel = null
+let pollTimer = null
+let lastSnapshot = ''
+
+function getWriteToken() {
+  try { return localStorage.getItem(WRITE_TOKEN_KEY) || '' }
+  catch(e) { return '' }
+}
+
+function setWriteToken(token) {
+  try {
+    if (token) localStorage.setItem(WRITE_TOKEN_KEY, token)
+    else localStorage.removeItem(WRITE_TOKEN_KEY)
+  } catch(e) {}
+}
+
+async function requestJson(url, options) {
+  const res = await fetch(url, options)
+  if (res.status === 204) return null
+  const data = await res.json().catch(() => null)
+  if (!res.ok) {
+    const message = data && data.error ? data.error : `Request failed (${res.status})`
+    const err = new Error(message)
+    err.status = res.status
+    throw err
+  }
+  return data
+}
+
+function pageParam(pageKey) {
+  return pageKey ? `?page_key=${encodeURIComponent(pageKey)}` : ''
+}
+
+function readHeaders() {
+  const headers = {}
+  const token = getWriteToken()
+  if (token) headers['x-feedback-token'] = token
+  return headers
+}
+
+function isDecisionsPage() {
+  try { return /(?:^|\/)decisions\.html$/i.test(window.location.pathname) }
+  catch(e) { return false }
+}
 
 // Fetch feedback rows (optionally filtered by page_key)
 async function fetchAll(pageKey) {
-  let query = client.from('feedback').select('page_key,section_id,version,choice,note,updated_at')
-  if (pageKey) query = query.eq('page_key', pageKey)
-  const { data, error } = await query
-  if (error) { console.warn('[SB] fetch error:', error.message); return []; }
-  return data || []
+  async function run() {
+    return requestJson('/api/feedback' + pageParam(pageKey), {
+      headers: readHeaders()
+    })
+  }
+
+  try {
+    return await run()
+  } catch(e) {
+    if (e.status === 401) {
+      const hadToken = !!getWriteToken()
+      if (hadToken) setWriteToken('')
+      if (hadToken || isDecisionsPage()) {
+        try { return await promptForTokenAndRetry(run) || [] } catch(retryErr) { e = retryErr }
+      }
+    }
+    console.warn('[SB] fetch error:', e.message)
+    return []
+  }
+}
+
+function writeHeaders() {
+  const headers = { 'Content-Type': 'application/json' }
+  const token = getWriteToken()
+  if (token) headers['x-feedback-token'] = token
+  return headers
+}
+
+async function promptForTokenAndRetry(fn) {
+  if (typeof window.prompt !== 'function') return null
+  const token = window.prompt('请输入反馈访问/写入令牌')
+  if (!token) return null
+  setWriteToken(token.trim())
+  return fn()
 }
 
 // Upsert a single feedback row
@@ -34,42 +100,94 @@ async function upsert(pageKey, sectionId, version, choice, note) {
     choice: choice,
     note: note || ''
   }
-  const { data, error } = await client
-    .from('feedback')
-    .upsert(row, { onConflict: 'page_key,section_id,version' })
-    .select()
-  if (error) { console.warn('[SB] upsert error:', error.message); return null; }
-  return data && data[0]
+
+  async function run() {
+    return requestJson('/api/feedback', {
+      method: 'POST',
+      headers: writeHeaders(),
+      body: JSON.stringify(row)
+    })
+  }
+
+  try {
+    return await run()
+  } catch(e) {
+    if (e.status === 401) {
+      setWriteToken('')
+      try { return await promptForTokenAndRetry(run) } catch(retryErr) { e = retryErr }
+    }
+    console.warn('[SB] upsert error:', e.message)
+    return null
+  }
 }
 
-// Subscribe to realtime changes; returns unsubscribe fn
+async function clearAll() {
+  async function run() {
+    await requestJson('/api/feedback', {
+      method: 'DELETE',
+      headers: writeHeaders()
+    })
+    return true
+  }
+
+  try {
+    return await run()
+  } catch(e) {
+    if (e.status === 401) {
+      setWriteToken('')
+      try { return await promptForTokenAndRetry(run) } catch(retryErr) { e = retryErr }
+    }
+    console.warn('[SB] clear error:', e.message)
+    return false
+  }
+}
+
+function rowKey(row) {
+  return [row.page_key, row.section_id, row.version].join('::')
+}
+
+function snapshotRows(rows) {
+  return rows
+    .map(r => `${rowKey(r)}::${r.choice || ''}::${r.note || ''}::${r.updated_at || ''}`)
+    .sort()
+    .join('|')
+}
+
+async function poll() {
+  if (listeners.size === 0) return
+  const rows = await fetchAll()
+  const nextSnapshot = snapshotRows(rows)
+  if (lastSnapshot && nextSnapshot !== lastSnapshot) {
+    rows.forEach(row => {
+      listeners.forEach(cb => {
+        try { cb({ event: 'poll', eventType: 'UPDATE', new: row }) }
+        catch(e) { console.warn('[SB] listener error:', e) }
+      })
+    })
+  }
+  lastSnapshot = nextSnapshot
+}
+
+// Subscribe to changes using lightweight polling; returns unsubscribe fn
 function subscribe(callback) {
   listeners.add(callback)
-  if (!channel) {
-    channel = client
-      .channel('feedback-changes')
-      .on('postgres_changes',
-        { event: '*', schema: 'public', table: 'feedback' },
-        payload => listeners.forEach(cb => {
-          try { cb(payload) } catch(e) { console.warn('[SB] listener error:', e) }
-        })
-      )
-      .subscribe(status => {
-        console.log('[SB] channel status:', status)
-      })
+  if (!pollTimer) {
+    poll().catch(e => console.warn('[SB] initial poll error:', e.message))
+    pollTimer = setInterval(() => {
+      poll().catch(e => console.warn('[SB] poll error:', e.message))
+    }, POLL_MS)
   }
   return () => {
     listeners.delete(callback)
-    if (listeners.size === 0 && channel) {
-      client.removeChannel(channel)
-      channel = null
+    if (listeners.size === 0 && pollTimer) {
+      clearInterval(pollTimer)
+      pollTimer = null
+      lastSnapshot = ''
     }
   }
 }
 
-// Convert Supabase rows into the v2 nested format used by localStorage/fb.js
-// Input: array of { page_key, section_id, version, choice, note, updated_at }
-// Output: { [pageKey]: { [sectionId]: { [version]: { c, n, t } } } }
+// Convert rows into the v2 nested format used by localStorage/fb.js
 function toNested(rows) {
   const out = {}
   rows.forEach(r => {
@@ -84,6 +202,6 @@ function toNested(rows) {
   return out
 }
 
-window.MSC_SB = { fetchAll, upsert, subscribe, toNested, client }
+window.MSC_SB = { fetchAll, upsert, clearAll, subscribe, toNested, setWriteToken, getWriteToken, client: null }
 window.dispatchEvent(new Event('msc-sb-ready'))
 console.log('[SB] ready')
