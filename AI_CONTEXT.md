@@ -13,13 +13,17 @@ This file is the first stop for any AI tool working on this repository. It exist
 
 ## Read Order For Every New AI Session
 
-1. Run `git status --short --branch` to see branch, dirty files, and whether another tool already changed something.
+Trigger this flow when the user asks to understand, research, analyze, review,
+or take over the project, even if they are not asking for code edits yet.
+
+1. Run `scripts/agent-bootstrap` if available; otherwise run `git status --short --branch`.
 2. Read this file.
 3. Read `TODO.md` for active strategy/product work.
 4. Read the newest section in `changelog.html` for the last published site version.
 5. If creating or editing a page, read `docs/style-guide.md`.
 6. If changing AI handoff rules, read `docs/ai-workflow.md`.
 7. If validating architecture assumptions, read `docs/architecture-understanding.md` and `docs/ai-dialogue.md`.
+8. If changing repo memory workflow, read `docs/project-memory-layer-localization.md`.
 
 Do not assume memory from a prior chat is current. Trust the repo files and `git status`.
 
@@ -36,6 +40,7 @@ Do not assume memory from a prior chat is current. Trust the repo files and `git
 - `changelog.html`: published site version history.
 - `docs/architecture-understanding.md`: Codex's explicit model of the repo architecture, written for peer review by another AI.
 - `docs/ai-dialogue.md`: async dialogue protocol and current open questions between AI tools.
+- `scripts/agent-bootstrap`: read-only startup snapshot for new AI tools.
 
 ## Feedback System Rules
 
@@ -74,6 +79,8 @@ Do not assume memory from a prior chat is current. Trust the repo files and `git
 - Multi-AI handoff workflow added: `AI_CONTEXT.md`, `AGENTS.md`, `CLAUDE.md`, and `docs/ai-workflow.md`.
 - Architecture peer-review packet added: `docs/architecture-understanding.md` and `docs/ai-dialogue.md`.
 - Claude Code reviewed the patch through a side-channel experiment and identified public feedback reads as the top blocker; Codex added a read-side token gate to `GET /api/feedback`.
+- Project Memory Layer docs added: `docs/project-memory-layer-reference.md` for other projects and `docs/project-memory-layer-localization.md` for this repo's adapted path.
+- `scripts/agent-bootstrap` added as the standard read-only project understanding snapshot for new AI sessions.
 - Before merging/deploying, validate in browser that:
   - chatA feedback can be saved and appears in `decisions.html`.
   - private paths such as `/TODO.md` return 404.

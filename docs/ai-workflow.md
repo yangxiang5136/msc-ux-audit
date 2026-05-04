@@ -4,9 +4,13 @@ This workflow keeps multiple AI tools aligned when improving the MSC.AI site.
 
 ## 1. Start Every Session With A Snapshot
 
+Use this snapshot for any project-understanding request, such as "help me first
+understand this project", not only for code-editing tasks.
+
 Run:
 
 ```bash
+scripts/agent-bootstrap
 git status --short --branch
 git log -1 --oneline
 ```
@@ -19,6 +23,7 @@ Then read:
 4. `docs/style-guide.md` if changing page structure or visual patterns
 5. `docs/architecture-understanding.md` if validating architecture assumptions
 6. `docs/ai-dialogue.md` if responding to another AI's review
+7. `docs/project-memory-layer-localization.md` if changing repo memory workflow
 
 Before making changes, state which baseline you are working from and which files you expect to touch.
 
