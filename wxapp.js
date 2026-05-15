@@ -850,23 +850,20 @@
       // 清掉除 upload 之外所有
       Array.from(list.children).forEach(c => { if (c !== upload) c.remove(); });
 
-      // ① 功能名 pill (proposal title · 不可改)
-      const titlePill = el('div', { class: 'wp-title-pill', title: state.proposal.slug },
-        state.proposal.title || state.proposal.slug);
+      // ① 合并的 title + section pill · 默认子项显示 proposal title, 切换后显示子项名
+      // 点击弹下拉 · 切换/新建/重命名都在这一处
+      const proposalTitle = state.proposal.title || state.proposal.slug;
+      const displayLabel = state.activeSection === '' ? proposalTitle : state.activeSection;
+      const subtitle = state.activeSection === '' ? '默认子项' : `子项 · ${proposalTitle}`;
+      const titlePill = el('div', { class: 'wp-title-pill wp-title-pill-menu', title: '点击切换/新建/重命名子项' }, [
+        el('div', { class: 'wp-tp-text' }, [
+          el('span', { class: 'wp-tp-label' }, displayLabel),
+          el('span', { class: 'wp-tp-sub' }, subtitle),
+        ]),
+        el('span', { class: 'wp-tp-arrow' }, '▾'),
+      ]);
+      titlePill.addEventListener('click', () => openSectionMenu(titlePill));
       list.insertBefore(titlePill, list.firstChild);
-
-      // ② 子项 pill · 显示当前 section · 点击切换/重命名/新建
-      const sections = getSections();
-      const curIdx = sections.indexOf(state.activeSection);
-      const sectionLabel = state.activeSection === '' ? '默认子项' : state.activeSection;
-      const sectionPill = el('div', { class: 'wp-section-pill', title: '点击切换或新建子项' },
-        [
-          el('span', { class: 'wp-sec-icon' }, '📂'),
-          el('span', { class: 'wp-sec-label' }, sectionLabel),
-          el('span', { class: 'wp-sec-arrow' }, '▾'),
-        ]);
-      sectionPill.addEventListener('click', () => openSectionMenu(sectionPill));
-      list.insertBefore(sectionPill, titlePill.nextSibling);
 
       // ③ 截图 · 反转, 按 section 过滤
       const shots = state.screenshots.filter(inSection).slice().reverse();

@@ -467,44 +467,45 @@ button { font-family: inherit; cursor: pointer; }
   -webkit-overflow-scrolling: touch;
 }
 
-/* title pill · 粘在最左 */
+/* 合并的 title + section pill · 粘左 · 点击下拉切换子项 */
 .wp-title-pill {
   flex-shrink: 0;
-  font-size: 13px; font-weight: 700;
-  color: var(--t1);
-  padding: 8px 14px;
-  background: var(--bg3);
-  border-radius: 7px;
-  white-space: nowrap;
-  max-width: 200px;
-  overflow: hidden; text-overflow: ellipsis;
   position: sticky; left: 8px;
   z-index: 3;
+  background: var(--bg3);
+  border: 1px solid var(--brd2);
+  border-radius: 7px;
+  padding: 6px 10px 6px 12px;
+  white-space: nowrap;
   box-shadow: 6px 0 8px -6px rgba(0,0,0,0.5);
 }
-
-/* section pill · 子项切换 · 紧贴 title pill 右侧 */
-.wp-section-pill {
-  flex-shrink: 0;
-  display: flex; align-items: center; gap: 6px;
-  font-size: 12px; font-weight: 600;
-  color: var(--role-uiux);
-  padding: 7px 12px;
-  background: rgba(52,211,153,.10);
-  border: 1px solid rgba(52,211,153,.30);
-  border-radius: 7px;
-  white-space: nowrap;
-  max-width: 180px;
+.wp-title-pill-menu {
   cursor: pointer;
-  position: sticky; left: 160px;   /* title 后面紧贴 */
-  z-index: 3;
-  transition: background .15s;
+  transition: background .15s, border-color .15s;
+  display: flex; align-items: center; gap: 8px;
 }
-.wp-section-pill:hover { background: rgba(52,211,153,.18); }
-.wp-section-pill .wp-sec-label {
-  overflow: hidden; text-overflow: ellipsis; max-width: 120px;
+.wp-title-pill-menu:hover {
+  background: var(--bg4);
+  border-color: var(--brd3);
 }
-.wp-section-pill .wp-sec-arrow { font-size: 9px; opacity: .7; }
+.wp-tp-text {
+  display: flex; flex-direction: column; gap: 1px;
+  max-width: 180px;
+}
+.wp-tp-label {
+  font-size: 13px; font-weight: 700; color: var(--t1);
+  line-height: 1.2;
+  overflow: hidden; text-overflow: ellipsis;
+}
+.wp-tp-sub {
+  font-size: 10px; color: var(--t3); font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: .3px;
+}
+.wp-tp-arrow {
+  font-size: 11px; color: var(--t3);
+  flex-shrink: 0;
+}
 
 /* section dropdown menu */
 .wp-section-menu {
