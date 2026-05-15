@@ -139,6 +139,8 @@
     annotate(slug, data)       { return _fetch('/api/wxapp/proposals/' + encodeURIComponent(slug) + '/annotations', { method:'POST', body: JSON.stringify(data) }); },
     patchAnnotation(slug, id, data) { return _fetch('/api/wxapp/proposals/' + encodeURIComponent(slug) + '/annotations/' + encodeURIComponent(id), { method:'PATCH', body: JSON.stringify(data) }); },
     deleteAnnotation(slug, id) { return _fetch('/api/wxapp/proposals/' + encodeURIComponent(slug) + '/annotations/' + encodeURIComponent(id), { method:'DELETE' }); },
+    patchComment(slug, id, data)    { return _fetch('/api/wxapp/proposals/' + encodeURIComponent(slug) + '/comments/' + encodeURIComponent(id), { method:'PATCH', body: JSON.stringify(data) }); },
+    patchScreenshot(slug, id, data) { return _fetch('/api/wxapp/proposals/' + encodeURIComponent(slug) + '/screenshots/' + encodeURIComponent(id), { method:'PATCH', body: JSON.stringify(data) }); },
     uploadScreenshot(slug, dataUri, caption) { return _fetch('/api/wxapp/proposals/' + encodeURIComponent(slug) + '/screenshots', { method:'POST', body: JSON.stringify({ data_uri: dataUri, caption }) }); },
     deleteScreenshot(slug, id) { return _fetch('/api/wxapp/proposals/' + encodeURIComponent(slug) + '/screenshots/' + encodeURIComponent(id), { method:'DELETE' }); },
   };
@@ -178,6 +180,58 @@
   }
   function escapeHtml(s) {
     return String(s || '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[c]);
+  }
+
+  /* ── SVG 图标库 · 替代 emoji 显高级感 · currentColor 跟随父元素颜色 ─── */
+  const ICONS = {
+    pen:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>',
+    circle:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>',
+    arrow:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>',
+    rect:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>',
+    pencil:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 1 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>',
+    folder:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>',
+    chevron: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>',
+    image:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21" fill="none"/></svg>',
+    check:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+    xmark:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+    ban:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>',
+    bulb:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 1 7 7c0 3-2 5-3 6v2H8v-2c-1-1-3-3-3-6a7 7 0 0 1 7-7z"/></svg>',
+    msg:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>',
+  };
+  function icon(name, extraClass) {
+    const sp = document.createElement('span');
+    sp.className = 'wp-icon' + (extraClass ? ' ' + extraClass : '');
+    sp.innerHTML = ICONS[name] || '';
+    return sp;
+  }
+  // kind / shape 标签里的图标 + 中文
+  const KIND_ICON_NAME = { note:'msg', approve:'check', reject:'xmark', block:'ban', idea:'bulb' };
+  const SHAPE_ICON_NAME = { freehand:'pen', circle:'circle', arrow:'arrow', rect:'rect', none:'image' };
+
+  /* ── inline 可编辑助手 · contenteditable + 保存 ───────────────── */
+  function makeEditable(el, onSave, opts = {}) {
+    el.setAttribute('contenteditable', 'true');
+    el.classList.add('wp-editable');
+    el.addEventListener('focus', () => { el.dataset.original = el.textContent; });
+    el.addEventListener('blur', async () => {
+      const v = el.textContent.trim();
+      const original = el.dataset.original || '';
+      if (v === original) return;
+      if (!opts.allowEmpty && !v) {
+        el.textContent = original;
+        return;
+      }
+      try {
+        await onSave(v, original);
+      } catch (e) {
+        toast(e.message, 'error');
+        el.textContent = original;
+      }
+    });
+    el.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); el.blur(); }
+      else if (e.key === 'Escape') { el.textContent = el.dataset.original; el.blur(); }
+    });
   }
   function fileToDataUri(file) {
     return new Promise((resolve, reject) => {
@@ -875,8 +929,27 @@
     /* ── 渲染 ─────────────────────────────────────────────────────── */
     function render() {
       const p = state.proposal;
-      $('#wp-title').textContent = p.title;
-      $('#wp-screen').textContent = p.screen_name || p.slug;
+      // 页头标题 · 中文标题 (可编辑) + 英文标注 (可编辑, screen_name)
+      const titleEl = $('#wp-title');
+      titleEl.textContent = p.title;
+      if (!titleEl.dataset.editableBound) {
+        makeEditable(titleEl, async (v) => {
+          await wpApi.patch(slug, { title: v });
+          toast('标题已保存', 'success');
+          await load();
+        });
+        titleEl.dataset.editableBound = '1';
+      }
+      const screenEl = $('#wp-screen');
+      screenEl.textContent = p.screen_name || p.slug;
+      if (!screenEl.dataset.editableBound) {
+        makeEditable(screenEl, async (v) => {
+          await wpApi.patch(slug, { screen_name: v });
+          toast('英文标注已保存', 'success');
+          await load();
+        }, { allowEmpty: true });
+        screenEl.dataset.editableBound = '1';
+      }
 
       // 改稿正文 (没改稿 HTML 时, 自动用 active screenshot 作画布背景)
       const activeShot = getActiveScreenshot();
@@ -921,19 +994,37 @@
       // 清掉除 upload 之外所有
       Array.from(list.children).forEach(c => { if (c !== upload) c.remove(); });
 
-      // ① 合并的 title + section pill · 默认子项显示 proposal title, 切换后显示子项名
-      // 点击弹下拉 · 切换/新建/重命名都在这一处
+      // ① 新版 pill · 顶行 = proposal.title (可编辑), 底行 = section 名 (可编辑) · 右侧 chevron 点击弹下拉
       const proposalTitle = state.proposal.title || state.proposal.slug;
-      const displayLabel = state.activeSection === '' ? proposalTitle : state.activeSection;
-      const subtitle = state.activeSection === '' ? '默认子项' : `子项 · ${proposalTitle}`;
-      const titlePill = el('div', { class: 'wp-title-pill wp-title-pill-menu', title: '点击切换/新建/重命名子项' }, [
-        el('div', { class: 'wp-tp-text' }, [
-          el('span', { class: 'wp-tp-label' }, displayLabel),
-          el('span', { class: 'wp-tp-sub' }, subtitle),
-        ]),
-        el('span', { class: 'wp-tp-arrow' }, '▾'),
+      const subitemName = state.activeSection || '';
+
+      const titleSpan = el('span', { class: 'wp-tp-label' }, proposalTitle);
+      makeEditable(titleSpan, async (v) => {
+        await wpApi.patch(slug, { title: v });
+        toast('标题已保存', 'success');
+        await load();
+      });
+
+      const subSpan = el('span', { class: 'wp-tp-sub' }, subitemName || '主体');
+      // 只有非默认子项才允许编辑 section 名 (默认子项 = 空字符串, 改名相当于新建)
+      if (state.activeSection !== '') {
+        makeEditable(subSpan, async (v, oldName) => {
+          if (!v) throw new Error('子项名不能为空');
+          await renameSection(oldName, v);
+        });
+      } else {
+        subSpan.style.opacity = '0.5';
+        subSpan.title = '默认子项 · 不可改名 · 通过下拉菜单新建独立子项';
+      }
+
+      const chevronBtn = el('span', { class: 'wp-tp-arrow', title: '点击切换/新建子项' });
+      chevronBtn.appendChild(icon('chevron'));
+      chevronBtn.addEventListener('click', (e) => { e.stopPropagation(); openSectionMenu(chevronBtn); });
+
+      const titlePill = el('div', { class: 'wp-title-pill wp-title-pill-menu' }, [
+        el('div', { class: 'wp-tp-text' }, [titleSpan, subSpan]),
+        chevronBtn,
       ]);
-      titlePill.addEventListener('click', () => openSectionMenu(titlePill));
       list.insertBefore(titlePill, list.firstChild);
 
       // ③ 截图 · 反转, 按 section 过滤
@@ -1039,16 +1130,17 @@
     }
 
     async function renameSection(oldName, newName) {
-      // 批量改 section · 对每条 annotation/comment/screenshot 调 PATCH (没批量接口, 串行调)
-      // 数据量一般不大 (子项内东西有限), 串行可接受
       try {
         const tasks = [];
         state.annotations.filter(a => (a.section || '') === oldName)
           .forEach(a => tasks.push(wpApi.patchAnnotation(slug, a.id, { section: newName })));
-        // comment / screenshot 没 PATCH 接口, 先不动 (TODO: 加上)
+        state.comments.filter(c => (c.section || '') === oldName)
+          .forEach(c => tasks.push(wpApi.patchComment(slug, c.id, { section: newName })));
+        state.screenshots.filter(s => (s.section || '') === oldName)
+          .forEach(s => tasks.push(wpApi.patchScreenshot(slug, s.id, { section: newName })));
         await Promise.all(tasks);
         setActiveSection(newName);
-        toast('已重命名', 'success');
+        toast(`已重命名 · 同步 ${tasks.length} 条`, 'success');
         await load();
       } catch (e) { toast(e.message, 'error'); }
     }
@@ -1115,22 +1207,27 @@
       const card = el('div', { class: 'wp-fb-card role-' + role + (state.selectedId === a.id ? ' selected' : '') });
       card.dataset.annotationId = a.id;
 
-      // 头部 · 包含 #N 截图引用 (点击跳转到那张截图)
+      // 头部 · #N 截图引用 + shape 图标 + 角色 pill + 时间
       const screenshotNum = getScreenshotNumber(a.screenshot_id);
-      const screenshotBadge = (screenshotNum != null) ? el('span', {
-        class: 'wp-fb-shot-ref',
-        title: '点击跳转到这张截图',
-      }, '📷 #' + screenshotNum) : null;
-      if (screenshotBadge) {
+      let screenshotBadge = null;
+      if (screenshotNum != null) {
+        screenshotBadge = el('span', {
+          class: 'wp-fb-shot-ref',
+          title: '点击跳转到这张截图',
+        }, [icon('image'), el('span', {}, '#' + screenshotNum)]);
         screenshotBadge.addEventListener('click', (e) => {
           e.stopPropagation();
           jumpToScreenshot(a.screenshot_id);
         });
       }
 
+      // shape 标签 · SVG 图标 + 中文
+      const shapeIcon = SHAPE_ICON_NAME[a.shape] || 'image';
+      const shapeTag = el('span', { class: 'wp-fb-shape-tag' }, [icon(shapeIcon), el('span', {}, SHAPE_LABELS[a.shape] || '标记')]);
+
       const head = el('div', { class: 'wp-fb-head', style: { cursor: 'pointer' } }, [
         el('span', { class: 'wp-fb-num role-' + role }, String(displayIdx)),
-        el('span', { class: 'wp-fb-shape-tag' }, SHAPE_LABELS[a.shape] || '标记'),
+        shapeTag,
         screenshotBadge,
         el('span', { class: 'wp-role-pill role-' + role, style: { fontSize: '10px', padding: '1px 6px' } },
           ROLE_LABELS[role] || role),
@@ -1230,10 +1327,12 @@
     }
 
     function renderReplyRow(c) {
+      const kindIcon = KIND_ICON_NAME[c.kind] || 'msg';
       return el('div', { class: 'wp-fb-reply' }, [
         el('div', { class: 'wp-fb-reply-head' }, [
           el('span', { class: 'wp-role-pill role-' + (c.author_role || 'none') }, ROLE_LABELS[c.author_role] || c.author_role || ''),
-          el('span', {}, KIND_ICONS[c.kind] + ' ' + KIND_LABELS[c.kind] || ''),
+          el('span', { class: 'kind-' + c.kind, style: { display: 'inline-flex', alignItems: 'center', gap: '4px' } },
+            [icon(kindIcon, 'wp-icon-sm'), el('span', {}, KIND_LABELS[c.kind] || c.kind)]),
           el('span', { style: { marginLeft: 'auto', color: 'var(--t4)' } }, fmtTime(c.created_at)),
         ]),
         el('div', { class: 'wp-fb-reply-body' }, c.body || ''),
@@ -1298,6 +1397,13 @@
     /* ── 画笔工具 + 自动停用 ─────────────────────────────────────── */
     function bindTools() {
       const tools = $$('.wp-tool[data-tool]');
+      // 把 data-icon 注入 SVG
+      tools.forEach(t => {
+        const iconName = t.dataset.icon;
+        if (iconName && ICONS[iconName]) {
+          t.innerHTML = '<span class="wp-icon">' + ICONS[iconName] + '</span>';
+        }
+      });
       let current = null;
       const setActive = (t) => {
         current = t;

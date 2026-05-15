@@ -49,12 +49,12 @@
         </div>
       </div>
 
-      <!-- 画布工具栏 · 精简版 -->
-      <div class="wp-stage-tools">
-        <button class="wp-tool" data-tool="freehand" title="自由画笔">✏️</button>
-        <button class="wp-tool" data-tool="circle"   title="圆圈">⭕</button>
-        <button class="wp-tool" data-tool="arrow"    title="箭头">➤</button>
-        <button class="wp-tool" data-tool="rect"     title="矩形">▭</button>
+      <!-- 画布工具栏 · 精简版 · SVG 图标由 wxapp.js 注入 -->
+      <div class="wp-stage-tools" id="wp-tools">
+        <button class="wp-tool" data-tool="freehand" data-icon="pen"    title="自由画笔"></button>
+        <button class="wp-tool" data-tool="circle"   data-icon="circle" title="圆圈"></button>
+        <button class="wp-tool" data-tool="arrow"    data-icon="arrow"  title="箭头"></button>
+        <button class="wp-tool" data-tool="rect"     data-icon="rect"   title="矩形"></button>
         <span class="wp-tool-hint">选工具 → 拖拽 → 输入文本 → 工具自动停用</span>
       </div>
 

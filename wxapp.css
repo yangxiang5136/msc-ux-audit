@@ -489,23 +489,100 @@ button { font-family: inherit; cursor: pointer; }
   border-color: var(--brd3);
 }
 .wp-tp-text {
-  display: flex; flex-direction: column; gap: 1px;
-  max-width: 180px;
+  display: flex; flex-direction: column; gap: 2px;
+  max-width: 200px;
 }
 .wp-tp-label {
-  font-size: 13px; font-weight: 700; color: var(--t1);
+  font-size: 14px; font-weight: 700; color: var(--t1);
   line-height: 1.2;
+  white-space: nowrap;
   overflow: hidden; text-overflow: ellipsis;
 }
 .wp-tp-sub {
-  font-size: 10px; color: var(--t3); font-weight: 400;
+  font-size: 11px; color: var(--t2); font-weight: 500;
   line-height: 1.2;
-  letter-spacing: .3px;
+  letter-spacing: .2px;
+  white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis;
+  max-width: 200px;
 }
 .wp-tp-arrow {
-  font-size: 11px; color: var(--t3);
+  flex-shrink: 0;
+  width: 22px; height: 22px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 6px;
+  color: var(--t3);
+  cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.wp-tp-arrow:hover { background: var(--bg4); color: var(--t1); }
+
+/* ── SVG 图标系统 · 替代 emoji ─────────────────────────────────────── */
+.wp-icon {
+  display: inline-flex;
+  align-items: center; justify-content: center;
+  width: 16px; height: 16px;
   flex-shrink: 0;
 }
+.wp-icon svg { width: 100%; height: 100%; display: block; }
+.wp-icon-sm { width: 13px; height: 13px; }
+.wp-icon-lg { width: 20px; height: 20px; }
+
+/* 工具栏图标按钮 · 容纳 SVG */
+.wp-tool .wp-icon { width: 18px; height: 18px; color: var(--t2); }
+.wp-tool:hover .wp-icon { color: var(--t1); }
+.wp-tool.active .wp-icon { color: var(--role-uiux); }
+
+/* shape tag · SVG + 标签文字 · 自动着色 */
+.wp-fb-shape-tag {
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.wp-fb-shape-tag .wp-icon { width: 12px; height: 12px; color: var(--t2); }
+/* shot-ref · 相机 icon + 编号 */
+.wp-fb-shot-ref {
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.wp-fb-shot-ref .wp-icon { width: 11px; height: 11px; }
+
+/* kind 着色 (评论 reply head 里 · 复用) */
+.kind-note    .wp-icon { color: var(--rx-note); }
+.kind-approve .wp-icon { color: var(--rx-approve); }
+.kind-reject  .wp-icon { color: var(--rx-reject); }
+.kind-block   .wp-icon { color: var(--rx-block); }
+.kind-idea    .wp-icon { color: var(--rx-idea); }
+
+/* ── inline 可编辑文本 · contenteditable + hover 铅笔 ────────────── */
+.wp-editable {
+  position: relative;
+  cursor: text;
+  padding: 1px 6px 1px 4px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  transition: background .12s, border-color .12s, padding-right .12s;
+}
+.wp-editable:hover {
+  background: rgba(96, 165, 250, .08);
+  border-color: rgba(96, 165, 250, .25);
+  padding-right: 22px;
+}
+.wp-editable:hover::after {
+  content: '';
+  position: absolute;
+  top: 50%; right: 4px;
+  width: 12px; height: 12px;
+  transform: translateY(-50%);
+  background: currentColor;
+  opacity: .55;
+  -webkit-mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 1 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>') no-repeat center / contain;
+          mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 1 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>') no-repeat center / contain;
+}
+.wp-editable:focus {
+  outline: none;
+  background: var(--bg3);
+  border-color: var(--brd2);
+  padding-right: 6px;
+}
+.wp-editable:focus::after { display: none; }
 
 /* section dropdown menu */
 .wp-section-menu {

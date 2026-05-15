@@ -469,6 +469,49 @@ app.patch('/api/wxapp/proposals/:slug', requireWxappRole, async (req, res) => {
   }
 });
 
+// v3: PATCH comment · 改 section / kind / body
+app.patch('/api/wxapp/proposals/:slug/comments/:id', requireWxappRole, async (req, res) => {
+  if (!ensureSupabaseConfigured(res)) return;
+  const id = cleanString(req.params.id, 64);
+  const body = req.body || {};
+  const patch = {};
+  if (body.section !== undefined) patch.section = cleanString(body.section, 64);
+  if (body.kind    !== undefined && WXAPP_COMMENT_KINDS.includes(body.kind)) patch.kind = body.kind;
+  if (body.body    !== undefined) patch.body = cleanString(body.body, 5000);
+  if (Object.keys(patch).length === 0) { res.status(400).json({ error: 'no patch fields' }); return; }
+  try {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/wxapp_comment?id=eq.${encodeURIComponent(id)}`, {
+      method: 'PATCH',
+      headers: feedbackHeaders({ 'Content-Type': 'application/json', Prefer: 'return=representation' }),
+      body: JSON.stringify(patch),
+    });
+    const p = await r.json().catch(() => null);
+    if (!r.ok) { res.status(r.status).json({ error: p?.message || 'comment patch failed' }); return; }
+    res.json(Array.isArray(p) ? p[0] : p);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// v3: PATCH screenshot · 改 section / caption
+app.patch('/api/wxapp/proposals/:slug/screenshots/:id', requireWxappRole, async (req, res) => {
+  if (!ensureSupabaseConfigured(res)) return;
+  const id = cleanString(req.params.id, 64);
+  const body = req.body || {};
+  const patch = {};
+  if (body.section !== undefined) patch.section = cleanString(body.section, 64);
+  if (body.caption !== undefined) patch.caption = cleanString(body.caption, 200);
+  if (Object.keys(patch).length === 0) { res.status(400).json({ error: 'no patch fields' }); return; }
+  try {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/wxapp_screenshot?id=eq.${encodeURIComponent(id)}`, {
+      method: 'PATCH',
+      headers: feedbackHeaders({ 'Content-Type': 'application/json', Prefer: 'return=representation' }),
+      body: JSON.stringify(patch),
+    });
+    const p = await r.json().catch(() => null);
+    if (!r.ok) { res.status(r.status).json({ error: p?.message || 'screenshot patch failed' }); return; }
+    res.json(Array.isArray(p) ? p[0] : p);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 app.post('/api/wxapp/proposals/:slug/comments', requireWxappRole, async (req, res) => {
   if (!ensureSupabaseConfigured(res)) return;
   const slug = cleanString(req.params.slug, 128);
