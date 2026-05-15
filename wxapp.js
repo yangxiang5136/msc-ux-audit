@@ -1245,8 +1245,14 @@
 
       const onComplete = (canvasEl, device) => async (data) => {
         // 弹文本输入 (不再问表态 · 表态去 comment 流里)
-        const text = prompt('给这条反馈写一句说明（回车跳过 · 之后可在右侧卡片改）：') || '';
+        const text = prompt('给这条反馈写一句说明（回车跳过 · 之后可在右侧卡片改 · Cancel 放弃这条反馈）：');
         data._domGroup && data._domGroup.remove();
+        if (text === null) {
+          // 用户点 Cancel · 反馈作废, 不入库, 也停掉工具
+          setActive(null);
+          toast('反馈已取消', '');
+          return;
+        }
         try {
           await wpApi.annotate(slug, {
             shape:    data.shape,
