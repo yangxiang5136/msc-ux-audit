@@ -186,6 +186,19 @@ button { font-family: inherit; cursor: pointer; }
 .s-accepted .wp-status-dot, .wp-status-dot.s-accepted { background: var(--st-accepted); }
 .s-rejected .wp-status-dot, .wp-status-dot.s-rejected { background: var(--st-rejected); }
 .s-shipped .wp-status-dot, .wp-status-dot.s-shipped  { background: var(--st-shipped); }
+/* proposal 级 3 档 (与 review/accepted 复用颜色) */
+.s-in_progress .wp-status-dot, .wp-status-dot.s-in_progress { background: var(--st-review); }
+.s-done .wp-status-dot, .wp-status-dot.s-done { background: var(--st-accepted); }
+
+/* 列表卡片状态标签 · 可点击循环 */
+.wp-card-status-clickable { cursor: pointer; transition: transform .12s, background .12s; }
+.wp-card-status-clickable:hover { transform: scale(1.05); }
+
+/* 详情页头部总览状态徽章 */
+.wp-proposal-status { display: inline-flex; align-items: center; gap: 4px; font-weight: 600; }
+.wp-proposal-status.s-draft       { background: rgba(139,149,168,.15); color: var(--st-draft); border-color: rgba(139,149,168,.4); }
+.wp-proposal-status.s-in_progress { background: rgba(251,191,36,.15);  color: var(--st-review); border-color: rgba(251,191,36,.4); }
+.wp-proposal-status.s-done        { background: rgba(52,211,153,.15);  color: var(--st-accepted); border-color: rgba(52,211,153,.4); }
 .wp-card-body { padding: 12px 14px; flex: 1; display: flex; flex-direction: column; gap: 6px; }
 .wp-card-title { font-size: 13px; font-weight: 700; line-height: 1.4; }
 .wp-card-sub { font-size: 11px; color: var(--t3); }

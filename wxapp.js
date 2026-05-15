@@ -15,6 +15,10 @@
 
 (function () {
   const ROLE_LABELS = { sean: 'Sean', uiux: 'UIUX', eng: '工程师', ceo: 'CEO' };
+  // proposal 级总览状态 · 3 档 · 全员可改 · 列表/详情顶部状态标签用
+  const PROPOSAL_STATUSES = ['draft', 'in_progress', 'done'];
+  const PROPOSAL_STATUS_LABELS = { draft: '草稿', in_progress: '修改中', done: '已完成' };
+  // annotation 级单条反馈状态 · 5 档 · 详情页右侧反馈卡/状态过滤用
   const STATUSES = ['draft','review','accepted','rejected','shipped'];
   const STATUS_LABELS = { draft:'草稿', review:'评审中', accepted:'已采纳', rejected:'已拒绝', shipped:'已开发' };
   const KIND_LABELS  = { note:'笔记', approve:'采纳', reject:'拒绝', block:'阻塞', idea:'想法' };
@@ -765,12 +769,12 @@
     }
     function renderStats(rows) {
       statsEl.innerHTML = '';
-      const counts = { draft:0, review:0, accepted:0, rejected:0, shipped:0 };
+      const counts = { draft: 0, in_progress: 0, done: 0 };
       rows.forEach(r => { counts[r.status] = (counts[r.status] || 0) + 1; });
-      STATUSES.forEach(s => {
+      PROPOSAL_STATUSES.forEach(s => {
         statsEl.appendChild(el('div', { class: 'wp-stat s-' + s },
           [ el('div', { class: 'wp-stat-n' }, String(counts[s] || 0)),
-            el('div', { class: 'wp-stat-l' }, STATUS_LABELS[s]) ]));
+            el('div', { class: 'wp-stat-l' }, PROPOSAL_STATUS_LABELS[s]) ]));
       });
     }
     function renderGrid(rows) {
@@ -788,12 +792,31 @@
       const thumb = r.original_image_url
         ? el('img', { src: r.original_image_url, alt: r.title })
         : el('div', { class: 'wp-card-thumb-placeholder' }, ['暂无原截图', el('br'), r.screen_name || '']);
+
+      // 状态标签 · 顶部右上角 · 点击循环 draft → in_progress → done → draft · 全员可改
+      const statusLabel = el('div', {
+        class: 'wp-card-status wp-card-status-clickable s-' + r.status,
+        title: '点击切换状态 (草稿→修改中→已完成)',
+      }, [
+        el('span', { class: 'wp-status-dot s-' + r.status }),
+        PROPOSAL_STATUS_LABELS[r.status] || r.status,
+      ]);
+      statusLabel.addEventListener('click', async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const cur = r.status;
+        const idx = PROPOSAL_STATUSES.indexOf(cur);
+        const next = PROPOSAL_STATUSES[(idx + 1) % PROPOSAL_STATUSES.length];
+        try {
+          await wpApi.patch(r.slug, { status: next });
+          toast(`已切到「${PROPOSAL_STATUS_LABELS[next]}」`, 'success');
+          load();
+        } catch (err) { toast(err.message, 'error'); }
+      });
+
       return el('a', { class: 'wp-card s-' + r.status, href: 'wxapp-detail.html?slug=' + encodeURIComponent(r.slug) },
         [
-          el('div', { class: 'wp-card-thumb' }, [
-            thumb,
-            el('div', { class: 'wp-card-status' }, [ el('span', { class: 'wp-status-dot s-' + r.status }), STATUS_LABELS[r.status] || r.status ]),
-          ]),
+          el('div', { class: 'wp-card-thumb' }, [ thumb, statusLabel ]),
           el('div', { class: 'wp-card-body' }, [
             el('div', { class: 'wp-card-title' }, r.title),
             el('div', { class: 'wp-card-sub' }, r.screen_name || r.slug),
@@ -991,6 +1014,28 @@
       renderMeta();
       renderRevisions();
       $('#wp-rationale').textContent = p.rationale || '（暂无理由说明）';
+      // 头部总览状态徽章 · 3 档全员可改 · 点击循环
+      const psBtn = $('#wp-proposal-status');
+      if (psBtn) {
+        const cur = p.status || 'draft';
+        psBtn.className = 'wp-chip wp-proposal-status s-' + cur;
+        psBtn.innerHTML = '';
+        psBtn.appendChild(el('span', { class: 'wp-status-dot s-' + cur }));
+        psBtn.appendChild(document.createTextNode(' ' + (PROPOSAL_STATUS_LABELS[cur] || cur)));
+        if (!psBtn.dataset.bound) {
+          psBtn.addEventListener('click', async () => {
+            const c = state.proposal.status || 'draft';
+            const idx = PROPOSAL_STATUSES.indexOf(c);
+            const next = PROPOSAL_STATUSES[(idx + 1) % PROPOSAL_STATUSES.length];
+            try {
+              await wpApi.patch(slug, { status: next });
+              toast(`总览状态切到「${PROPOSAL_STATUS_LABELS[next]}」`, 'success');
+              await load();
+            } catch (e) { toast(e.message, 'error'); }
+          });
+          psBtn.dataset.bound = '1';
+        }
+      }
     }
 
     /* ── 截图带 · 横滑 + 子项切换 ───────────────────────────────── */

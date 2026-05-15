@@ -36,7 +36,12 @@ const WXAPP_TOKENS = {
   eng:  process.env.WXAPP_TOKEN_ENG  || '',
   ceo:  process.env.WXAPP_TOKEN_CEO  || '',
 };
-const WXAPP_STATUSES = ['draft', 'review', 'accepted', 'rejected', 'shipped'];
+// proposal 级总览状态 · 全员可改 · 简单 3 档
+const WXAPP_PROPOSAL_STATUSES = ['draft', 'in_progress', 'done'];
+// annotation 级单条反馈状态 · 细分 5 档 · 不变
+const WXAPP_ANNOTATION_STATUSES = ['draft', 'review', 'accepted', 'rejected', 'shipped'];
+// 旧名兼容 · 默认指 annotation 级
+const WXAPP_STATUSES = WXAPP_ANNOTATION_STATUSES;
 const WXAPP_DEVICE_TARGETS = ['ios', 'android', 'both'];
 const WXAPP_COMMENT_KINDS = ['note', 'approve', 'reject', 'block', 'idea'];
 const WXAPP_ANNOTATION_SHAPES = ['freehand', 'circle', 'arrow', 'rect', 'none'];
@@ -310,7 +315,7 @@ app.get('/api/wxapp/proposals', requireWxappRole, async (req, res) => {
   if (!ensureSupabaseConfigured(res)) return;
   try {
     const params = new URLSearchParams({ select: '*', order: 'updated_at.desc' });
-    if (req.query.status && WXAPP_STATUSES.includes(req.query.status)) {
+    if (req.query.status && WXAPP_PROPOSAL_STATUSES.includes(req.query.status)) {
       params.set('status', `eq.${req.query.status}`);
     }
     if (req.query.flow_group) {
@@ -366,7 +371,7 @@ app.post('/api/wxapp/proposals', requireWxappRole, async (req, res) => {
     title:              cleanString(body.title, 256),
     screen_name:        cleanString(body.screen_name, 128) || null,
     flow_group:         cleanString(body.flow_group, 64) || null,
-    status:             WXAPP_STATUSES.includes(body.status) ? body.status : 'draft',
+    status:             WXAPP_PROPOSAL_STATUSES.includes(body.status) ? body.status : 'draft',
     device_target:      WXAPP_DEVICE_TARGETS.includes(body.device_target) ? body.device_target : 'both',
     original_image_url: cleanString(body.original_image_url, 2048) || null,
     redesign_html:      String(body.redesign_html || '').slice(0, 50000),
@@ -438,8 +443,8 @@ app.patch('/api/wxapp/proposals/:slug', requireWxappRole, async (req, res) => {
     for (const k of fields) {
       if (body[k] !== undefined) patch[k] = body[k];
     }
-    if (patch.status && !WXAPP_STATUSES.includes(patch.status)) {
-      res.status(400).json({ error: 'invalid status' });
+    if (patch.status && !WXAPP_PROPOSAL_STATUSES.includes(patch.status)) {
+      res.status(400).json({ error: 'invalid status (must be draft/in_progress/done)' });
       return;
     }
     if (patch.device_target && !WXAPP_DEVICE_TARGETS.includes(patch.device_target)) {

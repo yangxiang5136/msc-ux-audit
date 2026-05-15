@@ -31,6 +31,8 @@
             style="background:rgba(52,211,153,.12);color:var(--role-uiux);border-color:rgba(52,211,153,.3);">
       📌 设为截图目标
     </button>
+    <!-- 改稿总览状态 · 3 档全员可改 · 跟反馈卡里的 annotation 5 档不同 -->
+    <button id="wp-proposal-status" class="wp-chip wp-proposal-status" title="点击循环 草稿 → 修改中 → 已完成"></button>
   </div>
 
   <div id="wp-detail-root" class="wp-detail">
@@ -41,10 +43,10 @@
       <!-- 三种上传方式：点 + 拖拽到 upload 区 + 全页面 ⌘V 粘贴 -->
       <div class="wp-screenshots-strip" id="wp-screenshots-strip">
         <div class="wp-screenshots-list" id="wp-screenshots-list">
-          <label class="wp-screenshot-upload" id="wp-screenshot-upload-label" title="点选 / 拖拽 / 或全页 ⌘V 粘贴（最大 500KB）">
+          <label class="wp-screenshot-upload" id="wp-screenshot-upload-label" title="点选图片文件 / 拖拽图片进来 / 或在页面任意位置粘贴图片（最大 10MB）">
             <input type="file" id="wp-screenshot-input" accept="image/*" hidden>
             <span class="wp-up-icon">＋</span>
-            <span>上传 / ⌘V</span>
+            <span>上传 / 粘贴图片</span>
           </label>
         </div>
       </div>
