@@ -494,16 +494,16 @@
      * selectedId: 选中的 annotation id
      * onPinClick: pin 被点击的回调 (annotation)
      */
-    renderExisting(canvasEl, annotations, device, filter, selectedId, onPinClick) {
+    renderExisting(canvasEl, annotations, device, filter, selectedId, onPinClick, overallIndexMap) {
       // 清掉旧 pin 和旧 transform-box
       canvasEl.querySelectorAll('.wp-annot-pin, .wp-transform-box').forEach(n => n.remove());
       const svg = this._ensureSvg(canvasEl);
       svg.innerHTML = '';
 
-      // 拿到当前设备下的 annotation，并且按筛选
+      // pin 号码用 overallIndexMap (全 section 全局序号) · 没 map 则 fallback 到本地序号
       const items = annotations.filter(a => a.device === device).map((a, idx) => ({
         ...a,
-        _index: idx + 1,
+        _index: (overallIndexMap && overallIndexMap.get(a.id)) || (idx + 1),
         x: a.anchor_x ?? 50,
         y: a.anchor_y ?? 50,
       }));
@@ -957,10 +957,16 @@
       wpRender.mountProposal($('#wp-host-ios'),     p.redesign_html, p.redesign_css, 'ios',     bgUri);
       wpRender.mountProposal($('#wp-host-android'), p.redesign_html, p.redesign_css, 'android', bgUri);
 
-      // 批注层 · section + 当前截图 + status filter 三层过滤
+      // 计算全 section 反馈全局序号 (跨所有截图 · 跨所有状态 · 按 created_at 顺序)
+      // 这个 map 让画布 pin 编号和反馈卡编号保持一致
+      const sectionAnns = state.annotations.filter(inSection);
+      state._overallIndexMap = new Map();
+      sectionAnns.forEach((a, idx) => state._overallIndexMap.set(a.id, idx + 1));
+
+      // 画布上只显示当前激活截图的标记 · 但 pin 编号用全局序号
       const visibleAnns = state.annotations.filter(a => inSection(a) && inActiveScreenshot(a));
-      wpAnnot.renderExisting($('#wp-canvas-ios'),     visibleAnns, 'ios',     state.filter, state.selectedId, onPinClick);
-      wpAnnot.renderExisting($('#wp-canvas-android'), visibleAnns, 'android', state.filter, state.selectedId, onPinClick);
+      wpAnnot.renderExisting($('#wp-canvas-ios'),     visibleAnns, 'ios',     state.filter, state.selectedId, onPinClick, state._overallIndexMap);
+      wpAnnot.renderExisting($('#wp-canvas-android'), visibleAnns, 'android', state.filter, state.selectedId, onPinClick, state._overallIndexMap);
 
       // 如果有选中, 渲染 transform handles 在对应设备的画布上
       if (state.selectedId) {
@@ -1102,9 +1108,10 @@
         toast(`已切到「${name.trim()}」· 下次上传/批注会归到这个子项`, 'success');
       });
       menu.appendChild(newItem);
-      // 重命名当前 (空字符串默认子项不让重命名)
+      // 重命名当前 + 删除当前 (默认子项 = '' 不允许操作)
       if (state.activeSection !== '') {
-        const renameItem = el('div', { class: 'wp-sec-menu-item' }, '✏️ 重命名「' + state.activeSection + '」');
+        const renameItem = el('div', { class: 'wp-sec-menu-item' },
+          [icon('pencil', 'wp-icon-sm'), el('span', {}, '重命名「' + state.activeSection + '」')]);
         renameItem.addEventListener('click', async () => {
           menu.remove();
           const newName = prompt('新名字:', state.activeSection);
@@ -1112,6 +1119,22 @@
           await renameSection(state.activeSection, newName.trim());
         });
         menu.appendChild(renameItem);
+
+        // 删除子项 · 把内容搬到默认子项, 不丢数据
+        const oldName = state.activeSection;
+        const movingCount = state.annotations.filter(a => (a.section || '') === oldName).length +
+                            state.comments.filter(c => (c.section || '') === oldName).length +
+                            state.screenshots.filter(s => (s.section || '') === oldName).length;
+        const deleteItem = el('div', { class: 'wp-sec-menu-item wp-sec-menu-delete' },
+          [icon('xmark', 'wp-icon-sm'), el('span', {}, '删除「' + oldName + '」' + (movingCount > 0 ? ` (${movingCount} 条转入默认)` : ''))]);
+        deleteItem.addEventListener('click', async () => {
+          menu.remove();
+          const ok = confirm(`删除子项「${oldName}」？\n该子项下 ${movingCount} 条反馈/截图/评论会自动搬到默认子项 · 数据不丢失。`);
+          if (!ok) return;
+          await renameSection(oldName, '');   // 重命名为空 = 转入默认 = 该 section 名消失
+          toast(`子项「${oldName}」已删除 · 内容已转入默认`, 'success');
+        });
+        menu.appendChild(deleteItem);
       }
 
       // 定位 menu 紧贴 anchor 下方
@@ -1182,8 +1205,10 @@
         ? baseAnns
         : baseAnns.filter(a => (a.status || 'draft') === state.filter);
 
-      visibleAnns.forEach((a, idx) => {
-        const card = renderFeedbackCard(a, idx + 1);
+      visibleAnns.forEach((a) => {
+        // displayIdx 用全局序号 · 跟画布 pin 一致
+        const overallIdx = state._overallIndexMap.get(a.id) || 0;
+        const card = renderFeedbackCard(a, overallIdx);
         stream.appendChild(card);
       });
 
@@ -1226,8 +1251,18 @@
       const shapeIcon = SHAPE_ICON_NAME[a.shape] || 'image';
       const shapeTag = el('span', { class: 'wp-fb-shape-tag' }, [icon(shapeIcon), el('span', {}, SHAPE_LABELS[a.shape] || '标记')]);
 
+      // 左侧大号码 · 可点击跳到对应截图 (若该反馈绑了 screenshot)
+      const numEl = el('span', { class: 'wp-fb-num role-' + role }, String(displayIdx));
+      if (a.screenshot_id) {
+        numEl.style.cursor = 'pointer';
+        numEl.title = '点击跳到 #' + (getScreenshotNumber(a.screenshot_id) || '?') + ' 截图';
+        numEl.addEventListener('click', (e) => {
+          e.stopPropagation();
+          jumpToScreenshot(a.screenshot_id);
+        });
+      }
       const head = el('div', { class: 'wp-fb-head', style: { cursor: 'pointer' } }, [
-        el('span', { class: 'wp-fb-num role-' + role }, String(displayIdx)),
+        numEl,
         shapeTag,
         screenshotBadge,
         el('span', { class: 'wp-role-pill role-' + role, style: { fontSize: '10px', padding: '1px 6px' } },

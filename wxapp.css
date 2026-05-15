@@ -604,6 +604,10 @@ button { font-family: inherit; cursor: pointer; }
 .wp-sec-menu-item:hover { background: var(--bg3); }
 .wp-sec-menu-item.active { background: rgba(52,211,153,.12); color: var(--role-uiux); }
 .wp-sec-menu-item.wp-sec-menu-new { color: var(--role-uiux); font-weight: 600; }
+.wp-sec-menu-item.wp-sec-menu-delete { color: var(--role-ceo); }
+.wp-sec-menu-item.wp-sec-menu-delete:hover { background: rgba(248, 113, 113, .12); color: var(--role-ceo); }
+.wp-sec-menu-item .wp-icon { width: 13px; height: 13px; }
+.wp-sec-menu-item { display: flex; align-items: center; gap: 7px; }
 .wp-sec-menu-item .wp-sec-count {
   font-size: 11px; color: var(--t3);
   background: var(--bg3); padding: 1px 7px; border-radius: 999px;
