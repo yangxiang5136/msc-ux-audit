@@ -789,11 +789,20 @@
       filtered.forEach(r => grid.appendChild(renderCard(r)));
     }
     function renderCard(r) {
-      const thumb = r.original_image_url
-        ? el('img', { src: r.original_image_url, alt: r.title })
-        : el('div', { class: 'wp-card-thumb-placeholder' }, ['暂无原截图', el('br'), r.screen_name || '']);
+      // 缩略图区: 优先用最近 4 张截图 (server 已附带 recent_screenshots) · 退化用 original_image_url · 再退化占位
+      const shots = Array.isArray(r.recent_screenshots) ? r.recent_screenshots.filter(Boolean) : [];
+      let thumbArea;
+      if (shots.length > 0) {
+        thumbArea = el('div', { class: 'wp-card-thumb-grid count-' + Math.min(shots.length, 4) },
+          shots.slice(0, 4).map(uri => el('img', { src: uri, alt: '', loading: 'lazy' }))
+        );
+      } else if (r.original_image_url) {
+        thumbArea = el('img', { src: r.original_image_url, alt: r.title, loading: 'lazy' });
+      } else {
+        thumbArea = el('div', { class: 'wp-card-thumb-placeholder' }, ['暂无截图', el('br'), r.screen_name || r.slug]);
+      }
 
-      // 状态标签 · 顶部右上角 · 点击循环 draft → in_progress → done → draft · 全员可改
+      // 状态标签 · 顶部右上角 · 点击循环
       const statusLabel = el('div', {
         class: 'wp-card-status wp-card-status-clickable s-' + r.status,
         title: '点击切换状态 (草稿→修改中→已完成)',
@@ -816,7 +825,7 @@
 
       return el('a', { class: 'wp-card s-' + r.status, href: 'wxapp-detail.html?slug=' + encodeURIComponent(r.slug) },
         [
-          el('div', { class: 'wp-card-thumb' }, [ thumb, statusLabel ]),
+          el('div', { class: 'wp-card-thumb' }, [ thumbArea, statusLabel ]),
           el('div', { class: 'wp-card-body' }, [
             el('div', { class: 'wp-card-title' }, r.title),
             el('div', { class: 'wp-card-sub' }, r.screen_name || r.slug),

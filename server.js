@@ -332,6 +332,25 @@ app.get('/api/wxapp/proposals', requireWxappRole, async (req, res) => {
       res.status(response.status).json({ error: payload?.message || 'list failed' });
       return;
     }
+    // 给每条 proposal 附最近 4 张截图 (跨子项 · 用作列表卡片缩略图)
+    if (Array.isArray(payload) && payload.length > 0) {
+      const ids = payload.map(p => p.id).filter(Boolean);
+      if (ids.length > 0) {
+        const inList = '(' + ids.map(id => `"${id}"`).join(',') + ')';
+        const shotRes = await fetch(`${SUPABASE_URL}/rest/v1/wxapp_screenshot?proposal_id=in.${inList}&select=proposal_id,data_uri,created_at&order=created_at.desc`, {
+          headers: feedbackHeaders(),
+        });
+        if (shotRes.ok) {
+          const shots = await shotRes.json().catch(() => []);
+          const byPid = {};
+          shots.forEach(s => {
+            const arr = byPid[s.proposal_id] || (byPid[s.proposal_id] = []);
+            if (arr.length < 4) arr.push(s.data_uri);
+          });
+          payload.forEach(p => { p.recent_screenshots = byPid[p.id] || []; });
+        }
+      }
+    }
     res.json(payload || []);
   } catch (err) {
     res.status(500).json({ error: err.message });
