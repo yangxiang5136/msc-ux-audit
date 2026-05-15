@@ -75,7 +75,13 @@ button { font-family: inherit; cursor: pointer; }
 }
 .wp-nav a:hover { background: var(--bg3); color: var(--t1); }
 .wp-nav a.active { background: var(--bg3); color: var(--t1); }
-.wp-me { margin-left: auto; display: flex; align-items: center; gap: 8px; font-size: 12px; }
+.wp-me { margin-left: auto; display: flex; align-items: center; gap: 10px; font-size: 12px; }
+.wp-secondary-link {
+  font-size: 11px; color: var(--t3);
+  padding: 3px 4px; border-bottom: 1px dashed transparent;
+  transition: color .15s, border-color .15s;
+}
+.wp-secondary-link:hover { color: var(--t2); border-bottom-color: var(--brd2); }
 .wp-role-pill {
   padding: 4px 10px; border-radius: 999px;
   font-size: 11px; font-weight: 600;

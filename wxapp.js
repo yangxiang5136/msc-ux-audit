@@ -703,9 +703,9 @@
       <nav class="wp-nav">
         <a href="wxapp.html" ${activeKey==='list'?'class="active"':''}>改稿列表</a>
         <a href="index.html">↩ 回设计中心</a>
-        <a href="decisions.html">决策面板</a>
       </nav>
       <div class="wp-me">
+        <a class="wp-secondary-link" href="decisions.html">决策面板</a>
         <span class="wp-role-pill ${roleClass}">${escapeHtml(roleLabel)}</span>
         <button class="wp-link-btn" id="wp-topbar-logout" type="button">登出</button>
       </div>
