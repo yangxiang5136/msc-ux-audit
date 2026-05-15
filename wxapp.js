@@ -161,6 +161,26 @@
     });
   }
 
+  /* ── Cloudinary 直传 (不经过 Railway · 不存 base64 占 Supabase) ─────── */
+  const CLOUDINARY_CLOUD = 'dowmjgsxp';
+  const CLOUDINARY_PRESET = 'msc-wxapp';
+  async function uploadToCloudinary(file) {
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('upload_preset', CLOUDINARY_PRESET);
+    const r = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, {
+      method: 'POST',
+      body: fd,
+    });
+    if (!r.ok) {
+      const t = await r.text().catch(() => '');
+      throw new Error('Cloudinary 拒绝上传: ' + t.slice(0, 200));
+    }
+    const data = await r.json();
+    if (!data.secure_url) throw new Error('Cloudinary 响应无 secure_url');
+    return data.secure_url;
+  }
+
   /* ── Shadow DOM 渲染 · 支持截图作背景 ───────────────────────────── */
   const wpRender = {
     /**
@@ -1336,23 +1356,22 @@
       if (!file || !file.type || !file.type.startsWith('image/')) {
         toast('只能上传图片', 'error'); return;
       }
+      const MAX_RAW = 10 * 1024 * 1024;  // 10MB · Cloudinary 默认上限
+      if (file.size > MAX_RAW) {
+        toast(`图片过大 (${(file.size/1024/1024).toFixed(1)}MB) · 上限 10MB · 压缩或裁剪`, 'error'); return;
+      }
       try {
-        const dataUri = await fileToDataUri(file);
-        const base64Body = dataUri.split(',')[1] || '';
-        const bytes = base64Body.length * 0.75;
-        const MAX_RAW = 3 * 1024 * 1024;  // 3MB 原图 · 已覆盖 iPhone Pro Max 截图
-        if (bytes > MAX_RAW) {
-          toast(`图片过大 (${(bytes/1024/1024).toFixed(1)}MB) · 上限 3MB · 请压缩或裁剪`, 'error'); return;
-        }
-        // 粘贴/拖拽默认带 source 备注 · 不再每次弹 prompt
+        // ① 直接传到 Cloudinary CDN (不走 Railway, 不占 Supabase)
+        toast(`☁️ 上传到 Cloudinary 中…`, '');
+        const cloudUrl = await uploadToCloudinary(file);
+        // ② 仅把 URL 存到 Supabase (一条几十字节)
         const caption = (source ? `[${source}] ` : '') + new Date().toLocaleString('zh-CN', { hour:'2-digit', minute:'2-digit' });
         const created = await _fetch('/api/wxapp/proposals/' + encodeURIComponent(slug) + '/screenshots', {
           method: 'POST',
-          body: JSON.stringify({ data_uri: dataUri, caption, section: state.activeSection }),
+          body: JSON.stringify({ data_uri: cloudUrl, caption, section: state.activeSection }),
         });
-        // 上传成功后自动选中这张作为画布背景
         if (created && created.id) setActiveScreenshot(created.id);
-        toast(`截图已上传 · ${source || '文件'} · 子项: ${state.activeSection || '默认'}`, 'success');
+        toast(`截图已上 Cloudinary · ${source || '文件'} · 子项: ${state.activeSection || '默认'}`, 'success');
         await load();
       } catch (err) { toast(err.message, 'error'); }
     }
@@ -1426,11 +1445,25 @@
       });
     }
 
+    /* ── 一键绑定 Hammerspoon 截图工具 ─────────────────────────── */
+    function bindHammerspoonLink() {
+      const btn = $('#wp-bind-hammerspoon');
+      if (!btn) return;
+      btn.addEventListener('click', () => {
+        // 通过 hammerspoon:// URL scheme 把当前 slug 直接传给 Hammerspoon
+        // Hammerspoon 端用 hs.urlevent.bind("wxapp-set-proposal", ...) 接收
+        const url = 'hammerspoon://wxapp-set-proposal?slug=' + encodeURIComponent(slug);
+        window.location.href = url;
+        toast(`已发送到 Hammerspoon · 下次 ⌘⌥⇧X 直传「${slug}」`, 'success');
+      });
+    }
+
     bindTools();
     bindDeviceToggle();
     bindGlobalCompose();
     bindScreenshotUpload();
     bindEditButtons();
+    bindHammerspoonLink();
     await load();
   }
 

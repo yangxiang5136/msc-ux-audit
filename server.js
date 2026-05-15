@@ -41,8 +41,10 @@ const WXAPP_DEVICE_TARGETS = ['ios', 'android', 'both'];
 const WXAPP_COMMENT_KINDS = ['note', 'approve', 'reject', 'block', 'idea'];
 const WXAPP_ANNOTATION_SHAPES = ['freehand', 'circle', 'arrow', 'rect', 'none'];
 const WXAPP_REACTIONS = ['approve', 'reject', 'block', 'idea', 'note'];
-const WXAPP_SCREENSHOT_MAX_BYTES = 4 * 1024 * 1024;  // 4MB base64 (~3MB 原图) · iPhone Pro Max 截图也能装下
+const WXAPP_SCREENSHOT_MAX_BYTES = 4 * 1024 * 1024;  // 4MB base64 (~3MB 原图) · 仅 base64 旧路径
 const WXAPP_SCREENSHOT_DATA_URI_RE = /^data:image\/(png|jpeg|jpg|gif|webp);base64,/i;
+// Cloudinary 直传新路径 · 客户端先上传到 Cloudinary 拿 secure_url, 再把 URL 存到 DB
+const WXAPP_SCREENSHOT_CLOUDINARY_RE = /^https:\/\/res\.cloudinary\.com\/[a-z0-9_-]+\/image\/upload\//i;
 
 function ensureDataDir() {
   try {
@@ -616,29 +618,46 @@ app.post('/api/wxapp/proposals/:slug/screenshots', requireWxappRole, async (req,
   const slug = cleanString(req.params.slug, 128);
   const body = req.body || {};
   const dataUri = String(body.data_uri || '');
-  if (!WXAPP_SCREENSHOT_DATA_URI_RE.test(dataUri)) {
-    res.status(400).json({ error: 'data_uri must be data:image/<png|jpeg|jpg|gif|webp>;base64,...' });
+  const isCloudinary = WXAPP_SCREENSHOT_CLOUDINARY_RE.test(dataUri);
+  const isBase64 = WXAPP_SCREENSHOT_DATA_URI_RE.test(dataUri);
+  if (!isCloudinary && !isBase64) {
+    res.status(400).json({ error: 'data_uri 必须是 Cloudinary URL 或 data:image/...;base64,...' });
     return;
   }
-  const base64Body = dataUri.split(',')[1] || '';
-  const byteSize = Math.floor(base64Body.length * 0.75);  // 估算解码后字节数
-  if (byteSize > WXAPP_SCREENSHOT_MAX_BYTES) {
-    const mb = (byteSize / 1024 / 1024).toFixed(1);
-    const max = (WXAPP_SCREENSHOT_MAX_BYTES / 1024 / 1024).toFixed(0);
-    res.status(400).json({ error: `screenshot 过大: ${mb}MB > ${max}MB 上限。请压缩或裁剪后重试。` });
-    return;
+  // base64 旧路径才校验大小; Cloudinary URL 短无需校验
+  let byteSize = 0;
+  if (isBase64) {
+    const base64Body = dataUri.split(',')[1] || '';
+    byteSize = Math.floor(base64Body.length * 0.75);
+    if (byteSize > WXAPP_SCREENSHOT_MAX_BYTES) {
+      const mb = (byteSize / 1024 / 1024).toFixed(1);
+      const max = (WXAPP_SCREENSHOT_MAX_BYTES / 1024 / 1024).toFixed(0);
+      res.status(400).json({ error: `screenshot 过大: ${mb}MB > ${max}MB 上限。压缩后重试。` });
+      return;
+    }
   }
   try {
     const proposal = await fetchProposalBySlug(slug);
     if (!proposal) { res.status(404).json({ error: 'proposal not found' }); return; }
+    // 推断 mime_type · base64 取标头, Cloudinary 看扩展名
+    let mimeType = 'image/png';
     const mimeMatch = dataUri.match(/^data:(image\/[a-z]+);base64,/i);
+    if (mimeMatch) {
+      mimeType = mimeMatch[1].toLowerCase();
+    } else if (isCloudinary) {
+      const extMatch = dataUri.match(/\.([a-z]+)(?:\?|$)/i);
+      if (extMatch) {
+        const ext = extMatch[1].toLowerCase();
+        mimeType = (ext === 'jpg' ? 'image/jpeg' : 'image/' + ext);
+      }
+    }
     const row = {
       proposal_id: proposal.id,
       data_uri:    dataUri,
-      mime_type:   mimeMatch ? mimeMatch[1].toLowerCase() : 'image/png',
+      mime_type:   mimeType,
       caption:     cleanString(body.caption, 200) || null,
       author_role: req.wxappRole,
-      byte_size:   byteSize,
+      byte_size:   byteSize,            // 0 表示 Cloudinary 不本地计数
       section:     cleanString(body.section, 64) || '',
     };
     const r = await fetch(`${SUPABASE_URL}/rest/v1/wxapp_screenshot`, {
