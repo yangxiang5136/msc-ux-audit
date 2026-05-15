@@ -576,10 +576,11 @@ button { font-family: inherit; cursor: pointer; }
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 
-/* upload · 粘在最右 · 不参与横滑 */
+/* upload · 粘在最右 · 不参与横滑 · 与前一个元素留出 24px 空隙 */
 .wp-screenshot-upload {
   flex-shrink: 0;
   width: 78px; height: 114px;
+  margin-left: 24px;
   border-radius: 8px; border: 1.5px dashed var(--brd2);
   background: var(--bg2);
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
