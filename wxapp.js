@@ -35,8 +35,24 @@
       { id: 'android-large',   label: 'Android 大屏',         w: 412, h: 915 },
     ],
   };
+  // ── 用户级偏好 · 一个 key 装所有界面设置 · 重启浏览器后自动恢复 ───────
+  // 设备尺寸、双设备/单设备切换 · 全部在这里
+  const USER_PREFS_KEY = 'wxapp_user_prefs';
+  function loadUserPrefs() {
+    try {
+      const raw = localStorage.getItem(USER_PREFS_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch {}
+    return null;
+  }
+  function saveUserPrefs(prefs) {
+    try { localStorage.setItem(USER_PREFS_KEY, JSON.stringify(prefs)); } catch {}
+  }
+  // 兼容旧 device sizes key (老数据迁移用 · 一次性)
   const DEVICE_SIZE_KEY = 'wxapp_device_sizes';
   function loadDeviceSizes() {
+    const prefs = loadUserPrefs();
+    if (prefs && prefs.deviceSizes) return prefs.deviceSizes;
     try {
       const raw = localStorage.getItem(DEVICE_SIZE_KEY);
       if (raw) return JSON.parse(raw);
@@ -44,7 +60,18 @@
     return { ios: { w: 375, h: 812, presetId: 'iphone-13' }, android: { w: 360, h: 800, presetId: 'android-standard' } };
   }
   function saveDeviceSizes(sizes) {
-    try { localStorage.setItem(DEVICE_SIZE_KEY, JSON.stringify(sizes)); } catch {}
+    const prefs = loadUserPrefs() || {};
+    prefs.deviceSizes = sizes;
+    saveUserPrefs(prefs);
+  }
+  function loadDeviceMode() {
+    const prefs = loadUserPrefs();
+    return (prefs && prefs.deviceMode) || 'both';
+  }
+  function saveDeviceMode(mode) {
+    const prefs = loadUserPrefs() || {};
+    prefs.deviceMode = mode;
+    saveUserPrefs(prefs);
   }
 
   /* ── Auth · cookie session + 角色 ────────────────────────────────────── */
@@ -772,8 +799,8 @@
       screenshots: [],
       filter: 'all',
       selectedId: null,
-      deviceMode: 'both', // 'both' | 'ios' | 'android'
-      deviceSizes: loadDeviceSizes(),
+      deviceMode: loadDeviceMode(),                                 // 持久化
+      deviceSizes: loadDeviceSizes(),                               // 持久化
       activeSection: localStorage.getItem(ACTIVE_SECTION_KEY) || '',
       activeScreenshotId: localStorage.getItem(ACTIVE_SCREENSHOT_KEY) || null,
     };
@@ -796,6 +823,13 @@
     }
     function inSection(item) {
       return (item.section || '') === state.activeSection;
+    }
+    // 标记跟随具体截图 · 如果当前选了截图, 只显示绑到该截图的标记;
+    // 没选截图 (redesign 模式) 显示 screenshot_id 为 null 的标记
+    function inActiveScreenshot(item) {
+      const itemId = item.screenshot_id || null;
+      const activeId = state.activeScreenshotId || null;
+      return itemId === activeId;
     }
     function getActiveScreenshot() {
       const visible = state.screenshots.filter(inSection);
@@ -833,10 +867,10 @@
       wpRender.mountProposal($('#wp-host-ios'),     p.redesign_html, p.redesign_css, 'ios',     bgUri);
       wpRender.mountProposal($('#wp-host-android'), p.redesign_html, p.redesign_css, 'android', bgUri);
 
-      // 批注层 · 同时受 status filter + section filter 影响
-      const sectionAnns = state.annotations.filter(inSection);
-      wpAnnot.renderExisting($('#wp-canvas-ios'),     sectionAnns, 'ios',     state.filter, state.selectedId, onPinClick);
-      wpAnnot.renderExisting($('#wp-canvas-android'), sectionAnns, 'android', state.filter, state.selectedId, onPinClick);
+      // 批注层 · section + 当前截图 + status filter 三层过滤
+      const visibleAnns = state.annotations.filter(a => inSection(a) && inActiveScreenshot(a));
+      wpAnnot.renderExisting($('#wp-canvas-ios'),     visibleAnns, 'ios',     state.filter, state.selectedId, onPinClick);
+      wpAnnot.renderExisting($('#wp-canvas-android'), visibleAnns, 'android', state.filter, state.selectedId, onPinClick);
 
       // 如果有选中, 渲染 transform handles 在对应设备的画布上
       if (state.selectedId) {
@@ -1006,10 +1040,10 @@
     function renderStatusFilter() {
       const wrap = $('#wp-status-filter');
       wrap.innerHTML = '';
-      // 只算当前 section 内的 annotation
-      const sectionAnns = state.annotations.filter(inSection);
-      const counts = { all: sectionAnns.length, draft: 0, review: 0, accepted: 0, rejected: 0, shipped: 0 };
-      sectionAnns.forEach(a => { counts[a.status || 'draft'] = (counts[a.status || 'draft'] || 0) + 1; });
+      // 只算当前 section + 当前截图下的 annotation
+      const visibleAnns = state.annotations.filter(a => inSection(a) && inActiveScreenshot(a));
+      const counts = { all: visibleAnns.length, draft: 0, review: 0, accepted: 0, rejected: 0, shipped: 0 };
+      visibleAnns.forEach(a => { counts[a.status || 'draft'] = (counts[a.status || 'draft'] || 0) + 1; });
       const mk = (key, label) => {
         const c = el('button', { class: 'wp-chip ' + (state.filter === key ? 'active ' : '') + (key !== 'all' ? 's-' + key : '') }, [
           label,
@@ -1031,11 +1065,11 @@
       const stream = $('#wp-feedback-stream');
       stream.innerHTML = '';
 
-      // 反馈流: 当前 section + 状态 filter
-      const sectionAnns = state.annotations.filter(inSection);
+      // 反馈流: 当前 section + 当前截图 + 状态 filter
+      const baseAnns = state.annotations.filter(a => inSection(a) && inActiveScreenshot(a));
       const visibleAnns = state.filter === 'all'
-        ? sectionAnns
-        : sectionAnns.filter(a => (a.status || 'draft') === state.filter);
+        ? baseAnns
+        : baseAnns.filter(a => (a.status || 'draft') === state.filter);
 
       visibleAnns.forEach((a, idx) => {
         const card = renderFeedbackCard(a, idx + 1);
@@ -1255,14 +1289,15 @@
         }
         try {
           await wpApi.annotate(slug, {
-            shape:    data.shape,
-            svg_path: data.svg_path,
+            shape:         data.shape,
+            svg_path:      data.svg_path,
             device,
-            anchor_x: data.anchor_x,
-            anchor_y: data.anchor_y,
-            comment:  text,
-            status:   'draft',
-            section:  state.activeSection,
+            anchor_x:      data.anchor_x,
+            anchor_y:      data.anchor_y,
+            comment:       text,
+            status:        'draft',
+            section:       state.activeSection,
+            screenshot_id: state.activeScreenshotId,    // ← 跟随当前激活截图
           });
           // 自动停用工具
           setActive(null);
@@ -1330,16 +1365,21 @@
       render();
     }
 
+    function applyDeviceMode(mode) {
+      state.deviceMode = mode;
+      $$('.wp-device-toggle [data-device-toggle]').forEach(x => x.classList.toggle('active', x.dataset.deviceToggle === mode));
+      $('#wp-wrap-ios').style.display     = (mode === 'android') ? 'none' : '';
+      $('#wp-wrap-android').style.display = (mode === 'ios') ? 'none' : '';
+    }
     function bindDeviceToggle() {
       $$('.wp-device-toggle [data-device-toggle]').forEach(b => b.addEventListener('click', () => {
         const mode = b.dataset.deviceToggle;
-        state.deviceMode = mode;
-        $$('.wp-device-toggle [data-device-toggle]').forEach(x => x.classList.toggle('active', x === b));
-        $('#wp-wrap-ios').style.display     = (mode === 'android') ? 'none' : '';
-        $('#wp-wrap-android').style.display = (mode === 'ios') ? 'none' : '';
+        applyDeviceMode(mode);
+        saveDeviceMode(mode);                       // 持久化 · 下次打开自动恢复
       }));
       renderDeviceSizePickers();
       applyDeviceSizes();
+      applyDeviceMode(state.deviceMode);            // 启动时应用持久化的设置
     }
 
     /* ── 全局评论 compose ────────────────────────────────────── */
@@ -1464,6 +1504,18 @@
       });
     }
 
+    /* ── 切回浏览器自动 reload (解决 Hammerspoon 上传后页面不更新) ───── */
+    let lastLoadAt = Date.now();
+    function loadIfStale() {
+      // 距上次 load 超 2 秒就重新拉, 避免来回切焦点导致雷暴式刷新
+      if (Date.now() - lastLoadAt < 2000) return;
+      load().then(() => { lastLoadAt = Date.now(); });
+    }
+    window.addEventListener('focus', loadIfStale);
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) loadIfStale();
+    });
+
     bindTools();
     bindDeviceToggle();
     bindGlobalCompose();
@@ -1471,6 +1523,7 @@
     bindEditButtons();
     bindHammerspoonLink();
     await load();
+    lastLoadAt = Date.now();
   }
 
   /* ── 路由分发 ──────────────────────────────────────────────────── */

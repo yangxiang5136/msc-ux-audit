@@ -524,6 +524,7 @@ app.post('/api/wxapp/proposals/:slug/annotations', requireWxappRole, async (req,
       status:          WXAPP_STATUSES.includes(body.status) ? body.status : 'draft',
       transform_data:  body.transform_data && typeof body.transform_data === 'object' ? body.transform_data : {},
       section:         cleanString(body.section, 64) || '',
+      screenshot_id:   (typeof body.screenshot_id === 'string' && body.screenshot_id) ? body.screenshot_id : null,
     };
     const r = await fetch(`${SUPABASE_URL}/rest/v1/wxapp_annotation`, {
       method: 'POST',
@@ -569,6 +570,7 @@ app.patch('/api/wxapp/proposals/:slug/annotations/:id', requireWxappRole, async 
   if (body.anchor_x !== undefined && typeof body.anchor_x === 'number') patch.anchor_x = body.anchor_x;
   if (body.anchor_y !== undefined && typeof body.anchor_y === 'number') patch.anchor_y = body.anchor_y;
   if (body.section !== undefined) patch.section = cleanString(body.section, 64);
+  if (body.screenshot_id !== undefined) patch.screenshot_id = (typeof body.screenshot_id === 'string' && body.screenshot_id) ? body.screenshot_id : null;
   if (Object.keys(patch).length === 0) {
     res.status(400).json({ error: 'no patch fields' });
     return;
