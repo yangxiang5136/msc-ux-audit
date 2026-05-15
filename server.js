@@ -480,6 +480,7 @@ app.post('/api/wxapp/proposals/:slug/comments', requireWxappRole, async (req, re
       author_role:   req.wxappRole,
       kind:          WXAPP_COMMENT_KINDS.includes(body.kind) ? body.kind : 'note',
       body:          cleanString(body.body, 5000),
+      section:       cleanString(body.section, 64) || '',
     };
     const r = await fetch(`${SUPABASE_URL}/rest/v1/wxapp_comment`, {
       method: 'POST',
@@ -520,6 +521,7 @@ app.post('/api/wxapp/proposals/:slug/annotations', requireWxappRole, async (req,
       reaction:        null,                                // v2: 表态从 annotation 移到 comment
       status:          WXAPP_STATUSES.includes(body.status) ? body.status : 'draft',
       transform_data:  body.transform_data && typeof body.transform_data === 'object' ? body.transform_data : {},
+      section:         cleanString(body.section, 64) || '',
     };
     const r = await fetch(`${SUPABASE_URL}/rest/v1/wxapp_annotation`, {
       method: 'POST',
@@ -564,6 +566,7 @@ app.patch('/api/wxapp/proposals/:slug/annotations/:id', requireWxappRole, async 
   }
   if (body.anchor_x !== undefined && typeof body.anchor_x === 'number') patch.anchor_x = body.anchor_x;
   if (body.anchor_y !== undefined && typeof body.anchor_y === 'number') patch.anchor_y = body.anchor_y;
+  if (body.section !== undefined) patch.section = cleanString(body.section, 64);
   if (Object.keys(patch).length === 0) {
     res.status(400).json({ error: 'no patch fields' });
     return;
@@ -636,6 +639,7 @@ app.post('/api/wxapp/proposals/:slug/screenshots', requireWxappRole, async (req,
       caption:     cleanString(body.caption, 200) || null,
       author_role: req.wxappRole,
       byte_size:   byteSize,
+      section:     cleanString(body.section, 64) || '',
     };
     const r = await fetch(`${SUPABASE_URL}/rest/v1/wxapp_screenshot`, {
       method: 'POST',

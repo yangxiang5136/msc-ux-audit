@@ -483,6 +483,62 @@ button { font-family: inherit; cursor: pointer; }
   box-shadow: 6px 0 8px -6px rgba(0,0,0,0.5);
 }
 
+/* section pill · 子项切换 · 紧贴 title pill 右侧 */
+.wp-section-pill {
+  flex-shrink: 0;
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 600;
+  color: var(--role-uiux);
+  padding: 7px 12px;
+  background: rgba(52,211,153,.10);
+  border: 1px solid rgba(52,211,153,.30);
+  border-radius: 7px;
+  white-space: nowrap;
+  max-width: 180px;
+  cursor: pointer;
+  position: sticky; left: 160px;   /* title 后面紧贴 */
+  z-index: 3;
+  transition: background .15s;
+}
+.wp-section-pill:hover { background: rgba(52,211,153,.18); }
+.wp-section-pill .wp-sec-label {
+  overflow: hidden; text-overflow: ellipsis; max-width: 120px;
+}
+.wp-section-pill .wp-sec-arrow { font-size: 9px; opacity: .7; }
+
+/* section dropdown menu */
+.wp-section-menu {
+  background: var(--bg2);
+  border: 1px solid var(--brd2);
+  border-radius: 8px;
+  padding: 6px;
+  min-width: 200px;
+  box-shadow: 0 12px 32px rgba(0,0,0,.5);
+}
+.wp-sec-menu-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: 5px;
+  font-size: 13px; color: var(--t1);
+  cursor: pointer; transition: background .12s;
+}
+.wp-sec-menu-item:hover { background: var(--bg3); }
+.wp-sec-menu-item.active { background: rgba(52,211,153,.12); color: var(--role-uiux); }
+.wp-sec-menu-item.wp-sec-menu-new { color: var(--role-uiux); font-weight: 600; }
+.wp-sec-menu-item .wp-sec-count {
+  font-size: 11px; color: var(--t3);
+  background: var(--bg3); padding: 1px 7px; border-radius: 999px;
+}
+.wp-sec-menu-sep {
+  height: 1px; background: var(--brd); margin: 4px 0;
+}
+
+/* 激活的截图 · 用绿色边框标识 */
+.wp-screenshot-card.active {
+  border-color: var(--role-uiux);
+  box-shadow: 0 0 0 2px rgba(52,211,153,.3);
+}
+
 .wp-screenshot-card {
   position: relative; flex-shrink: 0;
   width: 78px; height: 114px;

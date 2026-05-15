@@ -161,9 +161,16 @@
     });
   }
 
-  /* ── Shadow DOM 渲染（不变） ──────────────────────────────────────── */
+  /* ── Shadow DOM 渲染 · 支持截图作背景 ───────────────────────────── */
   const wpRender = {
-    mountProposal(hostEl, html, css, device = 'ios') {
+    /**
+     * @param hostEl 寄存元素
+     * @param html 改稿 HTML (空字符串时会落到 backgroundDataUri)
+     * @param css 改稿 CSS
+     * @param device 'ios' | 'android'
+     * @param backgroundDataUri 可选 · 当 html 为空时把这张图作为画布内容
+     */
+    mountProposal(hostEl, html, css, device, backgroundDataUri) {
       hostEl.innerHTML = '';
       const inner = el('div', { class: 'wp-shadow-anchor', style: { width: '100%', height: '100%' } });
       hostEl.appendChild(inner);
@@ -174,9 +181,20 @@
         body, html { margin:0; padding:0; font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif; background:#f6f7f9; color:#1a1a1a; font-size:14px; line-height:1.5; -webkit-font-smoothing:antialiased; }
         a { color:#576b95; text-decoration:none; }
         button { font-family:inherit; }
-        :host { --wp-device: "${device}"; }
+        :host { --wp-device: "${device || 'ios'}"; }
+        .wp-bg-screenshot { width:100%; height:100%; object-fit:contain; display:block; background:#000; }
+        .wp-empty-hint { display:flex; align-items:center; justify-content:center; height:100%; padding:24px; color:#999; font-size:13px; text-align:center; line-height:1.6; }
       `;
-      shadow.innerHTML = `<style>${baseCss}\n${css || ''}</style>\n<div class="wp-frame">${html || ''}</div>`;
+      let body;
+      if (html && html.trim()) {
+        body = `<div class="wp-frame">${html}</div>`;
+      } else if (backgroundDataUri) {
+        // 没改稿 HTML 时, 截图自动充当画布内容
+        body = `<img class="wp-bg-screenshot" src="${backgroundDataUri}" alt="">`;
+      } else {
+        body = `<div class="wp-empty-hint">空白画布<br><small>上传截图或写改稿 HTML 后这里会显示内容</small></div>`;
+      }
+      shadow.innerHTML = `<style>${baseCss}\n${css || ''}</style>\n${body}`;
       return shadow;
     },
   };
@@ -723,6 +741,8 @@
     const slug = new URLSearchParams(location.search).get('slug');
     if (!slug) { $('#wp-detail-root').innerHTML = '<div class="wp-empty">缺少 slug 参数</div>'; return; }
 
+    const ACTIVE_SECTION_KEY = 'wxapp_active_section_' + slug;
+    const ACTIVE_SCREENSHOT_KEY = 'wxapp_active_screenshot_' + slug;
     const state = {
       slug,
       proposal: null,
@@ -734,7 +754,37 @@
       selectedId: null,
       deviceMode: 'both', // 'both' | 'ios' | 'android'
       deviceSizes: loadDeviceSizes(),
+      activeSection: localStorage.getItem(ACTIVE_SECTION_KEY) || '',
+      activeScreenshotId: localStorage.getItem(ACTIVE_SCREENSHOT_KEY) || null,
     };
+    function setActiveSection(s) {
+      state.activeSection = s || '';
+      localStorage.setItem(ACTIVE_SECTION_KEY, state.activeSection);
+    }
+    function setActiveScreenshot(id) {
+      state.activeScreenshotId = id;
+      if (id) localStorage.setItem(ACTIVE_SCREENSHOT_KEY, id);
+      else localStorage.removeItem(ACTIVE_SCREENSHOT_KEY);
+    }
+    function getSections() {
+      // 从子表 distinct 出现有子项 + 始终包含默认 ''
+      const s = new Set(['']);
+      state.screenshots.forEach(x => x.section && s.add(x.section));
+      state.annotations.forEach(x => x.section && s.add(x.section));
+      state.comments.forEach(x => x.section && s.add(x.section));
+      return Array.from(s);
+    }
+    function inSection(item) {
+      return (item.section || '') === state.activeSection;
+    }
+    function getActiveScreenshot() {
+      const visible = state.screenshots.filter(inSection);
+      if (!visible.length) return null;
+      const byId = state.activeScreenshotId
+        ? visible.find(s => s.id === state.activeScreenshotId)
+        : null;
+      return byId || visible[visible.length - 1];   // 默认最新一张 (反转后右侧)
+    }
 
     /* ── 加载 ──────────────────────────────────────────────────────── */
     async function load() {
@@ -757,13 +807,16 @@
       $('#wp-title').textContent = p.title;
       $('#wp-screen').textContent = p.screen_name || p.slug;
 
-      // 改稿正文
-      wpRender.mountProposal($('#wp-host-ios'),     p.redesign_html, p.redesign_css, 'ios');
-      wpRender.mountProposal($('#wp-host-android'), p.redesign_html, p.redesign_css, 'android');
+      // 改稿正文 (没改稿 HTML 时, 自动用 active screenshot 作画布背景)
+      const activeShot = getActiveScreenshot();
+      const bgUri = activeShot ? activeShot.data_uri : null;
+      wpRender.mountProposal($('#wp-host-ios'),     p.redesign_html, p.redesign_css, 'ios',     bgUri);
+      wpRender.mountProposal($('#wp-host-android'), p.redesign_html, p.redesign_css, 'android', bgUri);
 
-      // 批注层 (受 filter 影响)
-      wpAnnot.renderExisting($('#wp-canvas-ios'),     state.annotations, 'ios',     state.filter, state.selectedId, onPinClick);
-      wpAnnot.renderExisting($('#wp-canvas-android'), state.annotations, 'android', state.filter, state.selectedId, onPinClick);
+      // 批注层 · 同时受 status filter + section filter 影响
+      const sectionAnns = state.annotations.filter(inSection);
+      wpAnnot.renderExisting($('#wp-canvas-ios'),     sectionAnns, 'ios',     state.filter, state.selectedId, onPinClick);
+      wpAnnot.renderExisting($('#wp-canvas-android'), sectionAnns, 'android', state.filter, state.selectedId, onPinClick);
 
       // 如果有选中, 渲染 transform handles 在对应设备的画布上
       if (state.selectedId) {
@@ -790,30 +843,44 @@
       $('#wp-rationale').textContent = p.rationale || '（暂无理由说明）';
     }
 
-    /* ── 截图带 · 横滑导航 ────────────────────────────────────── */
+    /* ── 截图带 · 横滑 + 子项切换 ───────────────────────────────── */
     function renderScreenshots() {
       const list = $('#wp-screenshots-list');
       const upload = $('#wp-screenshot-upload-label');
-      // 清掉除 upload 之外所有 (保留 input)
+      // 清掉除 upload 之外所有
       Array.from(list.children).forEach(c => { if (c !== upload) c.remove(); });
 
-      // ① 功能/页面名 pill · 粘在最左
+      // ① 功能名 pill (proposal title · 不可改)
       const titlePill = el('div', { class: 'wp-title-pill', title: state.proposal.slug },
         state.proposal.title || state.proposal.slug);
       list.insertBefore(titlePill, list.firstChild);
 
-      // ② 截图 · 反转使新的在右 (最新上传紧靠 upload 按钮)
-      const shots = state.screenshots.slice().reverse();
+      // ② 子项 pill · 显示当前 section · 点击切换/重命名/新建
+      const sections = getSections();
+      const curIdx = sections.indexOf(state.activeSection);
+      const sectionLabel = state.activeSection === '' ? '默认子项' : state.activeSection;
+      const sectionPill = el('div', { class: 'wp-section-pill', title: '点击切换或新建子项' },
+        [
+          el('span', { class: 'wp-sec-icon' }, '📂'),
+          el('span', { class: 'wp-sec-label' }, sectionLabel),
+          el('span', { class: 'wp-sec-arrow' }, '▾'),
+        ]);
+      sectionPill.addEventListener('click', () => openSectionMenu(sectionPill));
+      list.insertBefore(sectionPill, titlePill.nextSibling);
+
+      // ③ 截图 · 反转, 按 section 过滤
+      const shots = state.screenshots.filter(inSection).slice().reverse();
+      const activeShot = getActiveScreenshot();
       shots.forEach((s, idx) => {
         const num = idx + 1;
-        const card = el('div', { class: 'wp-screenshot-card' });
+        const card = el('div', {
+          class: 'wp-screenshot-card' + (activeShot && activeShot.id === s.id ? ' active' : ''),
+        });
         card.dataset.screenshotId = s.id;
-
         card.appendChild(el('img', { src: s.data_uri, alt: s.caption || '' }));
         card.appendChild(el('span', { class: 'wp-sc-num' }, String(num)));
         card.appendChild(el('div', { class: 'wp-sc-author' },
           (ROLE_LABELS[s.author_role] || s.author_role || '—') + (s.caption ? ' · ' + s.caption : '')));
-
         const del = el('button', { class: 'wp-sc-del', title: '删除' }, '×');
         del.addEventListener('click', async (e) => {
           e.stopPropagation();
@@ -822,26 +889,110 @@
           catch (err) { toast(err.message, 'error'); }
         });
         card.appendChild(del);
-
-        // 点击 · 滚动到屏幕中央 + 大图预览
+        // 点击 · 设为画布背景 + 滚动居中
         card.addEventListener('click', () => {
+          setActiveScreenshot(s.id);
+          render();
           card.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        });
+        // 双击 · 大图预览
+        card.addEventListener('dblclick', (e) => {
+          e.stopPropagation();
           const w = window.open();
           if (w) w.document.body.innerHTML = `<title>#${num} · ${escapeHtml(s.caption || '')}</title><img src="${s.data_uri}" style="max-width:100%">`;
         });
-
-        // 插入到 upload 按钮之前 (upload 永远在最右)
         list.insertBefore(card, upload);
       });
+    }
+
+    /* ── 子项切换菜单 (简易 dropdown) ──────────────────────────────── */
+    function openSectionMenu(anchorEl) {
+      const sections = getSections();
+      // 清掉已有的 menu
+      document.querySelectorAll('.wp-section-menu').forEach(n => n.remove());
+      const menu = el('div', { class: 'wp-section-menu' });
+      sections.forEach(s => {
+        const label = s === '' ? '默认子项' : s;
+        const counts = state.screenshots.filter(x => (x.section || '') === s).length +
+                       state.annotations.filter(x => (x.section || '') === s).length;
+        const item = el('div', {
+          class: 'wp-sec-menu-item' + (s === state.activeSection ? ' active' : ''),
+        }, [
+          el('span', { class: 'wp-sec-name' }, label),
+          el('span', { class: 'wp-sec-count' }, String(counts)),
+        ]);
+        item.addEventListener('click', () => {
+          setActiveSection(s);
+          setActiveScreenshot(null);
+          menu.remove();
+          render();
+        });
+        menu.appendChild(item);
+      });
+      menu.appendChild(el('div', { class: 'wp-sec-menu-sep' }));
+      // 新建
+      const newItem = el('div', { class: 'wp-sec-menu-item wp-sec-menu-new' }, '＋ 新建子项');
+      newItem.addEventListener('click', () => {
+        menu.remove();
+        const name = prompt('子项名 (例如：注册任务 / AI 确权)：');
+        if (!name || !name.trim()) return;
+        setActiveSection(name.trim());
+        setActiveScreenshot(null);
+        render();
+        toast(`已切到「${name.trim()}」· 下次上传/批注会归到这个子项`, 'success');
+      });
+      menu.appendChild(newItem);
+      // 重命名当前 (空字符串默认子项不让重命名)
+      if (state.activeSection !== '') {
+        const renameItem = el('div', { class: 'wp-sec-menu-item' }, '✏️ 重命名「' + state.activeSection + '」');
+        renameItem.addEventListener('click', async () => {
+          menu.remove();
+          const newName = prompt('新名字:', state.activeSection);
+          if (!newName || newName === state.activeSection) return;
+          await renameSection(state.activeSection, newName.trim());
+        });
+        menu.appendChild(renameItem);
+      }
+
+      // 定位 menu 紧贴 anchor 下方
+      document.body.appendChild(menu);
+      const r = anchorEl.getBoundingClientRect();
+      menu.style.position = 'fixed';
+      menu.style.left = r.left + 'px';
+      menu.style.top = (r.bottom + 4) + 'px';
+      menu.style.zIndex = '999';
+      setTimeout(() => {
+        document.addEventListener('click', function close(e) {
+          if (!menu.contains(e.target) && e.target !== anchorEl) {
+            menu.remove(); document.removeEventListener('click', close);
+          }
+        });
+      }, 10);
+    }
+
+    async function renameSection(oldName, newName) {
+      // 批量改 section · 对每条 annotation/comment/screenshot 调 PATCH (没批量接口, 串行调)
+      // 数据量一般不大 (子项内东西有限), 串行可接受
+      try {
+        const tasks = [];
+        state.annotations.filter(a => (a.section || '') === oldName)
+          .forEach(a => tasks.push(wpApi.patchAnnotation(slug, a.id, { section: newName })));
+        // comment / screenshot 没 PATCH 接口, 先不动 (TODO: 加上)
+        await Promise.all(tasks);
+        setActiveSection(newName);
+        toast('已重命名', 'success');
+        await load();
+      } catch (e) { toast(e.message, 'error'); }
     }
 
     /* ── 状态筛选条 ─────────────────────────────────────────────── */
     function renderStatusFilter() {
       const wrap = $('#wp-status-filter');
       wrap.innerHTML = '';
-      // 计算每个状态下有多少 annotation
-      const counts = { all: state.annotations.length, draft: 0, review: 0, accepted: 0, rejected: 0, shipped: 0 };
-      state.annotations.forEach(a => { counts[a.status || 'draft'] = (counts[a.status || 'draft'] || 0) + 1; });
+      // 只算当前 section 内的 annotation
+      const sectionAnns = state.annotations.filter(inSection);
+      const counts = { all: sectionAnns.length, draft: 0, review: 0, accepted: 0, rejected: 0, shipped: 0 };
+      sectionAnns.forEach(a => { counts[a.status || 'draft'] = (counts[a.status || 'draft'] || 0) + 1; });
       const mk = (key, label) => {
         const c = el('button', { class: 'wp-chip ' + (state.filter === key ? 'active ' : '') + (key !== 'all' ? 's-' + key : '') }, [
           label,
@@ -863,19 +1014,19 @@
       const stream = $('#wp-feedback-stream');
       stream.innerHTML = '';
 
-      // 拿这一批 annotation (受 filter 影响, 不分设备 - 流里全显)
+      // 反馈流: 当前 section + 状态 filter
+      const sectionAnns = state.annotations.filter(inSection);
       const visibleAnns = state.filter === 'all'
-        ? state.annotations
-        : state.annotations.filter(a => (a.status || 'draft') === state.filter);
+        ? sectionAnns
+        : sectionAnns.filter(a => (a.status || 'draft') === state.filter);
 
-      // 为每条 annotation 渲染一个 card
       visibleAnns.forEach((a, idx) => {
         const card = renderFeedbackCard(a, idx + 1);
         stream.appendChild(card);
       });
 
-      // 全局评论 (annotation_id 为 null 的 comment)
-      const globalComments = state.comments.filter(c => !c.annotation_id);
+      // 全局评论 · 也按 section 过滤
+      const globalComments = state.comments.filter(c => !c.annotation_id && inSection(c));
       if (globalComments.length) {
         stream.appendChild(el('div', { style: { padding: '8px 4px', fontSize: '11px', color: 'var(--t3)', fontWeight: '600', letterSpacing: '1px' } }, '── 全局评论 ──'));
         globalComments.forEach(c => stream.appendChild(renderGlobalCommentRow(c)));
@@ -1088,6 +1239,7 @@
             anchor_y: data.anchor_y,
             comment:  text,
             status:   'draft',
+            section:  state.activeSection,
           });
           // 自动停用工具
           setActive(null);
@@ -1174,7 +1326,7 @@
         const kind = $('#wp-comment-kind').value;
         if (!body) return toast('评论内容不能为空', 'error');
         try {
-          await wpApi.comment(slug, { body, kind });
+          await wpApi.comment(slug, { body, kind, section: state.activeSection });
           $('#wp-comment-body').value = '';
           toast('已发布', 'success');
           await load();
@@ -1197,8 +1349,13 @@
         }
         // 粘贴/拖拽默认带 source 备注 · 不再每次弹 prompt
         const caption = (source ? `[${source}] ` : '') + new Date().toLocaleString('zh-CN', { hour:'2-digit', minute:'2-digit' });
-        await wpApi.uploadScreenshot(slug, dataUri, caption);
-        toast('截图已上传 · 来源 ' + (source || '文件'), 'success');
+        const created = await _fetch('/api/wxapp/proposals/' + encodeURIComponent(slug) + '/screenshots', {
+          method: 'POST',
+          body: JSON.stringify({ data_uri: dataUri, caption, section: state.activeSection }),
+        });
+        // 上传成功后自动选中这张作为画布背景
+        if (created && created.id) setActiveScreenshot(created.id);
+        toast(`截图已上传 · ${source || '文件'} · 子项: ${state.activeSection || '默认'}`, 'success');
         await load();
       } catch (err) { toast(err.message, 'error'); }
     }
