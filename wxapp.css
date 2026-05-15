@@ -1,0 +1,443 @@
+/* =============================================================================
+ * /wxapp/ 微信小程序改稿协作框架 · 样式
+ * 沿用 index.html 暗色调性 (Noto Sans SC + green/blue/amber/red 角色色彩)
+ * ============================================================================= */
+
+:root {
+  --bg:    #0a0c10;
+  --bg2:   #141820;
+  --bg3:   #1a2030;
+  --bg4:   #232a3d;
+  --brd:   rgba(255,255,255,.06);
+  --brd2:  rgba(255,255,255,.12);
+  --brd3:  rgba(255,255,255,.20);
+  --t1:    #f0f2f5;
+  --t2:    #8b95a8;
+  --t3:    #5a6478;
+  --t4:    #404757;
+
+  /* 角色色 · 与 chatA-K 现有色板呼应但语义不同 */
+  --role-sean:    #60a5fa;  /* 蓝 · Sean · 产出方 */
+  --role-uiux:    #34d399;  /* 绿 · UIUX · 美学 */
+  --role-eng:     #fbbf24;  /* 黄 · 工程 · 实现 */
+  --role-ceo:     #f87171;  /* 红 · CEO · 拍板 */
+
+  /* 状态色 */
+  --st-draft:     #8b95a8;
+  --st-review:    #fbbf24;
+  --st-accepted:  #34d399;
+  --st-rejected:  #f87171;
+  --st-shipped:   #a78bfa;
+
+  /* 表态色 */
+  --rx-approve:   #34d399;
+  --rx-reject:    #f87171;
+  --rx-block:     #fbbf24;
+  --rx-idea:      #a78bfa;
+  --rx-note:      #8b95a8;
+
+  --sw: 260px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Noto Sans SC', -apple-system, sans-serif;
+  background: var(--bg); color: var(--t1);
+  line-height: 1.6; -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; }
+
+/* ── 顶栏 ─────────────────────────────────────────────────────────────────── */
+.wp-topbar {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(10,12,16,.95); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--brd);
+  display: flex; align-items: center; gap: 16px;
+  padding: 12px 24px;
+}
+.wp-brand {
+  display: flex; align-items: center; gap: 10px;
+  font-weight: 700; font-size: 14px;
+}
+.wp-brand .wp-logo {
+  width: 30px; height: 30px; border-radius: 8px;
+  background: linear-gradient(135deg, var(--role-sean), var(--role-uiux));
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900; font-size: 13px; color: #000;
+}
+.wp-brand small { color: var(--t3); font-weight: 400; margin-left: 6px; }
+.wp-nav { display: flex; gap: 4px; }
+.wp-nav a {
+  padding: 7px 12px; border-radius: 7px;
+  font-size: 13px; color: var(--t2); transition: all .15s;
+}
+.wp-nav a:hover { background: var(--bg3); color: var(--t1); }
+.wp-nav a.active { background: var(--bg3); color: var(--t1); }
+.wp-me { margin-left: auto; display: flex; align-items: center; gap: 8px; font-size: 12px; }
+.wp-role-pill {
+  padding: 4px 10px; border-radius: 999px;
+  font-size: 11px; font-weight: 600;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.wp-role-pill::before {
+  content: ''; width: 7px; height: 7px; border-radius: 50%; background: currentColor;
+}
+.wp-role-pill.role-sean { background: rgba(96,165,250,.12); color: var(--role-sean); }
+.wp-role-pill.role-uiux { background: rgba(52,211,153,.12); color: var(--role-uiux); }
+.wp-role-pill.role-eng  { background: rgba(251,191,36,.12); color: var(--role-eng); }
+.wp-role-pill.role-ceo  { background: rgba(248,113,113,.12); color: var(--role-ceo); }
+.wp-role-pill.role-none { background: rgba(139,149,168,.12); color: var(--t2); }
+.wp-link-btn {
+  padding: 6px 12px; border-radius: 7px; border: 1px solid var(--brd2);
+  background: var(--bg2); color: var(--t1); font-size: 12px;
+}
+.wp-link-btn:hover { border-color: var(--brd3); background: var(--bg3); }
+
+/* ── 主容器 ───────────────────────────────────────────────────────────────── */
+.wp-main { max-width: 1280px; margin: 0 auto; padding: 24px; }
+.wp-page-head { margin-bottom: 24px; }
+.wp-page-head h1 { font-size: 24px; font-weight: 900; margin-bottom: 4px; }
+.wp-page-head p { font-size: 13px; color: var(--t2); }
+
+/* ── 筛选栏 ───────────────────────────────────────────────────────────────── */
+.wp-filters {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  background: var(--bg2); border: 1px solid var(--brd);
+  padding: 12px 14px; border-radius: 10px;
+  margin-bottom: 20px;
+}
+.wp-filter-group { display: flex; align-items: center; gap: 6px; }
+.wp-filter-group label { font-size: 11px; color: var(--t3); font-weight: 600; letter-spacing: 1px; }
+.wp-chip {
+  padding: 4px 10px; border-radius: 999px;
+  font-size: 11px; border: 1px solid var(--brd2);
+  background: transparent; color: var(--t2);
+  transition: all .15s;
+}
+.wp-chip.active { background: var(--bg4); color: var(--t1); border-color: var(--brd3); }
+.wp-chip:hover { color: var(--t1); }
+.wp-search {
+  flex: 1; min-width: 140px;
+  padding: 5px 10px; border-radius: 7px;
+  background: var(--bg); color: var(--t1);
+  border: 1px solid var(--brd2);
+  font-size: 12px; font-family: inherit;
+}
+.wp-spacer { flex: 1; }
+.wp-btn-primary {
+  padding: 7px 14px; border-radius: 8px; border: 1px solid var(--role-uiux);
+  background: rgba(52,211,153,.12); color: var(--role-uiux); font-size: 12px; font-weight: 600;
+}
+.wp-btn-primary:hover { background: rgba(52,211,153,.18); }
+
+/* ── 进度统计 ─────────────────────────────────────────────────────────────── */
+.wp-stats {
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;
+  margin-bottom: 20px;
+}
+.wp-stat {
+  background: var(--bg2); border: 1px solid var(--brd);
+  padding: 14px; border-radius: 10px;
+}
+.wp-stat-n { font-size: 22px; font-weight: 900; line-height: 1; margin-bottom: 4px; }
+.wp-stat-l { font-size: 11px; color: var(--t3); font-weight: 600; letter-spacing: 1px; }
+.wp-stat.s-draft    .wp-stat-n { color: var(--st-draft); }
+.wp-stat.s-review   .wp-stat-n { color: var(--st-review); }
+.wp-stat.s-accepted .wp-stat-n { color: var(--st-accepted); }
+.wp-stat.s-rejected .wp-stat-n { color: var(--st-rejected); }
+.wp-stat.s-shipped  .wp-stat-n { color: var(--st-shipped); }
+
+/* ── 缩略图墙 ─────────────────────────────────────────────────────────────── */
+.wp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+.wp-card {
+  background: var(--bg2); border: 1px solid var(--brd);
+  border-radius: 12px; overflow: hidden;
+  transition: all .25s; cursor: pointer;
+  display: flex; flex-direction: column;
+}
+.wp-card:hover { border-color: var(--brd2); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.3); }
+.wp-card-thumb {
+  aspect-ratio: 375 / 670;
+  background: var(--bg); border-bottom: 1px solid var(--brd);
+  position: relative; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+.wp-card-thumb img {
+  width: 100%; height: 100%; object-fit: cover; object-position: top;
+}
+.wp-card-thumb-placeholder {
+  color: var(--t4); font-size: 11px; text-align: center; padding: 16px;
+}
+.wp-card-status {
+  position: absolute; top: 8px; right: 8px;
+  padding: 3px 8px; border-radius: 999px;
+  font-size: 10px; font-weight: 600;
+  background: rgba(10,12,16,.85); backdrop-filter: blur(8px);
+}
+.wp-status-dot { display:inline-block; width:6px; height:6px; border-radius:50%; margin-right:5px; vertical-align:middle; }
+.s-draft .wp-status-dot, .wp-status-dot.s-draft    { background: var(--st-draft); }
+.s-review .wp-status-dot, .wp-status-dot.s-review   { background: var(--st-review); }
+.s-accepted .wp-status-dot, .wp-status-dot.s-accepted { background: var(--st-accepted); }
+.s-rejected .wp-status-dot, .wp-status-dot.s-rejected { background: var(--st-rejected); }
+.s-shipped .wp-status-dot, .wp-status-dot.s-shipped  { background: var(--st-shipped); }
+.wp-card-body { padding: 12px 14px; flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.wp-card-title { font-size: 13px; font-weight: 700; line-height: 1.4; }
+.wp-card-sub { font-size: 11px; color: var(--t3); }
+.wp-card-meta { display: flex; gap: 8px; margin-top: auto; font-size: 10px; color: var(--t3); align-items: center; }
+.wp-card-meta .wp-role-pill { font-size: 9px; padding: 2px 6px; }
+
+/* ── 详情页 · 双画布 ──────────────────────────────────────────────────────── */
+.wp-detail {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 20px;
+}
+@media (max-width: 1100px) { .wp-detail { grid-template-columns: 1fr; } }
+
+.wp-stage {
+  background: var(--bg2); border: 1px solid var(--brd);
+  border-radius: 14px; padding: 20px;
+  min-height: 80vh;
+}
+.wp-stage-tools {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+  margin-bottom: 18px;
+  padding-bottom: 14px; border-bottom: 1px solid var(--brd);
+}
+.wp-tool {
+  width: 34px; height: 34px;
+  border-radius: 8px; border: 1px solid var(--brd2);
+  background: var(--bg); color: var(--t2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; transition: all .15s;
+}
+.wp-tool:hover { color: var(--t1); border-color: var(--brd3); }
+.wp-tool.active { background: var(--bg4); color: var(--t1); border-color: var(--brd3); }
+.wp-tool-sep { width: 1px; height: 22px; background: var(--brd); margin: 0 4px; }
+
+.wp-canvases {
+  display: flex; gap: 24px; justify-content: center; align-items: flex-start;
+  flex-wrap: wrap;
+  padding: 8px 0;
+}
+.wp-canvas-wrap {
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+}
+.wp-canvas-label {
+  font-size: 11px; color: var(--t3); font-weight: 600;
+  letter-spacing: 2px; text-transform: uppercase;
+}
+.wp-canvas {
+  position: relative;
+  border-radius: 28px; /* 拟手机圆角 */
+  border: 6px solid #1a1f2a;
+  background: #fff;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,.4);
+}
+.wp-canvas.device-ios     { width: 375px; height: 812px; }
+.wp-canvas.device-android { width: 360px; height: 800px; }
+
+/* Shadow DOM 寄存元素 · 实际内容由 JS 注入 */
+.wp-host {
+  position: absolute; inset: 0;
+  overflow: hidden;
+}
+
+/* 批注画布层 · 覆盖在 wp-host 上 */
+.wp-annot-svg {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  pointer-events: none; /* 默认不拦截，进入批注模式才开启 */
+}
+.wp-canvas.draw-mode .wp-annot-svg { pointer-events: auto; cursor: crosshair; }
+.wp-annot-svg path,
+.wp-annot-svg circle,
+.wp-annot-svg ellipse,
+.wp-annot-svg rect,
+.wp-annot-svg line,
+.wp-annot-svg polyline {
+  fill: none;
+  stroke-width: 2.5;
+  stroke-linecap: round; stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+.wp-annot-pin {
+  position: absolute;
+  width: 22px; height: 22px;
+  border-radius: 999px;
+  border: 2px solid #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 800; color: #fff;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 2px 8px rgba(0,0,0,.4);
+  cursor: pointer;
+}
+.wp-annot-pin.role-sean { background: var(--role-sean); }
+.wp-annot-pin.role-uiux { background: var(--role-uiux); }
+.wp-annot-pin.role-eng  { background: var(--role-eng); }
+.wp-annot-pin.role-ceo  { background: var(--role-ceo); }
+
+.wp-annot-bubble {
+  position: absolute;
+  min-width: 240px; max-width: 320px;
+  background: rgba(10,12,16,.96);
+  border: 1px solid var(--brd2);
+  backdrop-filter: blur(8px);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 12px;
+  z-index: 10;
+  box-shadow: 0 8px 24px rgba(0,0,0,.5);
+}
+.wp-annot-bubble.hidden { display: none; }
+.wp-annot-bubble .b-head {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; color: var(--t3); margin-bottom: 6px;
+}
+.wp-annot-bubble .b-body { color: var(--t1); line-height: 1.5; word-break: break-word; }
+.wp-annot-bubble .b-reaction { margin-top: 6px; font-size: 11px; }
+
+/* ── 侧栏 · 信息/评论/历史 ────────────────────────────────────────────────── */
+.wp-side {
+  display: flex; flex-direction: column; gap: 16px;
+}
+.wp-panel {
+  background: var(--bg2); border: 1px solid var(--brd);
+  border-radius: 12px; padding: 16px;
+}
+.wp-panel h3 {
+  font-size: 11px; font-weight: 700; letter-spacing: 2px;
+  color: var(--t3); margin-bottom: 12px;
+  padding-bottom: 8px; border-bottom: 1px solid var(--brd);
+}
+.wp-meta-row { display: flex; justify-content: space-between; gap: 12px; font-size: 12px; padding: 5px 0; }
+.wp-meta-row .k { color: var(--t3); }
+.wp-meta-row .v { color: var(--t1); }
+.wp-rationale {
+  font-size: 13px; color: var(--t2); line-height: 1.7;
+  white-space: pre-wrap; word-break: break-word;
+}
+.wp-status-controls {
+  display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px;
+}
+.wp-status-btn {
+  padding: 5px 10px; border-radius: 7px; border: 1px solid var(--brd2);
+  background: var(--bg); color: var(--t2); font-size: 11px;
+}
+.wp-status-btn:hover { color: var(--t1); border-color: var(--brd3); }
+.wp-status-btn.active { color: #000; font-weight: 700; }
+.wp-status-btn.active.s-draft    { background: var(--st-draft); }
+.wp-status-btn.active.s-review   { background: var(--st-review); }
+.wp-status-btn.active.s-accepted { background: var(--st-accepted); }
+.wp-status-btn.active.s-rejected { background: var(--st-rejected); }
+.wp-status-btn.active.s-shipped  { background: var(--st-shipped); }
+
+/* 评论流 */
+.wp-comments-list { display: flex; flex-direction: column; gap: 10px; max-height: 360px; overflow-y: auto; padding-right: 4px; }
+.wp-comment {
+  padding: 10px 12px; border-radius: 8px;
+  background: var(--bg); border-left: 3px solid var(--brd2);
+}
+.wp-comment.role-sean { border-left-color: var(--role-sean); }
+.wp-comment.role-uiux { border-left-color: var(--role-uiux); }
+.wp-comment.role-eng  { border-left-color: var(--role-eng); }
+.wp-comment.role-ceo  { border-left-color: var(--role-ceo); }
+.wp-comment.kind-approve { background: rgba(52,211,153,.06); }
+.wp-comment.kind-reject  { background: rgba(248,113,113,.06); }
+.wp-comment.kind-block   { background: rgba(251,191,36,.06); }
+.wp-comment.kind-idea    { background: rgba(167,139,250,.06); }
+.wp-comment .c-head { display: flex; align-items: center; gap: 8px; font-size: 11px; margin-bottom: 4px; }
+.wp-comment .c-time { color: var(--t4); margin-left: auto; }
+.wp-comment .c-kind {
+  font-size: 10px; padding: 1px 6px; border-radius: 4px;
+  background: var(--bg3); color: var(--t2); font-weight: 600;
+}
+.wp-comment .c-kind.kind-approve { background: rgba(52,211,153,.15); color: var(--rx-approve); }
+.wp-comment .c-kind.kind-reject  { background: rgba(248,113,113,.15); color: var(--rx-reject); }
+.wp-comment .c-kind.kind-block   { background: rgba(251,191,36,.15); color: var(--rx-block); }
+.wp-comment .c-kind.kind-idea    { background: rgba(167,139,250,.15); color: var(--rx-idea); }
+.wp-comment .c-body { font-size: 12px; color: var(--t1); line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
+
+.wp-comment-compose {
+  display: flex; flex-direction: column; gap: 8px;
+  margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--brd);
+}
+.wp-comment-compose textarea {
+  background: var(--bg); color: var(--t1);
+  border: 1px solid var(--brd2); border-radius: 8px;
+  padding: 8px 10px; font-size: 12px; font-family: inherit;
+  resize: vertical; min-height: 60px;
+}
+.wp-kind-row { display: flex; gap: 5px; flex-wrap: wrap; }
+.wp-kind-chip {
+  padding: 4px 10px; border-radius: 999px;
+  border: 1px solid var(--brd2); background: transparent;
+  color: var(--t2); font-size: 11px;
+}
+.wp-kind-chip.active.kind-note    { background: var(--rx-note);    color: #000; border-color: var(--rx-note); }
+.wp-kind-chip.active.kind-approve { background: var(--rx-approve); color: #000; border-color: var(--rx-approve); }
+.wp-kind-chip.active.kind-reject  { background: var(--rx-reject);  color: #000; border-color: var(--rx-reject); }
+.wp-kind-chip.active.kind-block   { background: var(--rx-block);   color: #000; border-color: var(--rx-block); }
+.wp-kind-chip.active.kind-idea    { background: var(--rx-idea);    color: #000; border-color: var(--rx-idea); }
+
+/* 修订历史 */
+.wp-revisions-list { display: flex; flex-direction: column; gap: 8px; }
+.wp-revision {
+  padding: 8px 12px; border-radius: 8px;
+  background: var(--bg); border: 1px solid var(--brd);
+  font-size: 11px; color: var(--t3);
+  display: flex; gap: 8px; align-items: center;
+}
+.wp-revision time { margin-left: auto; color: var(--t4); }
+
+/* ── 登录页 ──────────────────────────────────────────────────────────────── */
+.wp-login-card {
+  max-width: 420px; margin: 80px auto;
+  background: var(--bg2); border: 1px solid var(--brd);
+  border-radius: 14px; padding: 32px;
+}
+.wp-login-card h1 { font-size: 20px; font-weight: 800; margin-bottom: 6px; }
+.wp-login-card p { font-size: 13px; color: var(--t2); margin-bottom: 22px; }
+.wp-login-row {
+  display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px;
+}
+.wp-login-row label { font-size: 11px; font-weight: 600; color: var(--t3); letter-spacing: 1px; }
+.wp-login-row input {
+  background: var(--bg); color: var(--t1);
+  border: 1px solid var(--brd2); border-radius: 8px;
+  padding: 9px 12px; font-size: 13px; font-family: 'JetBrains Mono', ui-monospace, monospace;
+}
+.wp-login-actions { display: flex; gap: 8px; margin-top: 10px; }
+.wp-login-actions .wp-btn-primary { flex: 1; padding: 10px; font-size: 13px; }
+
+.wp-empty {
+  padding: 60px 20px; text-align: center; color: var(--t3); font-size: 13px;
+  border: 1px dashed var(--brd2); border-radius: 12px;
+}
+.wp-toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  background: rgba(10,12,16,.96); border: 1px solid var(--brd2);
+  padding: 10px 16px; border-radius: 8px;
+  font-size: 13px; color: var(--t1);
+  z-index: 999;
+  box-shadow: 0 8px 24px rgba(0,0,0,.5);
+}
+.wp-toast.error { border-color: var(--role-ceo); color: var(--role-ceo); }
+.wp-toast.success { border-color: var(--role-uiux); color: var(--role-uiux); }
+
+/* utility */
+.wp-hidden { display: none !important; }
+.wp-loading {
+  display: inline-block; width: 14px; height: 14px;
+  border: 2px solid var(--brd2); border-top-color: var(--role-uiux);
+  border-radius: 50%; animation: wp-spin .8s linear infinite;
+  vertical-align: middle;
+}
+@keyframes wp-spin { to { transform: rotate(360deg); } }

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>小程序改稿 · 登录 · MSC.AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="wxapp.css">
+</head>
+<body data-wxapp-page="login">
+
+<main class="wp-main">
+  <section class="wp-login-card">
+    <h1>小程序改稿协作 · 登录</h1>
+    <p>输入你的角色 token 才能进入沙箱。登录成功后浏览器保留 30 天，无需重复输入。token 也是身份识别凭证 · 写入会自动带上你的角色。</p>
+
+    <form id="wp-login-form" autocomplete="off">
+      <div class="wp-login-row">
+        <label for="wp-token-in">角色 token</label>
+        <input id="wp-token-in" type="password" placeholder="粘贴你的 WXAPP_TOKEN_xxx" autocomplete="off">
+      </div>
+      <div class="wp-login-actions">
+        <button id="wp-btn-login" class="wp-btn-primary" type="submit">登录</button>
+        <button id="wp-btn-logout" class="wp-link-btn" type="button">登出</button>
+      </div>
+      <p id="wp-login-status" style="margin-top:14px;font-size:12px;color:var(--t3);"></p>
+    </form>
+
+    <hr style="margin:22px 0;border:0;border-top:1px solid var(--brd);">
+
+    <h2 style="font-size:13px;font-weight:700;color:var(--t2);margin-bottom:8px;">角色对照</h2>
+    <ul style="list-style:none;padding:0;font-size:12px;color:var(--t2);line-height:1.9;">
+      <li><span class="wp-role-pill role-sean">Sean</span> · 产出方 · 创建/迭代改稿、推进状态</li>
+      <li><span class="wp-role-pill role-uiux">UIUX</span> · 美学 · 微调 HTML/CSS、加视觉批注</li>
+      <li><span class="wp-role-pill role-eng">工程师</span> · 实现 · 留实现备注、标记复杂度</li>
+      <li><span class="wp-role-pill role-ceo">CEO</span> · 拍板 · 状态采纳/拒绝、战略备注</li>
+    </ul>
+
+    <p style="margin-top:18px;font-size:11px;color:var(--t4);line-height:1.6;">
+      认证机制：登录成功后服务端写一个 HTTP-only cookie（30 天），后续请求自动带 · token 本身不会留在前端 localStorage。<br>
+      换电脑/换浏览器/手动清 cookie 后请重新登录。<br>
+      token 由 Sean 在 Railway env vars 配置：<code>WXAPP_TOKEN_SEAN/UIUX/ENG/CEO</code>
+    </p>
+  </section>
+</main>
+
+<script src="wxapp.js"></script>
+</body>
+</html>

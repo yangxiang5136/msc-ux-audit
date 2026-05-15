@@ -26,6 +26,21 @@ const FEEDBACK_PAGE_KEYS = [
   'chatG', 'chatH', 'chatJ', 'chatK', 'architecture', 'product-spec'
 ];
 
+// ── /wxapp/ 模块：角色 token 配置 ─────────────────────────────────────────────
+// 每个角色独立 token，写入时自动注入 author_role。
+// 部署时在 Railway → Variables 配置 WXAPP_TOKEN_SEAN/UIUX/ENG/CEO。
+const WXAPP_TOKENS = {
+  sean: process.env.WXAPP_TOKEN_SEAN || '',
+  uiux: process.env.WXAPP_TOKEN_UIUX || '',
+  eng:  process.env.WXAPP_TOKEN_ENG  || '',
+  ceo:  process.env.WXAPP_TOKEN_CEO  || '',
+};
+const WXAPP_STATUSES = ['draft', 'review', 'accepted', 'rejected', 'shipped'];
+const WXAPP_DEVICE_TARGETS = ['ios', 'android', 'both'];
+const WXAPP_COMMENT_KINDS = ['note', 'approve', 'reject', 'block', 'idea'];
+const WXAPP_ANNOTATION_SHAPES = ['freehand', 'circle', 'arrow', 'rect', 'none'];
+const WXAPP_REACTIONS = ['approve', 'reject', 'block', 'idea', 'note'];
+
 function ensureDataDir() {
   try {
     if (!fs.existsSync(DATA_DIR)) {
@@ -180,6 +195,362 @@ app.post('/api/feedback', requireFeedbackWriteToken, async (req, res) => {
   }
 });
 
+// ── /api/wxapp/* 微信小程序改稿协作模块 ──────────────────────────────────────
+const WXAPP_COOKIE_NAME = 'wxapp_session';
+const WXAPP_COOKIE_MAX_AGE = 60 * 60 * 24 * 30; // 30 天
+
+function parseCookies(req) {
+  const header = req.headers.cookie || '';
+  const out = {};
+  header.split(';').forEach((part) => {
+    const idx = part.indexOf('=');
+    if (idx > -1) {
+      const k = part.slice(0, idx).trim();
+      const v = part.slice(idx + 1).trim();
+      if (k) {
+        try { out[k] = decodeURIComponent(v); }
+        catch { out[k] = v; }
+      }
+    }
+  });
+  return out;
+}
+
+function setWxappSessionCookie(req, res, token) {
+  const isHttps = req.secure || (req.headers['x-forwarded-proto'] || '').includes('https');
+  const parts = [
+    `${WXAPP_COOKIE_NAME}=${encodeURIComponent(token)}`,
+    'Path=/',
+    `Max-Age=${WXAPP_COOKIE_MAX_AGE}`,
+    'HttpOnly',
+    'SameSite=Lax',
+  ];
+  if (isHttps) parts.push('Secure');
+  res.setHeader('Set-Cookie', parts.join('; '));
+}
+
+function clearWxappSessionCookie(req, res) {
+  const isHttps = req.secure || (req.headers['x-forwarded-proto'] || '').includes('https');
+  const parts = [
+    `${WXAPP_COOKIE_NAME}=`,
+    'Path=/',
+    'Max-Age=0',
+    'HttpOnly',
+    'SameSite=Lax',
+  ];
+  if (isHttps) parts.push('Secure');
+  res.setHeader('Set-Cookie', parts.join('; '));
+}
+
+function resolveWxappRole(token) {
+  if (!token) return null;
+  for (const [role, value] of Object.entries(WXAPP_TOKENS)) {
+    if (value && token === value) return role;
+  }
+  return null;
+}
+
+function extractWxappToken(req) {
+  // 1. 优先 cookie (浏览器自动带)
+  const cookies = parseCookies(req);
+  if (cookies[WXAPP_COOKIE_NAME]) return cookies[WXAPP_COOKIE_NAME];
+  // 2. fallback: x-wxapp-token header (适合 curl 测试 / 备用)
+  return req.get('x-wxapp-token') || '';
+}
+
+function requireWxappRole(req, res, next) {
+  const token = extractWxappToken(req);
+  const role = resolveWxappRole(token);
+  if (!role) {
+    res.status(401).json({ error: 'Invalid or missing wxapp session' });
+    return;
+  }
+  req.wxappRole = role;
+  next();
+}
+
+// ── 登录 / 登出 ─────────────────────────────────────────────────────────
+app.post('/api/wxapp/login', (req, res) => {
+  const body = req.body || {};
+  const token = typeof body.token === 'string' ? body.token.trim() : '';
+  const role = resolveWxappRole(token);
+  if (!role) {
+    res.status(401).json({ error: 'token 无效或未在 Railway 配置' });
+    return;
+  }
+  setWxappSessionCookie(req, res, token);
+  res.json({ role });
+});
+
+app.post('/api/wxapp/logout', (req, res) => {
+  clearWxappSessionCookie(req, res);
+  res.status(204).end();
+});
+
+async function fetchProposalBySlug(slug) {
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/wxapp_proposal?slug=eq.${encodeURIComponent(slug)}&select=*&limit=1`,
+    { headers: feedbackHeaders() }
+  );
+  const arr = await res.json().catch(() => []);
+  if (!res.ok || !Array.isArray(arr) || arr.length === 0) return null;
+  return arr[0];
+}
+
+app.get('/api/wxapp/whoami', requireWxappRole, (req, res) => {
+  res.json({ role: req.wxappRole });
+});
+
+app.get('/api/wxapp/proposals', requireWxappRole, async (req, res) => {
+  if (!ensureSupabaseConfigured(res)) return;
+  try {
+    const params = new URLSearchParams({ select: '*', order: 'updated_at.desc' });
+    if (req.query.status && WXAPP_STATUSES.includes(req.query.status)) {
+      params.set('status', `eq.${req.query.status}`);
+    }
+    if (req.query.flow_group) {
+      params.set('flow_group', `eq.${cleanString(req.query.flow_group, 64)}`);
+    }
+    if (req.query.author_role && Object.keys(WXAPP_TOKENS).includes(req.query.author_role)) {
+      params.set('author_role', `eq.${req.query.author_role}`);
+    }
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/wxapp_proposal?${params}`, {
+      headers: feedbackHeaders(),
+    });
+    const payload = await response.json().catch(() => null);
+    if (!response.ok) {
+      res.status(response.status).json({ error: payload?.message || 'list failed' });
+      return;
+    }
+    res.json(payload || []);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/wxapp/proposals/:slug', requireWxappRole, async (req, res) => {
+  if (!ensureSupabaseConfigured(res)) return;
+  const slug = cleanString(req.params.slug, 128);
+  try {
+    const proposal = await fetchProposalBySlug(slug);
+    if (!proposal) { res.status(404).json({ error: 'proposal not found' }); return; }
+
+    const [revRes, cmRes, anRes] = await Promise.all([
+      fetch(`${SUPABASE_URL}/rest/v1/wxapp_proposal_revision?proposal_id=eq.${proposal.id}&select=*&order=created_at.desc`, { headers: feedbackHeaders() }),
+      fetch(`${SUPABASE_URL}/rest/v1/wxapp_comment?proposal_id=eq.${proposal.id}&select=*&order=created_at.asc`, { headers: feedbackHeaders() }),
+      fetch(`${SUPABASE_URL}/rest/v1/wxapp_annotation?proposal_id=eq.${proposal.id}&select=*&order=created_at.asc`, { headers: feedbackHeaders() }),
+    ]);
+    const [revisions, comments, annotations] = await Promise.all([
+      revRes.json().catch(() => []),
+      cmRes.json().catch(() => []),
+      anRes.json().catch(() => []),
+    ]);
+    res.json({ proposal, revisions, comments, annotations });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/wxapp/proposals', requireWxappRole, async (req, res) => {
+  if (!ensureSupabaseConfigured(res)) return;
+  const body = req.body || {};
+  const row = {
+    slug:               cleanString(body.slug, 128),
+    title:              cleanString(body.title, 256),
+    screen_name:        cleanString(body.screen_name, 128) || null,
+    flow_group:         cleanString(body.flow_group, 64) || null,
+    status:             WXAPP_STATUSES.includes(body.status) ? body.status : 'draft',
+    device_target:      WXAPP_DEVICE_TARGETS.includes(body.device_target) ? body.device_target : 'both',
+    original_image_url: cleanString(body.original_image_url, 2048) || null,
+    redesign_html:      String(body.redesign_html || '').slice(0, 50000),
+    redesign_css:       String(body.redesign_css || '').slice(0, 20000),
+    rationale:          String(body.rationale || '').slice(0, 20000),
+    author_role:        req.wxappRole,
+  };
+  if (!row.slug || !row.title) {
+    res.status(400).json({ error: 'slug and title are required' });
+    return;
+  }
+  // slug 简单合法性检查（防止 /a/b 路径注入）
+  if (!/^[a-z0-9][a-z0-9-_]{0,127}$/i.test(row.slug)) {
+    res.status(400).json({ error: 'slug must match [a-z0-9][a-z0-9-_]*' });
+    return;
+  }
+  try {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/wxapp_proposal`, {
+      method: 'POST',
+      headers: feedbackHeaders({
+        'Content-Type': 'application/json',
+        Prefer: 'return=representation',
+      }),
+      body: JSON.stringify(row),
+    });
+    const p = await r.json().catch(() => null);
+    if (!r.ok) {
+      res.status(r.status).json({ error: p?.message || 'create failed' });
+      return;
+    }
+    res.json(Array.isArray(p) ? p[0] : p);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.patch('/api/wxapp/proposals/:slug', requireWxappRole, async (req, res) => {
+  if (!ensureSupabaseConfigured(res)) return;
+  const slug = cleanString(req.params.slug, 128);
+  const body = req.body || {};
+  try {
+    const proposal = await fetchProposalBySlug(slug);
+    if (!proposal) { res.status(404).json({ error: 'proposal not found' }); return; }
+
+    // 若改稿正文/CSS/rationale 有变 → 先把旧版本快照到 revision
+    const contentChanged =
+      (body.redesign_html !== undefined && body.redesign_html !== proposal.redesign_html) ||
+      (body.redesign_css  !== undefined && body.redesign_css  !== proposal.redesign_css)  ||
+      (body.rationale     !== undefined && body.rationale     !== proposal.rationale);
+    if (contentChanged) {
+      await fetch(`${SUPABASE_URL}/rest/v1/wxapp_proposal_revision`, {
+        method: 'POST',
+        headers: feedbackHeaders({
+          'Content-Type': 'application/json',
+          Prefer: 'return=minimal',
+        }),
+        body: JSON.stringify({
+          proposal_id:   proposal.id,
+          redesign_html: proposal.redesign_html,
+          redesign_css:  proposal.redesign_css,
+          rationale:     proposal.rationale,
+          author_role:   proposal.author_role,
+        }),
+      }).catch(err => console.warn('[wxapp] revision snapshot failed:', err.message));
+    }
+
+    const patch = { updated_at: new Date().toISOString(), author_role: req.wxappRole };
+    const fields = ['title','screen_name','flow_group','status','device_target','original_image_url','redesign_html','redesign_css','rationale'];
+    for (const k of fields) {
+      if (body[k] !== undefined) patch[k] = body[k];
+    }
+    if (patch.status && !WXAPP_STATUSES.includes(patch.status)) {
+      res.status(400).json({ error: 'invalid status' });
+      return;
+    }
+    if (patch.device_target && !WXAPP_DEVICE_TARGETS.includes(patch.device_target)) {
+      res.status(400).json({ error: 'invalid device_target' });
+      return;
+    }
+    if (typeof patch.redesign_html === 'string') patch.redesign_html = patch.redesign_html.slice(0, 50000);
+    if (typeof patch.redesign_css  === 'string') patch.redesign_css  = patch.redesign_css.slice(0, 20000);
+    if (typeof patch.rationale     === 'string') patch.rationale     = patch.rationale.slice(0, 20000);
+
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/wxapp_proposal?id=eq.${proposal.id}`, {
+      method: 'PATCH',
+      headers: feedbackHeaders({
+        'Content-Type': 'application/json',
+        Prefer: 'return=representation',
+      }),
+      body: JSON.stringify(patch),
+    });
+    const p = await r.json().catch(() => null);
+    if (!r.ok) {
+      res.status(r.status).json({ error: p?.message || 'update failed' });
+      return;
+    }
+    res.json(Array.isArray(p) ? p[0] : p);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/wxapp/proposals/:slug/comments', requireWxappRole, async (req, res) => {
+  if (!ensureSupabaseConfigured(res)) return;
+  const slug = cleanString(req.params.slug, 128);
+  const body = req.body || {};
+  try {
+    const proposal = await fetchProposalBySlug(slug);
+    if (!proposal) { res.status(404).json({ error: 'proposal not found' }); return; }
+    const row = {
+      proposal_id: proposal.id,
+      author_role: req.wxappRole,
+      kind:        WXAPP_COMMENT_KINDS.includes(body.kind) ? body.kind : 'note',
+      body:        cleanString(body.body, 5000),
+    };
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/wxapp_comment`, {
+      method: 'POST',
+      headers: feedbackHeaders({
+        'Content-Type': 'application/json',
+        Prefer: 'return=representation',
+      }),
+      body: JSON.stringify(row),
+    });
+    const p = await r.json().catch(() => null);
+    if (!r.ok) {
+      res.status(r.status).json({ error: p?.message || 'comment failed' });
+      return;
+    }
+    res.json(Array.isArray(p) ? p[0] : p);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/wxapp/proposals/:slug/annotations', requireWxappRole, async (req, res) => {
+  if (!ensureSupabaseConfigured(res)) return;
+  const slug = cleanString(req.params.slug, 128);
+  const body = req.body || {};
+  try {
+    const proposal = await fetchProposalBySlug(slug);
+    if (!proposal) { res.status(404).json({ error: 'proposal not found' }); return; }
+    const row = {
+      proposal_id:     proposal.id,
+      author_role:     req.wxappRole,
+      shape:           WXAPP_ANNOTATION_SHAPES.includes(body.shape) ? body.shape : 'none',
+      svg_path:        cleanString(body.svg_path, 20000) || null,
+      target_selector: cleanString(body.target_selector, 256) || null,
+      device:          ['ios','android'].includes(body.device) ? body.device : 'ios',
+      anchor_x:        typeof body.anchor_x === 'number' ? body.anchor_x : null,
+      anchor_y:        typeof body.anchor_y === 'number' ? body.anchor_y : null,
+      comment:         cleanString(body.comment, 5000),
+      reaction:        WXAPP_REACTIONS.includes(body.reaction) ? body.reaction : null,
+    };
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/wxapp_annotation`, {
+      method: 'POST',
+      headers: feedbackHeaders({
+        'Content-Type': 'application/json',
+        Prefer: 'return=representation',
+      }),
+      body: JSON.stringify(row),
+    });
+    const p = await r.json().catch(() => null);
+    if (!r.ok) {
+      res.status(r.status).json({ error: p?.message || 'annotation failed' });
+      return;
+    }
+    res.json(Array.isArray(p) ? p[0] : p);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete('/api/wxapp/proposals/:slug/annotations/:id', requireWxappRole, async (req, res) => {
+  if (!ensureSupabaseConfigured(res)) return;
+  const id = cleanString(req.params.id, 64);
+  try {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/wxapp_annotation?id=eq.${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+      headers: feedbackHeaders({ Prefer: 'return=minimal' }),
+    });
+    if (!r.ok) {
+      const p = await r.json().catch(() => null);
+      res.status(r.status).json({ error: p?.message || 'delete failed' });
+      return;
+    }
+    res.status(204).end();
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.delete('/api/feedback', requireFeedbackWriteToken, async (req, res) => {
   if (!ensureSupabaseConfigured(res)) return;
   try {
@@ -248,9 +619,25 @@ app.use((req, res, next) => {
 // Serve site assets from the project root, but block internal project files.
 app.use((req, res, next) => {
   const pathname = decodeURIComponent(req.path);
-  if (/^\/(?:\.|[^/]+\.md|Dockerfile|package(?:-lock)?\.json|server\.js|docs(?:\/|$)|ai-bridge(?:\/|$)|telegram-agent-bridge(?:\/|$)|scripts(?:\/|$)|node_modules(?:\/|$)|data(?:\/|$))/i.test(pathname)) {
+  if (/^\/(?:\.|[^/]+\.md|Dockerfile|package(?:-lock)?\.json|server\.js|docs(?:\/|$)|feedback-archive(?:\/|$)|ai-bridge(?:\/|$)|telegram-agent-bridge(?:\/|$)|scripts(?:\/|$)|migrations(?:\/|$)|node_modules(?:\/|$)|data(?:\/|$))/i.test(pathname)) {
     res.status(404).send('Not found');
     return;
+  }
+  next();
+});
+
+// ── /wxapp/ 页面守卫 ────────────────────────────────────────────────────────
+// 没有有效 session cookie 时, /wxapp.html 和 /wxapp-detail.html 一律 404,
+// 让外人完全察觉不到沙箱存在。/wxapp-login.html 永远公开 (这是唯一入口)。
+// /wxapp.js 和 /wxapp.css 也保持公开因为登录页需要它们。
+app.use((req, res, next) => {
+  const pathname = decodeURIComponent(req.path);
+  if (/^\/wxapp(?:-detail)?\.html$/i.test(pathname)) {
+    const token = extractWxappToken(req);
+    if (!resolveWxappRole(token)) {
+      res.status(404).send('Not found');
+      return;
+    }
   }
   next();
 });

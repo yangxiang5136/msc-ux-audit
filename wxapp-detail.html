@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>小程序改稿 · 详情 · MSC.AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="wxapp.css">
+</head>
+<body data-wxapp-page="detail">
+
+<main class="wp-main">
+  <div class="wp-page-head" style="display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;">
+    <div style="flex:1;min-width:200px;">
+      <h1 id="wp-title">…</h1>
+      <p id="wp-screen"></p>
+    </div>
+    <div class="wp-device-toggle" style="display:flex;gap:4px;">
+      <button class="wp-chip active" data-device-toggle="both">双设备</button>
+      <button class="wp-chip" data-device-toggle="ios">仅 iOS</button>
+      <button class="wp-chip" data-device-toggle="android">仅 Android</button>
+    </div>
+  </div>
+
+  <div id="wp-detail-root" class="wp-detail">
+    <!-- 左：双画布 + 工具栏 -->
+    <div class="wp-stage">
+      <div class="wp-stage-tools">
+        <button class="wp-tool" data-tool="freehand" title="自由画笔">✏️</button>
+        <button class="wp-tool" data-tool="circle"   title="圆圈">⭕</button>
+        <button class="wp-tool" data-tool="arrow"    title="箭头">➤</button>
+        <button class="wp-tool" data-tool="rect"     title="矩形">▭</button>
+        <span class="wp-tool-sep"></span>
+        <button class="wp-tool" id="wp-edit-html"      title="编辑 HTML">{ }</button>
+        <button class="wp-tool" id="wp-edit-css"       title="编辑 CSS">CSS</button>
+        <button class="wp-tool" id="wp-edit-rationale" title="编辑改稿理由">📝</button>
+        <button class="wp-tool" id="wp-edit-image"     title="设置原截图 URL">🖼️</button>
+        <span style="margin-left:auto;font-size:11px;color:var(--t3);">选工具后在画布上拖拽 · 释放后会弹窗补充文本和表态</span>
+      </div>
+
+      <div class="wp-canvases">
+        <div class="wp-canvas-wrap" id="wp-wrap-ios">
+          <div class="wp-canvas-label">iOS · 375×812</div>
+          <div class="wp-canvas device-ios" id="wp-canvas-ios" data-device="ios">
+            <div class="wp-host" id="wp-host-ios"></div>
+          </div>
+        </div>
+        <div class="wp-canvas-wrap" id="wp-wrap-android">
+          <div class="wp-canvas-label">Android · 360×800</div>
+          <div class="wp-canvas device-android" id="wp-canvas-android" data-device="android">
+            <div class="wp-host" id="wp-host-android"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 右：信息 + 评论 + 历史 -->
+    <aside class="wp-side">
+      <section class="wp-panel">
+        <h3>状态</h3>
+        <div id="wp-status-controls" class="wp-status-controls"></div>
+      </section>
+
+      <section class="wp-panel">
+        <h3>元信息</h3>
+        <div id="wp-meta"></div>
+      </section>
+
+      <section class="wp-panel">
+        <h3>改稿理由</h3>
+        <div id="wp-rationale" class="wp-rationale"></div>
+      </section>
+
+      <section class="wp-panel">
+        <h3>评论流</h3>
+        <div id="wp-comments-list" class="wp-comments-list"></div>
+        <div class="wp-comment-compose">
+          <div id="wp-comment-kind" class="wp-kind-row">
+            <button class="wp-kind-chip active kind-note"    data-kind="note">💭 笔记</button>
+            <button class="wp-kind-chip kind-approve" data-kind="approve">✅ 采纳</button>
+            <button class="wp-kind-chip kind-reject"  data-kind="reject">❌ 拒绝</button>
+            <button class="wp-kind-chip kind-block"   data-kind="block">⛔ 阻塞</button>
+            <button class="wp-kind-chip kind-idea"    data-kind="idea">💡 想法</button>
+          </div>
+          <textarea id="wp-comment-body" placeholder="写一条评论…"></textarea>
+          <button id="wp-comment-submit" class="wp-btn-primary">发布评论</button>
+        </div>
+      </section>
+
+      <section class="wp-panel">
+        <h3>修订历史</h3>
+        <div id="wp-revisions-list" class="wp-revisions-list"></div>
+      </section>
+    </aside>
+  </div>
+</main>
+
+<script src="wxapp.js"></script>
+</body>
+</html>

@@ -4,6 +4,7 @@
   "description": "MSC.AI UX audit frontend with visitor IP geolocation tracking",
   "main": "server.js",
   "scripts": {
+    "archive:feedback": "node scripts/archive-feedback.mjs",
     "start": "node server.js"
   },
   "dependencies": {

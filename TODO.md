@@ -1,6 +1,6 @@
 # MSC.AI · 工作 TODO
 
-> Last updated: **2026-05-02** by Codex 「review fixes」
+> Last updated: **2026-05-15** by Claude (Cowork) 「/wxapp/ 微信小程序改稿协作框架上线」
 > Maintainer: Sean(co-founder · Product/UX/CTO)
 > 用法:任何 AI 工具开场先读 `AI_CONTEXT.md`,再读这个文件和 `changelog.html` 最新版本块,即可对齐当前战场
 
@@ -10,9 +10,9 @@
 
 > 这是 *本周* 真正在做的 1-3 件事。其他都是辅助。
 
-1. **消化辛总 13 条反馈,启动 chatJ v7.10 战略再校准** · 核心修正 3 条:GitHub 比喻太小 / 创造 vs 依赖 / B/C 不分述
-2. **chatK 交易平台 UI 改版**(待 v7.10 战略定稿后启动)· 含支线 A/B/C 三个 v7.9.0 遗留同步任务
-3. **建立反馈永久存档机制** · 解决 Supabase 覆盖写入导致历史反馈丢失的根因问题
+1. **微信小程序客户端打磨 · /wxapp/ 框架部署** · 代码已 push,等 Sean 跑 SQL 迁移 + 加 4 个 token env var + 验证线上端到端
+2. **消化辛总 13 条反馈,启动 chatJ v7.10 战略再校准** · 核心修正 3 条:GitHub 比喻太小 / 创造 vs 依赖 / B/C 不分述
+3. **chatK 交易平台 UI 改版**(待 v7.10 战略定稿后启动)· 含支线 A/B/C 三个 v7.9.0 遗留同步任务
 
 ---
 
@@ -51,10 +51,27 @@
 
 ### 工程层(Railway · Supabase · 小程序)
 
-- [ ] **反馈永久存档机制 · 层级 1**(立即止血)
-  - [ ] /feedback-archive/ 目录建立
-  - [ ] 今天 (msc-feedback-2026-04-24.json) 作为第一份存档推上去
-  - [ ] 制定"每次导出 → 立即归档"流程
+- [~] **微信小程序 · /wxapp/ 改稿协作框架**(2026-05-15 创建)
+  - [x] migrations/wxapp_001.sql · 4 张表 + RLS
+  - [x] server.js · /api/wxapp/* 全套接口 + 4 角色 token 中间件
+  - [x] wxapp.html / wxapp-detail.html / wxapp-login.html · 三个页面
+  - [x] wxapp.js · Shadow DOM 渲染 + SVG 画笔 + 锚定算法 + Supabase 客户端
+  - [x] wxapp.css · 沿用 dark theme + 角色色彩系统
+  - [x] docs/wxapp-workflow.md · 工作流文档
+  - [x] docs/uiux-reference-will.md · Will Notion UIUX 库参考报告
+  - [ ] **Sean 跑 SQL 迁移**(Supabase SQL Editor)
+  - [ ] **Sean 加 4 个 env var**(Railway: WXAPP_TOKEN_SEAN/UIUX/ENG/CEO)
+  - [ ] **Sean 验证线上端到端**:登录 → 新建一条 → 改 HTML → 加批注 → 评论 → 切状态 → 看 revision
+  - [ ] 分发 token 给 Wang / 工程师 / 辛总
+  - [ ] 第一条真实改稿:Sean 截一张小程序图,跑完一遍工作流验证 UX
+- [ ] **下一阶段:截屏 skill 原型**(iPhone Mirroring + 区域绑定 + 自动粘贴) · 框架部署稳定后做
+- [ ] **decisions.html 加 wxapp tab** · 小程序改稿决策聚合
+- [ ] **npm run archive:wxapp** · 改稿快照永久存档(参考 archive:feedback)
+
+- [~] **反馈永久存档机制 · 层级 1**(立即止血)
+  - [x] /feedback-archive/ 目录建立
+  - [ ] 首份真实反馈 JSON 归档(需要浏览器导出文件或 FEEDBACK_READ_TOKEN)
+  - [x] 制定"每次导出 → 立即归档"流程(`npm run archive:feedback`)
 - [ ] **反馈永久存档机制 · 层级 2**(主动防御)· 下周再决定做不做
   - [ ] Supabase 改为 append-only feedback_log 表
   - [ ] fb.js 补全所有 fb 块的 data-ver 属性
@@ -77,7 +94,7 @@
 
 ## 🗓️ 短期(本周内)
 
-- [ ] 把今天这份 feedback JSON 归档到 GitHub
+- [ ] 拿到浏览器导出文件或 FEEDBACK_READ_TOKEN 后，归档首份真实 feedback JSON 到 `feedback-archive/`
 - [ ] 启动 v7.10 战略 chat
 - [ ] 准备和辛总对齐通话的提纲(基于 13 条反馈)
 
@@ -101,11 +118,11 @@
 
 ## 📝 最近重要决策(滚动 5 条)
 
+- **2026-05-15** · /wxapp/ 微信小程序改稿协作框架落地 · 4 角色 token + 4 Supabase 表 + Shadow DOM + SVG 画笔 · 壳页一次部署后零重新部署 · 同时引入 docs/uiux-reference-will.md 作为主流 UIUX 设计理念参考
+- **2026-05-04** · 反馈永久存档机制落地：`feedback-archive/` + `npm run archive:feedback` · 真实首份归档待导出文件或 read token
 - **2026-05-02** · Codex 本地修复 5 个 P1/P2 review finding · 待本地浏览器验证后再决定是否 merge
 - **2026-04-28** · 启用 TODO.md 工作流 · 替代记忆碎片化 · 每个 chat 开场 fetch + 结尾 update
 - **2026-04-24** · 辛总反馈 13 条到位 · 战略需要 v7.10 重写 · 不是局部调整是世界观修正
-- **2026-04-23** · chatJ v7.9.0 上线 · 14 章 · 21 反馈点 · 4 决策点 · 同时修复 fb.js toggle bug
-- **2026-04-23** · Railway 部署模式确认为 Node/Express 容器(不是静态托管)· server.js + Dockerfile 已知 · 推送时注意 server.js 防御
 
 ---
 
