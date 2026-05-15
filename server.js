@@ -342,7 +342,7 @@ app.get('/api/wxapp/proposals/:slug', requireWxappRole, async (req, res) => {
       fetch(`${SUPABASE_URL}/rest/v1/wxapp_proposal_revision?proposal_id=eq.${proposal.id}&select=*&order=created_at.desc`, { headers: feedbackHeaders() }),
       fetch(`${SUPABASE_URL}/rest/v1/wxapp_comment?proposal_id=eq.${proposal.id}&select=*&order=created_at.asc`, { headers: feedbackHeaders() }),
       fetch(`${SUPABASE_URL}/rest/v1/wxapp_annotation?proposal_id=eq.${proposal.id}&select=*&order=created_at.asc`, { headers: feedbackHeaders() }),
-      fetch(`${SUPABASE_URL}/rest/v1/wxapp_screenshot?proposal_id=eq.${proposal.id}&select=id,caption,author_role,byte_size,mime_type,data_uri,created_at&order=created_at.desc`, { headers: feedbackHeaders() }),
+      fetch(`${SUPABASE_URL}/rest/v1/wxapp_screenshot?proposal_id=eq.${proposal.id}&select=id,caption,author_role,byte_size,mime_type,data_uri,section,created_at&order=created_at.desc`, { headers: feedbackHeaders() }),
     ]);
     const [revisions, comments, annotations, screenshots] = await Promise.all([
       revRes.json().catch(() => []),
