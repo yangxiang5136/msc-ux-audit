@@ -21,6 +21,32 @@
   const KIND_ICONS   = { note:'💭', approve:'✅', reject:'❌', block:'⛔', idea:'💡' };
   const SHAPE_LABELS = { freehand:'画笔', circle:'圆圈', arrow:'箭头', rect:'矩形', none:'标记' };
 
+  // 设备尺寸预设 · 主流机型
+  const DEVICE_PRESETS = {
+    ios: [
+      { id: 'iphone-se',       label: 'iPhone SE',           w: 320, h: 568 },
+      { id: 'iphone-13',       label: 'iPhone 13/14',         w: 375, h: 812 },
+      { id: 'iphone-15',       label: 'iPhone 15/16',         w: 393, h: 852 },
+      { id: 'iphone-15-plus',  label: 'iPhone 15/16 Plus',    w: 430, h: 932 },
+    ],
+    android: [
+      { id: 'android-compact', label: 'Android 紧凑',         w: 360, h: 640 },
+      { id: 'android-standard',label: 'Android 标准',         w: 360, h: 800 },
+      { id: 'android-large',   label: 'Android 大屏',         w: 412, h: 915 },
+    ],
+  };
+  const DEVICE_SIZE_KEY = 'wxapp_device_sizes';
+  function loadDeviceSizes() {
+    try {
+      const raw = localStorage.getItem(DEVICE_SIZE_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch {}
+    return { ios: { w: 375, h: 812, presetId: 'iphone-13' }, android: { w: 360, h: 800, presetId: 'android-standard' } };
+  }
+  function saveDeviceSizes(sizes) {
+    try { localStorage.setItem(DEVICE_SIZE_KEY, JSON.stringify(sizes)); } catch {}
+  }
+
   /* ── Auth · cookie session + 角色 ────────────────────────────────────── */
   const ROLE_KEY = 'wxapp_role';
   const wpAuth = {
@@ -204,6 +230,7 @@
       activeGroup: null,
       activeShape: null,
       role: 'sean',
+      transformAbort: null,   // AbortController · 防止 transform 监听器累积
     },
 
     setTool(tool) { this.state.tool = tool; },
@@ -405,8 +432,14 @@
      * onTransformEnd(newTransformData): 提交回调 (松手)
      */
     renderTransformHandles(canvasEl, annotation, onTransform, onTransformEnd) {
-      // 先清掉旧的
+      // 关键修复 · 清掉旧 listener 防止累积导致拖拽漂移
+      if (this.state.transformAbort) {
+        try { this.state.transformAbort.abort(); } catch {}
+        this.state.transformAbort = null;
+      }
+      // 先清掉旧 DOM 元素
       canvasEl.querySelectorAll('.wp-transform-box, .wp-transform-handle').forEach(n => n.remove());
+      if (!annotation) return;
 
       const g = canvasEl.querySelector(`g.wp-annot-group[data-annotation-id="${annotation.id}"]`);
       if (!g) return;
@@ -700,6 +733,7 @@
       filter: 'all',
       selectedId: null,
       deviceMode: 'both', // 'both' | 'ios' | 'android'
+      deviceSizes: loadDeviceSizes(),
     };
 
     /* ── 加载 ──────────────────────────────────────────────────────── */
@@ -756,33 +790,48 @@
       $('#wp-rationale').textContent = p.rationale || '（暂无理由说明）';
     }
 
-    /* ── 截图带 ─────────────────────────────────────────────────── */
+    /* ── 截图带 · 横滑导航 ────────────────────────────────────── */
     function renderScreenshots() {
       const list = $('#wp-screenshots-list');
-      list.innerHTML = '';
-      state.screenshots.forEach(s => {
-        const card = el('div', { class: 'wp-screenshot-card' }, [
-          el('img', { src: s.data_uri, alt: s.caption || '' }),
-          el('div', { class: 'wp-sc-author' },
-            (ROLE_LABELS[s.author_role] || s.author_role || '—') + (s.caption ? ' · ' + s.caption : '')),
-        ]);
+      const upload = $('#wp-screenshot-upload-label');
+      // 清掉除 upload 之外所有 (保留 input)
+      Array.from(list.children).forEach(c => { if (c !== upload) c.remove(); });
+
+      // ① 功能/页面名 pill · 粘在最左
+      const titlePill = el('div', { class: 'wp-title-pill', title: state.proposal.slug },
+        state.proposal.title || state.proposal.slug);
+      list.insertBefore(titlePill, list.firstChild);
+
+      // ② 截图 · 反转使新的在右 (最新上传紧靠 upload 按钮)
+      const shots = state.screenshots.slice().reverse();
+      shots.forEach((s, idx) => {
+        const num = idx + 1;
+        const card = el('div', { class: 'wp-screenshot-card' });
+        card.dataset.screenshotId = s.id;
+
+        card.appendChild(el('img', { src: s.data_uri, alt: s.caption || '' }));
+        card.appendChild(el('span', { class: 'wp-sc-num' }, String(num)));
+        card.appendChild(el('div', { class: 'wp-sc-author' },
+          (ROLE_LABELS[s.author_role] || s.author_role || '—') + (s.caption ? ' · ' + s.caption : '')));
+
         const del = el('button', { class: 'wp-sc-del', title: '删除' }, '×');
         del.addEventListener('click', async (e) => {
           e.stopPropagation();
-          if (!confirm('删除这张截图？')) return;
-          try {
-            await wpApi.deleteScreenshot(slug, s.id);
-            toast('已删除', 'success');
-            await load();
-          } catch (err) { toast(err.message, 'error'); }
+          if (!confirm('删除截图 #' + num + '?')) return;
+          try { await wpApi.deleteScreenshot(slug, s.id); toast('已删除', 'success'); await load(); }
+          catch (err) { toast(err.message, 'error'); }
         });
         card.appendChild(del);
-        // 点击放大预览（简易版）
+
+        // 点击 · 滚动到屏幕中央 + 大图预览
         card.addEventListener('click', () => {
+          card.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
           const w = window.open();
-          if (w) w.document.body.innerHTML = `<img src="${s.data_uri}" style="max-width:100%">`;
+          if (w) w.document.body.innerHTML = `<title>#${num} · ${escapeHtml(s.caption || '')}</title><img src="${s.data_uri}" style="max-width:100%">`;
         });
-        list.appendChild(card);
+
+        // 插入到 upload 按钮之前 (upload 永远在最右)
+        list.insertBefore(card, upload);
       });
     }
 
@@ -845,19 +894,19 @@
       const annComments = state.comments.filter(c => c.annotation_id === a.id);
       const card = el('div', { class: 'wp-fb-card role-' + role + (state.selectedId === a.id ? ' selected' : '') });
       card.dataset.annotationId = a.id;
-      card.addEventListener('click', () => {
-        state.selectedId = (state.selectedId === a.id) ? null : a.id;
-        render();
-      });
 
-      // 头部
-      const head = el('div', { class: 'wp-fb-head' }, [
+      // 头部 · 只在 head 切换 selectedId (避免点击 textarea/button 等子元素时误触发收起)
+      const head = el('div', { class: 'wp-fb-head', style: { cursor: 'pointer' } }, [
         el('span', { class: 'wp-fb-num role-' + role }, String(displayIdx)),
         el('span', { class: 'wp-fb-shape-tag' }, SHAPE_LABELS[a.shape] || '标记'),
         el('span', { class: 'wp-role-pill role-' + role, style: { fontSize: '10px', padding: '1px 6px' } },
           ROLE_LABELS[role] || role),
         el('span', { class: 'wp-fb-time' }, fmtTime(a.created_at) + ' · ' + (a.device === 'android' ? 'Android' : 'iOS')),
       ]);
+      head.addEventListener('click', () => {
+        state.selectedId = (state.selectedId === a.id) ? null : a.id;
+        render();
+      });
       card.appendChild(head);
 
       // 文本（原 annotation.comment 字段）
@@ -1053,7 +1102,59 @@
       wpAnnot.attachDrawing(andCv, () => wpAuth.getRole(), onComplete(andCv, 'android'));
     }
 
-    /* ── 设备显隐切换 ─────────────────────────────────────────── */
+    /* ── 设备显隐切换 + 尺寸预设 ──────────────────────────────── */
+    function applyDeviceSizes() {
+      const sizes = state.deviceSizes;
+      const iosCv  = $('#wp-canvas-ios');
+      const andCv  = $('#wp-canvas-android');
+      iosCv.style.width  = sizes.ios.w + 'px';
+      iosCv.style.height = sizes.ios.h + 'px';
+      andCv.style.width  = sizes.android.w + 'px';
+      andCv.style.height = sizes.android.h + 'px';
+      // 更新尺寸标签
+      const iosLabel = $('#wp-wrap-ios .wp-canvas-label');
+      const andLabel = $('#wp-wrap-android .wp-canvas-label');
+      if (iosLabel) iosLabel.textContent = `iOS · ${sizes.ios.w}×${sizes.ios.h}`;
+      if (andLabel) andLabel.textContent = `Android · ${sizes.android.w}×${sizes.android.h}`;
+    }
+
+    function renderDeviceSizePickers() {
+      const iosSel = $('#wp-ios-size-select');
+      const andSel = $('#wp-android-size-select');
+      if (!iosSel || iosSel.children.length > 0) return; // 只填一次
+      DEVICE_PRESETS.ios.forEach(p => iosSel.appendChild(el('option', { value: p.id }, `${p.label} · ${p.w}×${p.h}`)));
+      iosSel.appendChild(el('option', { value: 'custom' }, '自定义…'));
+      DEVICE_PRESETS.android.forEach(p => andSel.appendChild(el('option', { value: p.id }, `${p.label} · ${p.w}×${p.h}`)));
+      andSel.appendChild(el('option', { value: 'custom' }, '自定义…'));
+      iosSel.value = state.deviceSizes.ios.presetId || 'iphone-13';
+      andSel.value = state.deviceSizes.android.presetId || 'android-standard';
+
+      iosSel.addEventListener('change', () => handleSizeChange('ios', iosSel.value));
+      andSel.addEventListener('change', () => handleSizeChange('android', andSel.value));
+    }
+
+    function handleSizeChange(platform, presetId) {
+      let w, h;
+      if (presetId === 'custom') {
+        const cur = state.deviceSizes[platform];
+        const wIn = prompt(`${platform.toUpperCase()} 自定义宽度 (px):`, String(cur.w || 375));
+        if (wIn === null) { renderDeviceSizePickers(); return; }
+        const hIn = prompt(`${platform.toUpperCase()} 自定义高度 (px):`, String(cur.h || 812));
+        if (hIn === null) return;
+        w = Math.max(120, Math.min(800, parseInt(wIn, 10) || 375));
+        h = Math.max(200, Math.min(1400, parseInt(hIn, 10) || 812));
+      } else {
+        const preset = DEVICE_PRESETS[platform].find(p => p.id === presetId);
+        if (!preset) return;
+        w = preset.w; h = preset.h;
+      }
+      state.deviceSizes[platform] = { w, h, presetId };
+      saveDeviceSizes(state.deviceSizes);
+      applyDeviceSizes();
+      // 重渲染让 transform handles 跟新尺寸对齐
+      render();
+    }
+
     function bindDeviceToggle() {
       $$('.wp-device-toggle [data-device-toggle]').forEach(b => b.addEventListener('click', () => {
         const mode = b.dataset.deviceToggle;
@@ -1062,6 +1163,8 @@
         $('#wp-wrap-ios').style.display     = (mode === 'android') ? 'none' : '';
         $('#wp-wrap-android').style.display = (mode === 'ios') ? 'none' : '';
       }));
+      renderDeviceSizePickers();
+      applyDeviceSizes();
     }
 
     /* ── 全局评论 compose ────────────────────────────────────── */
@@ -1079,29 +1182,67 @@
       });
     }
 
-    /* ── 截图上传 ────────────────────────────────────────────── */
+    /* ── 截图上传 · 三通道：选文件 / 拖拽 / 粘贴 ──────────────────── */
+    async function _uploadImageFile(file, source) {
+      if (!file || !file.type || !file.type.startsWith('image/')) {
+        toast('只能上传图片', 'error'); return;
+      }
+      try {
+        const dataUri = await fileToDataUri(file);
+        const base64Body = dataUri.split(',')[1] || '';
+        const bytes = base64Body.length * 0.75;
+        if (bytes > 700 * 1024) {
+          toast(`图片过大 (${Math.round(bytes/1024)}KB) · 上限 500KB · 请压缩`, 'error'); return;
+        }
+        // 粘贴/拖拽默认带 source 备注 · 不再每次弹 prompt
+        const caption = (source ? `[${source}] ` : '') + new Date().toLocaleString('zh-CN', { hour:'2-digit', minute:'2-digit' });
+        await wpApi.uploadScreenshot(slug, dataUri, caption);
+        toast('截图已上传 · 来源 ' + (source || '文件'), 'success');
+        await load();
+      } catch (err) { toast(err.message, 'error'); }
+    }
+
     function bindScreenshotUpload() {
+      // 通道 1: 文件选择
       const input = $('#wp-screenshot-input');
       input.addEventListener('change', async (e) => {
         const f = e.target.files && e.target.files[0];
         if (!f) return;
-        if (!f.type.startsWith('image/')) { toast('只能上传图片', 'error'); return; }
-        try {
-          const dataUri = await fileToDataUri(f);
-          // 简单估算大小
-          const base64Body = dataUri.split(',')[1] || '';
-          const bytes = base64Body.length * 0.75;
-          if (bytes > 700 * 1024) {
-            toast(`图片过大 (${Math.round(bytes/1024)}KB) · 上限 500KB · 请压缩后再传`, 'error');
-            input.value = '';
-            return;
+        await _uploadImageFile(f, '文件选择');
+        input.value = '';
+      });
+
+      // 通道 2: 拖拽到 upload 区
+      const uploadLabel = $('#wp-screenshot-upload-label');
+      ['dragenter','dragover'].forEach(ev =>
+        uploadLabel.addEventListener(ev, (e) => { e.preventDefault(); uploadLabel.classList.add('dragover'); })
+      );
+      ['dragleave','drop'].forEach(ev =>
+        uploadLabel.addEventListener(ev, (e) => { e.preventDefault(); uploadLabel.classList.remove('dragover'); })
+      );
+      uploadLabel.addEventListener('drop', async (e) => {
+        e.preventDefault();
+        const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+        if (f) await _uploadImageFile(f, '拖拽');
+      });
+
+      // 通道 3: 粘贴 (⌘V 任何位置都能上传)
+      document.addEventListener('paste', async (e) => {
+        // 如果焦点在 textarea / input · 不抢粘贴
+        const t = document.activeElement;
+        if (t && (t.tagName === 'TEXTAREA' || t.tagName === 'INPUT')) return;
+        const items = e.clipboardData && e.clipboardData.items;
+        if (!items) return;
+        for (let i = 0; i < items.length; i++) {
+          if (items[i].type && items[i].type.startsWith('image/')) {
+            const file = items[i].getAsFile();
+            if (file) {
+              e.preventDefault();
+              await _uploadImageFile(file, '剪贴板粘贴');
+              return;
+            }
           }
-          const caption = prompt('给这张截图加一句备注（回车跳过）:') || '';
-          await wpApi.uploadScreenshot(slug, dataUri, caption);
-          toast('截图已上传', 'success');
-          input.value = '';
-          await load();
-        } catch (err) { toast(err.message, 'error'); }
+        }
       });
     }
 

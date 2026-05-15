@@ -241,8 +241,10 @@ button { font-family: inherit; cursor: pointer; }
   overflow: hidden;
   box-shadow: 0 20px 60px rgba(0,0,0,.4);
 }
+/* 默认尺寸 · 实际尺寸由 JS inline style 设置，可通过设备尺寸选择器切换 */
 .wp-canvas.device-ios     { width: 375px; height: 812px; }
 .wp-canvas.device-android { width: 360px; height: 800px; }
+.wp-canvas { transition: width .2s, height .2s; }
 
 /* Shadow DOM 寄存元素 · 实际内容由 JS 注入 */
 .wp-host {
@@ -446,48 +448,106 @@ button { font-family: inherit; cursor: pointer; }
  * v2 · 反馈工作流重构（2026-05-15）
  * ============================================================================ */
 
-/* ── 截图上传带 ─────────────────────────────────────────────────────────── */
+/* ── 截图导航带 v2 · title pill 粘左 + 截图反转新在右 + upload 粘右 ─── */
 .wp-screenshots-strip {
-  display: flex; gap: 10px; align-items: stretch;
   margin-bottom: 16px;
-  overflow-x: auto;
-  padding-bottom: 4px;
+  border: 1px solid var(--brd);
+  border-radius: 10px;
+  background: var(--bg2);
+  overflow: hidden;
 }
-.wp-screenshots-list { display: flex; gap: 10px; }
+.wp-screenshots-list {
+  display: flex; gap: 8px;
+  padding: 8px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  align-items: center;
+  min-height: 130px;
+  /* iOS/macOS 弹性滚动 + 隐藏垂直滚动条干扰 */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* title pill · 粘在最左 */
+.wp-title-pill {
+  flex-shrink: 0;
+  font-size: 13px; font-weight: 700;
+  color: var(--t1);
+  padding: 8px 14px;
+  background: var(--bg3);
+  border-radius: 7px;
+  white-space: nowrap;
+  max-width: 200px;
+  overflow: hidden; text-overflow: ellipsis;
+  position: sticky; left: 8px;
+  z-index: 3;
+  box-shadow: 6px 0 8px -6px rgba(0,0,0,0.5);
+}
+
 .wp-screenshot-card {
   position: relative; flex-shrink: 0;
-  width: 80px; height: 120px;
+  width: 78px; height: 114px;
   border-radius: 8px; overflow: hidden;
   border: 1px solid var(--brd);
   background: var(--bg);
+  cursor: pointer;
 }
-.wp-screenshot-card img { width: 100%; height: 100%; object-fit: cover; }
+.wp-screenshot-card img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.wp-sc-num {
+  position: absolute; top: 4px; left: 4px;
+  min-width: 22px; height: 22px; padding: 0 5px;
+  background: rgba(0,0,0,.7); color: #fff;
+  border-radius: 999px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 800;
+  backdrop-filter: blur(4px);
+  z-index: 2;
+}
 .wp-screenshot-card .wp-sc-del {
   position: absolute; top: 4px; right: 4px;
   width: 20px; height: 20px; border-radius: 999px;
   background: rgba(248,113,113,.9); color: #fff;
   border: 0; font-size: 11px; font-weight: 700;
   display: none; align-items: center; justify-content: center;
-  cursor: pointer;
+  cursor: pointer; z-index: 2;
 }
 .wp-screenshot-card:hover .wp-sc-del { display: flex; }
 .wp-screenshot-card .wp-sc-author {
   position: absolute; bottom: 0; left: 0; right: 0;
   padding: 3px 6px;
-  background: linear-gradient(to top, rgba(0,0,0,.7), transparent);
+  background: linear-gradient(to top, rgba(0,0,0,.75), transparent);
   color: #fff; font-size: 9px; font-weight: 600;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 
+/* upload · 粘在最右 · 不参与横滑 */
 .wp-screenshot-upload {
   flex-shrink: 0;
-  width: 80px; height: 120px;
+  width: 78px; height: 114px;
   border-radius: 8px; border: 1.5px dashed var(--brd2);
+  background: var(--bg2);
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
   color: var(--t3); font-size: 11px;
   cursor: pointer; transition: all .15s;
+  position: sticky; right: 8px;
+  z-index: 3;
+  box-shadow: -6px 0 8px -6px rgba(0,0,0,0.5);
 }
-.wp-screenshot-upload:hover { border-color: var(--role-uiux); color: var(--role-uiux); }
+.wp-screenshot-upload:hover,
+.wp-screenshot-upload.dragover {
+  border-color: var(--role-uiux);
+  color: var(--role-uiux);
+  background: rgba(52,211,153,.08);
+}
 .wp-screenshot-upload .wp-up-icon { font-size: 22px; }
+
+/* 设备尺寸选择器 */
+.wp-size-select {
+  background: var(--bg); color: var(--t1);
+  border: 1px solid var(--brd2); border-radius: 7px;
+  padding: 5px 8px; font-size: 12px; font-family: inherit;
+  cursor: pointer;
+}
+.wp-size-select:hover { border-color: var(--brd3); }
 
 /* ── 工具栏 hint 文本 ──────────────────────────────────────────────────── */
 .wp-tool-hint {

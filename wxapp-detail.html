@@ -16,6 +16,12 @@
       <h1 id="wp-title">…</h1>
       <p id="wp-screen"></p>
     </div>
+    <div class="wp-size-pickers" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+      <label style="font-size:11px;color:var(--t3);font-weight:600;letter-spacing:1px;">iOS</label>
+      <select id="wp-ios-size-select" class="wp-size-select"></select>
+      <label style="font-size:11px;color:var(--t3);font-weight:600;letter-spacing:1px;">Android</label>
+      <select id="wp-android-size-select" class="wp-size-select"></select>
+    </div>
     <div class="wp-device-toggle" style="display:flex;gap:4px;">
       <button class="wp-chip active" data-device-toggle="both">双设备</button>
       <button class="wp-chip" data-device-toggle="ios">仅 iOS</button>
@@ -26,14 +32,17 @@
   <div id="wp-detail-root" class="wp-detail">
     <!-- 左：截图带 + 画布工具栏 + 双画布 -->
     <div class="wp-stage">
-      <!-- 截图带 · 任何角色都能上传辅助截图 -->
+      <!-- 截图带 · 横滑导航 · 任何角色都能上传辅助截图 -->
+      <!-- 结构：[title pill 粘左] [截图1] [截图2] ... [截图N 最新] [上传 粘右] -->
+      <!-- 三种上传方式：点 + 拖拽到 upload 区 + 全页面 ⌘V 粘贴 -->
       <div class="wp-screenshots-strip" id="wp-screenshots-strip">
-        <div class="wp-screenshots-list" id="wp-screenshots-list"></div>
-        <label class="wp-screenshot-upload" id="wp-screenshot-upload-label" title="上传辅助截图（最大 500KB）">
-          <input type="file" id="wp-screenshot-input" accept="image/*" hidden>
-          <span class="wp-up-icon">＋</span>
-          <span>上传截图</span>
-        </label>
+        <div class="wp-screenshots-list" id="wp-screenshots-list">
+          <label class="wp-screenshot-upload" id="wp-screenshot-upload-label" title="点选 / 拖拽 / 或全页 ⌘V 粘贴（最大 500KB）">
+            <input type="file" id="wp-screenshot-input" accept="image/*" hidden>
+            <span class="wp-up-icon">＋</span>
+            <span>上传 / ⌘V</span>
+          </label>
+        </div>
       </div>
 
       <!-- 画布工具栏 · 精简版 -->
