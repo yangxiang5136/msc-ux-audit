@@ -1005,16 +1005,17 @@
         await load();
       });
 
-      const subSpan = el('span', { class: 'wp-tp-sub' }, subitemName || '主体');
-      // 只有非默认子项才允许编辑 section 名 (默认子项 = 空字符串, 改名相当于新建)
+      const subSpan = el('span', { class: 'wp-tp-sub' }, subitemName || '未分类');
+      // 只有非默认子项才允许 inline 改名
       if (state.activeSection !== '') {
         makeEditable(subSpan, async (v, oldName) => {
           if (!v) throw new Error('子项名不能为空');
           await renameSection(oldName, v);
         });
       } else {
-        subSpan.style.opacity = '0.5';
-        subSpan.title = '默认子项 · 不可改名 · 通过下拉菜单新建独立子项';
+        subSpan.style.opacity = '0.55';
+        subSpan.style.fontStyle = 'italic';
+        subSpan.title = '默认子项 · 通过右侧下拉菜单新建独立子项';
       }
 
       const chevronBtn = el('span', { class: 'wp-tp-arrow', title: '点击切换/新建子项' });

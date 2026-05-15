@@ -489,22 +489,23 @@ button { font-family: inherit; cursor: pointer; }
   border-color: var(--brd3);
 }
 .wp-tp-text {
-  display: flex; flex-direction: column; gap: 2px;
-  max-width: 200px;
+  display: flex; flex-direction: column; gap: 1px;
+  max-width: 220px;
 }
+/* 上行 = proposal.title · 背景上下文 · 小字辅助色 */
 .wp-tp-label {
-  font-size: 14px; font-weight: 700; color: var(--t1);
-  line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden; text-overflow: ellipsis;
-}
-.wp-tp-sub {
-  font-size: 11px; color: var(--t2); font-weight: 500;
-  line-height: 1.2;
+  font-size: 11px; font-weight: 500; color: var(--t3);
+  line-height: 1.25;
   letter-spacing: .2px;
   white-space: nowrap;
   overflow: hidden; text-overflow: ellipsis;
-  max-width: 200px;
+}
+/* 下行 = section 名 · 当前焦点 · 大字主色 */
+.wp-tp-sub {
+  font-size: 15px; font-weight: 700; color: var(--t1);
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis;
 }
 .wp-tp-arrow {
   flex-shrink: 0;
