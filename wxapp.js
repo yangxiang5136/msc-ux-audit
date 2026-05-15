@@ -839,6 +839,23 @@
         : null;
       return byId || visible[visible.length - 1];   // 默认最新一张 (反转后右侧)
     }
+    // 算某个 screenshot 在当前 section 里的编号 (与截图带左→右编号一致)
+    function getScreenshotNumber(id) {
+      if (!id) return null;
+      const shots = state.screenshots.filter(inSection).slice().reverse();
+      const idx = shots.findIndex(s => s.id === id);
+      return idx >= 0 ? idx + 1 : null;
+    }
+    // 跳转到指定 screenshot · 设为激活 + 滚动到中央
+    function jumpToScreenshot(id) {
+      if (!id) return;
+      setActiveScreenshot(id);
+      render();
+      setTimeout(() => {
+        const card = document.querySelector(`.wp-screenshot-card[data-screenshot-id="${id}"]`);
+        if (card) card.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      }, 80);
+    }
 
     /* ── 加载 ──────────────────────────────────────────────────────── */
     async function load() {
@@ -1040,8 +1057,8 @@
     function renderStatusFilter() {
       const wrap = $('#wp-status-filter');
       wrap.innerHTML = '';
-      // 只算当前 section + 当前截图下的 annotation
-      const visibleAnns = state.annotations.filter(a => inSection(a) && inActiveScreenshot(a));
+      // 统计跟反馈流一致 · 当前 section 跨所有截图
+      const visibleAnns = state.annotations.filter(inSection);
       const counts = { all: visibleAnns.length, draft: 0, review: 0, accepted: 0, rejected: 0, shipped: 0 };
       visibleAnns.forEach(a => { counts[a.status || 'draft'] = (counts[a.status || 'draft'] || 0) + 1; });
       const mk = (key, label) => {
@@ -1065,8 +1082,9 @@
       const stream = $('#wp-feedback-stream');
       stream.innerHTML = '';
 
-      // 反馈流: 当前 section + 当前截图 + 状态 filter
-      const baseAnns = state.annotations.filter(a => inSection(a) && inActiveScreenshot(a));
+      // 反馈流: 当前 section 跨截图 · 用 #N 徽章标识归属 · 点击徽章跳转
+      // (画布上仍然只显示当前截图的标记 · 见 render() 里的 visibleAnns)
+      const baseAnns = state.annotations.filter(inSection);
       const visibleAnns = state.filter === 'all'
         ? baseAnns
         : baseAnns.filter(a => (a.status || 'draft') === state.filter);
@@ -1097,15 +1115,29 @@
       const card = el('div', { class: 'wp-fb-card role-' + role + (state.selectedId === a.id ? ' selected' : '') });
       card.dataset.annotationId = a.id;
 
-      // 头部 · 只在 head 切换 selectedId (避免点击 textarea/button 等子元素时误触发收起)
+      // 头部 · 包含 #N 截图引用 (点击跳转到那张截图)
+      const screenshotNum = getScreenshotNumber(a.screenshot_id);
+      const screenshotBadge = (screenshotNum != null) ? el('span', {
+        class: 'wp-fb-shot-ref',
+        title: '点击跳转到这张截图',
+      }, '📷 #' + screenshotNum) : null;
+      if (screenshotBadge) {
+        screenshotBadge.addEventListener('click', (e) => {
+          e.stopPropagation();
+          jumpToScreenshot(a.screenshot_id);
+        });
+      }
+
       const head = el('div', { class: 'wp-fb-head', style: { cursor: 'pointer' } }, [
         el('span', { class: 'wp-fb-num role-' + role }, String(displayIdx)),
         el('span', { class: 'wp-fb-shape-tag' }, SHAPE_LABELS[a.shape] || '标记'),
+        screenshotBadge,
         el('span', { class: 'wp-role-pill role-' + role, style: { fontSize: '10px', padding: '1px 6px' } },
           ROLE_LABELS[role] || role),
         el('span', { class: 'wp-fb-time' }, fmtTime(a.created_at) + ' · ' + (a.device === 'android' ? 'Android' : 'iOS')),
       ]);
-      head.addEventListener('click', () => {
+      head.addEventListener('click', (e) => {
+        // 点截图徽章已经 stopPropagation, 这里只处理 head 其他区域
         state.selectedId = (state.selectedId === a.id) ? null : a.id;
         render();
       });
