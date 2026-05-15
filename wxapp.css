@@ -441,3 +441,263 @@ button { font-family: inherit; cursor: pointer; }
   vertical-align: middle;
 }
 @keyframes wp-spin { to { transform: rotate(360deg); } }
+
+/* ============================================================================
+ * v2 · 反馈工作流重构（2026-05-15）
+ * ============================================================================ */
+
+/* ── 截图上传带 ─────────────────────────────────────────────────────────── */
+.wp-screenshots-strip {
+  display: flex; gap: 10px; align-items: stretch;
+  margin-bottom: 16px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+.wp-screenshots-list { display: flex; gap: 10px; }
+.wp-screenshot-card {
+  position: relative; flex-shrink: 0;
+  width: 80px; height: 120px;
+  border-radius: 8px; overflow: hidden;
+  border: 1px solid var(--brd);
+  background: var(--bg);
+}
+.wp-screenshot-card img { width: 100%; height: 100%; object-fit: cover; }
+.wp-screenshot-card .wp-sc-del {
+  position: absolute; top: 4px; right: 4px;
+  width: 20px; height: 20px; border-radius: 999px;
+  background: rgba(248,113,113,.9); color: #fff;
+  border: 0; font-size: 11px; font-weight: 700;
+  display: none; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+.wp-screenshot-card:hover .wp-sc-del { display: flex; }
+.wp-screenshot-card .wp-sc-author {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 3px 6px;
+  background: linear-gradient(to top, rgba(0,0,0,.7), transparent);
+  color: #fff; font-size: 9px; font-weight: 600;
+}
+
+.wp-screenshot-upload {
+  flex-shrink: 0;
+  width: 80px; height: 120px;
+  border-radius: 8px; border: 1.5px dashed var(--brd2);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  color: var(--t3); font-size: 11px;
+  cursor: pointer; transition: all .15s;
+}
+.wp-screenshot-upload:hover { border-color: var(--role-uiux); color: var(--role-uiux); }
+.wp-screenshot-upload .wp-up-icon { font-size: 22px; }
+
+/* ── 工具栏 hint 文本 ──────────────────────────────────────────────────── */
+.wp-tool-hint {
+  margin-left: auto; font-size: 11px; color: var(--t3);
+  line-height: 1.4;
+}
+
+/* ── 状态筛选条 ────────────────────────────────────────────────────────── */
+.wp-status-filter {
+  display: flex; flex-wrap: wrap; gap: 5px;
+}
+.wp-status-filter .wp-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-weight: 600;
+}
+.wp-status-filter .wp-chip .count {
+  font-size: 10px; opacity: .7;
+  background: rgba(255,255,255,.08);
+  padding: 1px 6px; border-radius: 999px;
+}
+.wp-status-filter .wp-chip.active.s-draft     { background: rgba(139,149,168,.18); color: var(--st-draft); border-color: var(--st-draft); }
+.wp-status-filter .wp-chip.active.s-review    { background: rgba(251,191,36,.15);  color: var(--st-review); border-color: var(--st-review); }
+.wp-status-filter .wp-chip.active.s-accepted  { background: rgba(52,211,153,.15);  color: var(--st-accepted); border-color: var(--st-accepted); }
+.wp-status-filter .wp-chip.active.s-rejected  { background: rgba(248,113,113,.15); color: var(--st-rejected); border-color: var(--st-rejected); }
+.wp-status-filter .wp-chip.active.s-shipped   { background: rgba(167,139,250,.15); color: var(--st-shipped); border-color: var(--st-shipped); }
+
+/* ── 反馈流卡片 ────────────────────────────────────────────────────────── */
+.wp-feedback-stream {
+  display: flex; flex-direction: column; gap: 12px;
+  max-height: 60vh; overflow-y: auto; padding-right: 4px;
+}
+
+.wp-fb-card {
+  border: 1px solid var(--brd); border-radius: 10px;
+  background: var(--bg);
+  padding: 10px 12px;
+  transition: all .15s;
+}
+.wp-fb-card.selected { border-color: var(--role-sean); box-shadow: 0 0 0 2px rgba(96,165,250,.2); }
+.wp-fb-card.role-sean { border-left: 3px solid var(--role-sean); }
+.wp-fb-card.role-uiux { border-left: 3px solid var(--role-uiux); }
+.wp-fb-card.role-eng  { border-left: 3px solid var(--role-eng); }
+.wp-fb-card.role-ceo  { border-left: 3px solid var(--role-ceo); }
+.wp-fb-card.dimmed { opacity: .3; }
+
+.wp-fb-head {
+  display: flex; align-items: center; gap: 6px; font-size: 11px;
+  margin-bottom: 6px;
+}
+.wp-fb-num {
+  width: 20px; height: 20px; border-radius: 999px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-weight: 800; color: #fff; font-size: 11px;
+  flex-shrink: 0;
+}
+.wp-fb-num.role-sean { background: var(--role-sean); }
+.wp-fb-num.role-uiux { background: var(--role-uiux); }
+.wp-fb-num.role-eng  { background: var(--role-eng); }
+.wp-fb-num.role-ceo  { background: var(--role-ceo); }
+
+.wp-fb-shape-tag {
+  font-size: 10px; padding: 1px 6px; border-radius: 4px;
+  background: var(--bg3); color: var(--t2); font-weight: 600;
+}
+.wp-fb-time { margin-left: auto; color: var(--t4); }
+
+.wp-fb-body {
+  font-size: 13px; color: var(--t1); line-height: 1.5;
+  white-space: pre-wrap; word-break: break-word;
+  margin-bottom: 8px;
+}
+
+.wp-fb-status-row {
+  display: flex; gap: 4px; flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+.wp-fb-status-row .wp-status-pill {
+  font-size: 10px; padding: 2px 7px; border-radius: 999px;
+  border: 1px solid var(--brd2);
+  background: transparent; color: var(--t3);
+  cursor: pointer; transition: all .15s;
+}
+.wp-fb-status-row .wp-status-pill:hover { color: var(--t1); border-color: var(--brd3); }
+.wp-fb-status-row .wp-status-pill.active.s-draft    { background: var(--st-draft);    color: #000; border-color: var(--st-draft); font-weight: 700; }
+.wp-fb-status-row .wp-status-pill.active.s-review   { background: var(--st-review);   color: #000; border-color: var(--st-review); font-weight: 700; }
+.wp-fb-status-row .wp-status-pill.active.s-accepted { background: var(--st-accepted); color: #000; border-color: var(--st-accepted); font-weight: 700; }
+.wp-fb-status-row .wp-status-pill.active.s-rejected { background: var(--st-rejected); color: #000; border-color: var(--st-rejected); font-weight: 700; }
+.wp-fb-status-row .wp-status-pill.active.s-shipped  { background: var(--st-shipped);  color: #000; border-color: var(--st-shipped); font-weight: 700; }
+
+.wp-fb-actions {
+  display: flex; gap: 6px; margin-top: 4px;
+}
+.wp-fb-actions button {
+  font-size: 11px; padding: 3px 8px;
+  border-radius: 6px; border: 1px solid var(--brd2);
+  background: transparent; color: var(--t2);
+}
+.wp-fb-actions button:hover { color: var(--t1); border-color: var(--brd3); }
+.wp-fb-actions .wp-fb-delete:hover { color: var(--role-ceo); border-color: var(--role-ceo); }
+
+/* 嵌套回复 */
+.wp-fb-replies {
+  margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--brd);
+  display: flex; flex-direction: column; gap: 6px;
+}
+.wp-fb-reply {
+  padding: 6px 8px; border-radius: 6px;
+  background: rgba(255,255,255,.02);
+  font-size: 12px;
+  display: flex; gap: 6px; flex-direction: column;
+}
+.wp-fb-reply-head { display: flex; align-items: center; gap: 6px; font-size: 10px; }
+.wp-fb-reply-head .wp-role-pill { font-size: 9px; padding: 1px 5px; }
+.wp-fb-reply-body { color: var(--t1); white-space: pre-wrap; word-break: break-word; }
+
+.wp-fb-reply-compose {
+  display: none; flex-direction: column; gap: 6px;
+  margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--brd);
+}
+.wp-fb-reply-compose.shown { display: flex; }
+.wp-fb-reply-compose textarea {
+  background: var(--bg2); color: var(--t1);
+  border: 1px solid var(--brd2); border-radius: 6px;
+  padding: 6px 8px; font-size: 12px; font-family: inherit;
+  resize: vertical; min-height: 44px;
+}
+.wp-fb-reply-actions { display: flex; gap: 6px; align-items: center; }
+
+/* ── 变换把手（选中 annotation 时） ──────────────────────────────────── */
+.wp-transform-box {
+  position: absolute;
+  border: 1.5px dashed rgba(96,165,250,.85);
+  pointer-events: none;
+  z-index: 5;
+}
+.wp-transform-handle {
+  position: absolute;
+  width: 12px; height: 12px;
+  background: #fff;
+  border: 2px solid var(--role-sean);
+  border-radius: 3px;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+  z-index: 6;
+}
+.wp-transform-handle.h-rotate { border-radius: 999px; cursor: crosshair; background: var(--role-sean); }
+.wp-transform-handle.h-move {
+  width: 26px; height: 26px;
+  background: rgba(96,165,250,.20);
+  border-color: rgba(96,165,250,.6);
+  border-radius: 999px;
+  cursor: move;
+}
+
+/* ── <details> 折叠面板 ──────────────────────────────────────────────── */
+details.wp-panel { padding: 0; }
+details.wp-panel > summary {
+  list-style: none; cursor: pointer; user-select: none;
+  padding: 14px 16px;
+  display: flex; align-items: center; gap: 8px;
+}
+details.wp-panel > summary::-webkit-details-marker { display: none; }
+details.wp-panel > summary::before {
+  content: '▶'; font-size: 9px; color: var(--t4);
+  transition: transform .15s;
+  width: 12px; display: inline-block;
+}
+details.wp-panel[open] > summary::before { transform: rotate(90deg); }
+details.wp-panel > summary > h3 { margin: 0; padding: 0; border: 0; }
+details.wp-panel > *:not(summary) {
+  padding: 0 16px 16px;
+}
+
+/* edit-proposal panel buttons */
+.wp-edit-buttons {
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+.wp-edit-buttons button {
+  flex: 1; min-width: 110px;
+  padding: 8px 10px; border-radius: 7px;
+  border: 1px solid var(--brd2); background: var(--bg);
+  color: var(--t2); font-size: 12px;
+  cursor: pointer;
+}
+.wp-edit-buttons button:hover { color: var(--t1); border-color: var(--brd3); }
+
+/* compose area */
+.wp-comment-compose {
+  display: flex; flex-direction: column; gap: 8px;
+  margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--brd);
+}
+.wp-comment-compose textarea {
+  background: var(--bg); color: var(--t1);
+  border: 1px solid var(--brd2); border-radius: 8px;
+  padding: 8px 10px; font-size: 12px; font-family: inherit;
+  resize: vertical; min-height: 50px;
+}
+.wp-comment-compose-mini { display:flex; gap:8px; align-items:center; }
+.wp-comment-compose-mini > select {
+  background: var(--bg); color: var(--t1);
+  border: 1px solid var(--brd2); border-radius: 7px;
+  padding: 6px 8px; font-size: 12px; font-family: inherit;
+}
+.wp-comment-compose-mini button { flex: 1; }
+
+.wp-hint { font-size: 10px; font-weight: 400; color: var(--t4); margin-left: 8px; letter-spacing: 0; text-transform: none; }
+
+/* annotation 的 SVG group 容器: 应用 transform */
+.wp-annot-svg .wp-annot-group {
+  transform-origin: center;
+  transition: transform .12s;
+}
+.wp-annot-svg .wp-annot-group.dragging { transition: none; }

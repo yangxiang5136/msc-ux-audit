@@ -88,7 +88,11 @@ Do not assume memory from a prior chat is current. Trust the repo files and `git
 - If an AI makes a meaningful code or content change, update this file before handing off.
 - If a change affects users, strategy, visible site content, or deployment assumptions, also update `TODO.md` or `changelog.html` as appropriate.
 
-## /wxapp/ Module Rules (added 2026-05-15, auth hardened later same day)
+## /wxapp/ Module Rules (added 2026-05-15, auth hardened + v2 feedback refactor same day)
+
+**v2 重构 (2026-05-15 evening)**: annotation 升级为决策单位（自带 status + transform_data）;评论可挂到 annotation 形成 threaded reply;新增 wxapp_screenshot 表（任何角色上传辅助截图 base64）;表态从 annotation 移到 comment.kind;UI 重排（status filter → 反馈流 → 折叠面板渐进披露）;工具完成一条自动停用;反馈可删除/可拖拽缩放旋转。变更见 migrations/wxapp_002.sql。
+
+
 
 - **Auth model = HTTP-only cookie session + 404-on-miss page guard.**
 - `/wxapp.html` and `/wxapp-detail.html` return **404 (not 401)** when no valid `wxapp_session` cookie → sandbox is invisible to outsiders.

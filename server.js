@@ -8,7 +8,8 @@ const path    = require('path');
 const app  = express();
 const PORT = process.env.PORT || 8080;
 
-app.use(express.json({ limit: '64kb' }));
+// body limit · 提升到 2mb 以接收 wxapp 上传的截图 (base64 编码后, 500KB 原图约 700KB)
+app.use(express.json({ limit: '2mb' }));
 
 // ── Persistent log file ──────────────────────────────────────────────────────
 // Railway mounts the /data volume here; fall back to a local file in dev.
@@ -40,6 +41,8 @@ const WXAPP_DEVICE_TARGETS = ['ios', 'android', 'both'];
 const WXAPP_COMMENT_KINDS = ['note', 'approve', 'reject', 'block', 'idea'];
 const WXAPP_ANNOTATION_SHAPES = ['freehand', 'circle', 'arrow', 'rect', 'none'];
 const WXAPP_REACTIONS = ['approve', 'reject', 'block', 'idea', 'note'];
+const WXAPP_SCREENSHOT_MAX_BYTES = 700 * 1024;  // 700KB base64 (~500KB raw)
+const WXAPP_SCREENSHOT_DATA_URI_RE = /^data:image\/(png|jpeg|jpg|gif|webp);base64,/i;
 
 function ensureDataDir() {
   try {
@@ -335,17 +338,19 @@ app.get('/api/wxapp/proposals/:slug', requireWxappRole, async (req, res) => {
     const proposal = await fetchProposalBySlug(slug);
     if (!proposal) { res.status(404).json({ error: 'proposal not found' }); return; }
 
-    const [revRes, cmRes, anRes] = await Promise.all([
+    const [revRes, cmRes, anRes, scRes] = await Promise.all([
       fetch(`${SUPABASE_URL}/rest/v1/wxapp_proposal_revision?proposal_id=eq.${proposal.id}&select=*&order=created_at.desc`, { headers: feedbackHeaders() }),
       fetch(`${SUPABASE_URL}/rest/v1/wxapp_comment?proposal_id=eq.${proposal.id}&select=*&order=created_at.asc`, { headers: feedbackHeaders() }),
       fetch(`${SUPABASE_URL}/rest/v1/wxapp_annotation?proposal_id=eq.${proposal.id}&select=*&order=created_at.asc`, { headers: feedbackHeaders() }),
+      fetch(`${SUPABASE_URL}/rest/v1/wxapp_screenshot?proposal_id=eq.${proposal.id}&select=id,caption,author_role,byte_size,mime_type,data_uri,created_at&order=created_at.desc`, { headers: feedbackHeaders() }),
     ]);
-    const [revisions, comments, annotations] = await Promise.all([
+    const [revisions, comments, annotations, screenshots] = await Promise.all([
       revRes.json().catch(() => []),
       cmRes.json().catch(() => []),
       anRes.json().catch(() => []),
+      scRes.json().catch(() => []),
     ]);
-    res.json({ proposal, revisions, comments, annotations });
+    res.json({ proposal, revisions, comments, annotations, screenshots });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -470,10 +475,11 @@ app.post('/api/wxapp/proposals/:slug/comments', requireWxappRole, async (req, re
     const proposal = await fetchProposalBySlug(slug);
     if (!proposal) { res.status(404).json({ error: 'proposal not found' }); return; }
     const row = {
-      proposal_id: proposal.id,
-      author_role: req.wxappRole,
-      kind:        WXAPP_COMMENT_KINDS.includes(body.kind) ? body.kind : 'note',
-      body:        cleanString(body.body, 5000),
+      proposal_id:   proposal.id,
+      annotation_id: typeof body.annotation_id === 'string' && body.annotation_id ? body.annotation_id : null,
+      author_role:   req.wxappRole,
+      kind:          WXAPP_COMMENT_KINDS.includes(body.kind) ? body.kind : 'note',
+      body:          cleanString(body.body, 5000),
     };
     const r = await fetch(`${SUPABASE_URL}/rest/v1/wxapp_comment`, {
       method: 'POST',
@@ -511,7 +517,9 @@ app.post('/api/wxapp/proposals/:slug/annotations', requireWxappRole, async (req,
       anchor_x:        typeof body.anchor_x === 'number' ? body.anchor_x : null,
       anchor_y:        typeof body.anchor_y === 'number' ? body.anchor_y : null,
       comment:         cleanString(body.comment, 5000),
-      reaction:        WXAPP_REACTIONS.includes(body.reaction) ? body.reaction : null,
+      reaction:        null,                                // v2: 表态从 annotation 移到 comment
+      status:          WXAPP_STATUSES.includes(body.status) ? body.status : 'draft',
+      transform_data:  body.transform_data && typeof body.transform_data === 'object' ? body.transform_data : {},
     };
     const r = await fetch(`${SUPABASE_URL}/rest/v1/wxapp_annotation`, {
       method: 'POST',
@@ -532,6 +540,54 @@ app.post('/api/wxapp/proposals/:slug/annotations', requireWxappRole, async (req,
   }
 });
 
+// v2: PATCH annotation · 更新 status / transform_data / comment 文本
+app.patch('/api/wxapp/proposals/:slug/annotations/:id', requireWxappRole, async (req, res) => {
+  if (!ensureSupabaseConfigured(res)) return;
+  const id = cleanString(req.params.id, 64);
+  const body = req.body || {};
+  const patch = {};
+  if (body.status !== undefined) {
+    if (!WXAPP_STATUSES.includes(body.status)) {
+      res.status(400).json({ error: 'invalid status' });
+      return;
+    }
+    patch.status = body.status;
+  }
+  if (body.transform_data !== undefined && typeof body.transform_data === 'object') {
+    patch.transform_data = body.transform_data;
+  }
+  if (body.comment !== undefined) {
+    patch.comment = String(body.comment).slice(0, 5000);
+  }
+  if (body.svg_path !== undefined) {
+    patch.svg_path = String(body.svg_path).slice(0, 20000);
+  }
+  if (body.anchor_x !== undefined && typeof body.anchor_x === 'number') patch.anchor_x = body.anchor_x;
+  if (body.anchor_y !== undefined && typeof body.anchor_y === 'number') patch.anchor_y = body.anchor_y;
+  if (Object.keys(patch).length === 0) {
+    res.status(400).json({ error: 'no patch fields' });
+    return;
+  }
+  try {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/wxapp_annotation?id=eq.${encodeURIComponent(id)}`, {
+      method: 'PATCH',
+      headers: feedbackHeaders({
+        'Content-Type': 'application/json',
+        Prefer: 'return=representation',
+      }),
+      body: JSON.stringify(patch),
+    });
+    const p = await r.json().catch(() => null);
+    if (!r.ok) {
+      res.status(r.status).json({ error: p?.message || 'annotation patch failed' });
+      return;
+    }
+    res.json(Array.isArray(p) ? p[0] : p);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.delete('/api/wxapp/proposals/:slug/annotations/:id', requireWxappRole, async (req, res) => {
   if (!ensureSupabaseConfigured(res)) return;
   const id = cleanString(req.params.id, 64);
@@ -543,6 +599,72 @@ app.delete('/api/wxapp/proposals/:slug/annotations/:id', requireWxappRole, async
     if (!r.ok) {
       const p = await r.json().catch(() => null);
       res.status(r.status).json({ error: p?.message || 'delete failed' });
+      return;
+    }
+    res.status(204).end();
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// v2: screenshot 上传 / 列表 / 删除 ───────────────────────────────────────
+app.post('/api/wxapp/proposals/:slug/screenshots', requireWxappRole, async (req, res) => {
+  if (!ensureSupabaseConfigured(res)) return;
+  const slug = cleanString(req.params.slug, 128);
+  const body = req.body || {};
+  const dataUri = String(body.data_uri || '');
+  if (!WXAPP_SCREENSHOT_DATA_URI_RE.test(dataUri)) {
+    res.status(400).json({ error: 'data_uri must be data:image/<png|jpeg|jpg|gif|webp>;base64,...' });
+    return;
+  }
+  const base64Body = dataUri.split(',')[1] || '';
+  const byteSize = Math.floor(base64Body.length * 0.75);  // 估算解码后字节数
+  if (byteSize > WXAPP_SCREENSHOT_MAX_BYTES) {
+    res.status(400).json({ error: `screenshot too big: ${byteSize}B > ${WXAPP_SCREENSHOT_MAX_BYTES}B 上限。请压缩到 500KB 内。` });
+    return;
+  }
+  try {
+    const proposal = await fetchProposalBySlug(slug);
+    if (!proposal) { res.status(404).json({ error: 'proposal not found' }); return; }
+    const mimeMatch = dataUri.match(/^data:(image\/[a-z]+);base64,/i);
+    const row = {
+      proposal_id: proposal.id,
+      data_uri:    dataUri,
+      mime_type:   mimeMatch ? mimeMatch[1].toLowerCase() : 'image/png',
+      caption:     cleanString(body.caption, 200) || null,
+      author_role: req.wxappRole,
+      byte_size:   byteSize,
+    };
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/wxapp_screenshot`, {
+      method: 'POST',
+      headers: feedbackHeaders({
+        'Content-Type': 'application/json',
+        Prefer: 'return=representation',
+      }),
+      body: JSON.stringify(row),
+    });
+    const p = await r.json().catch(() => null);
+    if (!r.ok) {
+      res.status(r.status).json({ error: p?.message || 'screenshot upload failed' });
+      return;
+    }
+    res.json(Array.isArray(p) ? p[0] : p);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete('/api/wxapp/proposals/:slug/screenshots/:id', requireWxappRole, async (req, res) => {
+  if (!ensureSupabaseConfigured(res)) return;
+  const id = cleanString(req.params.id, 64);
+  try {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/wxapp_screenshot?id=eq.${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+      headers: feedbackHeaders({ Prefer: 'return=minimal' }),
+    });
+    if (!r.ok) {
+      const p = await r.json().catch(() => null);
+      res.status(r.status).json({ error: p?.message || 'screenshot delete failed' });
       return;
     }
     res.status(204).end();

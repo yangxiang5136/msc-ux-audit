@@ -22,8 +22,22 @@
 页面：
 
 - `/wxapp.html` · 改稿列表（缩略图墙 + 状态/作者筛选 + 进度统计）
-- `/wxapp-detail.html?slug=...` · 详情页（双设备画布 + 工具栏 + 评论流 + 修订历史）
+- `/wxapp-detail.html?slug=...` · 详情页（双设备画布 + 截图带 + 反馈流 + 折叠面板）
 - `/wxapp-login.html` · token 登录与角色显示
+
+**v2 重构（2026-05-15）**：
+
+| 旧版 | v2 |
+|---|---|
+| proposal.status 是主决策单位 | annotation.status 是主决策单位（每条反馈自带生命周期）|
+| 画完工具一直激活 | 完成一条反馈 → 工具自动停用（一次一条节奏）|
+| 反馈含表态字段 | 表态从 annotation 移到 comment（评论按 kind 区分） |
+| 反馈不可删/不可编辑 | 反馈卡可删/可改文本/可拖拽缩放旋转（变换 handle）|
+| 评论是 proposal 级 | 评论可挂到具体 annotation 上（threaded reply）|
+| 元信息固定显示 | 元信息/编辑/历史折叠（`<details>` 渐进披露）|
+| 状态栏控制 proposal | 状态栏 = 反馈流+画布的过滤器 |
+| 只能填 image URL | 任何角色都能拖拽上传截图（base64 in DB · 500KB 上限）|
+| pin 重叠看不清 | pin 自动错位避免重叠 |
 
 API（全部要 cookie 或 `x-wxapp-token` header · 一般用前者）：
 
