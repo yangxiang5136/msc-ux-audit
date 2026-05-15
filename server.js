@@ -8,8 +8,8 @@ const path    = require('path');
 const app  = express();
 const PORT = process.env.PORT || 8080;
 
-// body limit · 提升到 2mb 以接收 wxapp 上传的截图 (base64 编码后, 500KB 原图约 700KB)
-app.use(express.json({ limit: '2mb' }));
+// body limit · 提升到 8mb 接收 wxapp 截图 (base64 编码后, 3MB 原图约 4MB)
+app.use(express.json({ limit: '8mb' }));
 
 // ── Persistent log file ──────────────────────────────────────────────────────
 // Railway mounts the /data volume here; fall back to a local file in dev.
@@ -41,7 +41,7 @@ const WXAPP_DEVICE_TARGETS = ['ios', 'android', 'both'];
 const WXAPP_COMMENT_KINDS = ['note', 'approve', 'reject', 'block', 'idea'];
 const WXAPP_ANNOTATION_SHAPES = ['freehand', 'circle', 'arrow', 'rect', 'none'];
 const WXAPP_REACTIONS = ['approve', 'reject', 'block', 'idea', 'note'];
-const WXAPP_SCREENSHOT_MAX_BYTES = 700 * 1024;  // 700KB base64 (~500KB raw)
+const WXAPP_SCREENSHOT_MAX_BYTES = 4 * 1024 * 1024;  // 4MB base64 (~3MB 原图) · iPhone Pro Max 截图也能装下
 const WXAPP_SCREENSHOT_DATA_URI_RE = /^data:image\/(png|jpeg|jpg|gif|webp);base64,/i;
 
 function ensureDataDir() {
@@ -620,7 +620,9 @@ app.post('/api/wxapp/proposals/:slug/screenshots', requireWxappRole, async (req,
   const base64Body = dataUri.split(',')[1] || '';
   const byteSize = Math.floor(base64Body.length * 0.75);  // 估算解码后字节数
   if (byteSize > WXAPP_SCREENSHOT_MAX_BYTES) {
-    res.status(400).json({ error: `screenshot too big: ${byteSize}B > ${WXAPP_SCREENSHOT_MAX_BYTES}B 上限。请压缩到 500KB 内。` });
+    const mb = (byteSize / 1024 / 1024).toFixed(1);
+    const max = (WXAPP_SCREENSHOT_MAX_BYTES / 1024 / 1024).toFixed(0);
+    res.status(400).json({ error: `screenshot 过大: ${mb}MB > ${max}MB 上限。请压缩或裁剪后重试。` });
     return;
   }
   try {

@@ -1191,8 +1191,9 @@
         const dataUri = await fileToDataUri(file);
         const base64Body = dataUri.split(',')[1] || '';
         const bytes = base64Body.length * 0.75;
-        if (bytes > 700 * 1024) {
-          toast(`图片过大 (${Math.round(bytes/1024)}KB) · 上限 500KB · 请压缩`, 'error'); return;
+        const MAX_RAW = 3 * 1024 * 1024;  // 3MB 原图 · 已覆盖 iPhone Pro Max 截图
+        if (bytes > MAX_RAW) {
+          toast(`图片过大 (${(bytes/1024/1024).toFixed(1)}MB) · 上限 3MB · 请压缩或裁剪`, 'error'); return;
         }
         // 粘贴/拖拽默认带 source 备注 · 不再每次弹 prompt
         const caption = (source ? `[${source}] ` : '') + new Date().toLocaleString('zh-CN', { hour:'2-digit', minute:'2-digit' });
