@@ -92,6 +92,11 @@ Do not assume memory from a prior chat is current. Trust the repo files and `git
 
 **v2 重构 (2026-05-15 evening)**: annotation 升级为决策单位（自带 status + transform_data）;评论可挂到 annotation 形成 threaded reply;新增 wxapp_screenshot 表（任何角色上传辅助截图 base64）;表态从 annotation 移到 comment.kind;UI 重排（status filter → 反馈流 → 折叠面板渐进披露）;工具完成一条自动停用;反馈可删除/可拖拽缩放旋转。变更见 migrations/wxapp_002.sql。
 
+**v2.1 (2026-05-15 late)**:
+- 登录页 form 监听 click + submit + Enter 三种事件（修手机虚拟键盘「完成/前往」触 submit 但前端只听 click 的静默失败）。token 输入框加 `name="password"` 让手机密码管理器能保存。
+- 新建改稿不再问 slug。前端只 prompt 标题；服务端收到空 slug 自动生成 `p-{ts36}-{rnd36}`（如 `p-lwd9q-jk7a`）。`POST /api/wxapp/proposals` 现在 title 必填，slug 可选。
+- 详情页加 `@media (max-width: 768px)` 极简模式：隐藏画笔工具栏 / 双画布 / 右侧栏 / 设备尺寸选择器 / Hammerspoon 按钮；保留可点击循环的状态徽章 + 可编辑标题 + 96×144 大缩略图截图带。手机端等价于"看 + 上传截图 + 改状态"。
+
 
 
 - **Auth model = HTTP-only cookie session + 404-on-miss page guard.**

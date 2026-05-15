@@ -726,17 +726,27 @@
     const status = $('#wp-login-status');
     const cur = await wpAuth.verify();
     if (cur) status.textContent = `已登录: ${ROLE_LABELS[cur] || cur} · 30 天免重输`;
-    btnLogin.addEventListener('click', async (e) => {
-      e.preventDefault();
+    let loggingIn = false;
+    async function doLogin() {
+      if (loggingIn) return;
       const t = tokenIn.value.trim();
       if (!t) return toast('请输入 token', 'error');
+      loggingIn = true;
       try {
         const role = await wpAuth.login(t);
         toast(`欢迎, ${ROLE_LABELS[role] || role}`, 'success');
         tokenIn.value = '';
         const next = new URLSearchParams(location.search).get('next') || 'wxapp.html';
         setTimeout(() => location.href = next, 500);
-      } catch (err) { toast(err.message, 'error'); }
+      } catch (err) {
+        toast(err.message, 'error');
+        loggingIn = false;
+      }
+    }
+    form.addEventListener('submit', (e) => { e.preventDefault(); doLogin(); });
+    btnLogin.addEventListener('click', (e) => { e.preventDefault(); doLogin(); });
+    tokenIn.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); doLogin(); }
     });
     btnLogout.addEventListener('click', async () => {
       await wpAuth.logout();
@@ -848,14 +858,14 @@
     }));
     $('#wp-search')?.addEventListener('input', (e) => { filters.q = e.target.value; load(); });
     $('#wp-btn-new')?.addEventListener('click', async () => {
-      const slug = prompt('改稿 slug (英文短码, 例如 asset-detail-v1):');
-      if (!slug) return;
       const title = prompt('改稿标题:');
       if (!title) return;
       try {
-        await wpApi.create({ slug, title, status: 'draft' });
+        const created = await wpApi.create({ title, status: 'draft' });
+        const newSlug = created?.slug;
+        if (!newSlug) { toast('创建成功但未拿到 slug', 'error'); return; }
         toast('已创建, 进入编辑…', 'success');
-        setTimeout(() => location.href = 'wxapp-detail.html?slug=' + encodeURIComponent(slug), 500);
+        setTimeout(() => location.href = 'wxapp-detail.html?slug=' + encodeURIComponent(newSlug), 500);
       } catch (e) { toast(e.message, 'error'); }
     });
     load();

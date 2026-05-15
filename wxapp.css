@@ -943,3 +943,70 @@ details.wp-panel > *:not(summary) {
   transition: transform .12s;
 }
 .wp-annot-svg .wp-annot-group.dragging { transition: none; }
+
+/* ────────────────────────────────────────────────────────────────────────
+ * 详情页 · 手机端极简模式 (max-width: 768px)
+ * 只保留: 状态徽章 (可点击循环) · 标题 (可编辑) · 截图带 (突出 96×144 缩略图)
+ * 隐藏: 画笔/工具栏 · 双设备画布 · 右侧栏 · 设备尺寸选择器 · Hammerspoon 按钮
+ * ──────────────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  body[data-wxapp-page="detail"] .wp-size-pickers,
+  body[data-wxapp-page="detail"] .wp-device-toggle,
+  body[data-wxapp-page="detail"] #wp-bind-hammerspoon,
+  body[data-wxapp-page="detail"] .wp-stage-tools,
+  body[data-wxapp-page="detail"] .wp-canvases,
+  body[data-wxapp-page="detail"] .wp-side {
+    display: none !important;
+  }
+
+  body[data-wxapp-page="detail"] .wp-detail {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  body[data-wxapp-page="detail"] .wp-stage {
+    background: transparent;
+    border: 0;
+    padding: 0;
+    min-height: 0;
+  }
+  body[data-wxapp-page="detail"] .wp-page-head {
+    margin-bottom: 16px;
+    gap: 8px;
+  }
+  body[data-wxapp-page="detail"] .wp-page-head h1 {
+    font-size: 20px;
+  }
+
+  /* 状态徽章 · 加大点击目标 */
+  body[data-wxapp-page="detail"] #wp-proposal-status {
+    font-size: 13px;
+    padding: 8px 14px;
+    min-height: 38px;
+  }
+
+  /* 截图带 · 突出 · 96×144 缩略图 */
+  body[data-wxapp-page="detail"] .wp-screenshots-strip {
+    margin-bottom: 0;
+    border-width: 1.5px;
+  }
+  body[data-wxapp-page="detail"] .wp-screenshots-list {
+    min-height: 160px;
+    padding: 12px;
+    gap: 10px;
+  }
+  body[data-wxapp-page="detail"] .wp-screenshot-card {
+    width: 96px;
+    height: 144px;
+    border-width: 1.5px;
+  }
+  body[data-wxapp-page="detail"] .wp-screenshot-upload {
+    width: 96px;
+    height: 144px;
+    margin-left: 16px;
+    border-width: 2px;
+    font-size: 12px;
+  }
+  body[data-wxapp-page="detail"] .wp-screenshot-upload .wp-up-icon {
+    font-size: 28px;
+  }
+}

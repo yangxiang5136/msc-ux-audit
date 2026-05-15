@@ -398,9 +398,15 @@ app.post('/api/wxapp/proposals', requireWxappRole, async (req, res) => {
     rationale:          String(body.rationale || '').slice(0, 20000),
     author_role:        req.wxappRole,
   };
-  if (!row.slug || !row.title) {
-    res.status(400).json({ error: 'slug and title are required' });
+  if (!row.title) {
+    res.status(400).json({ error: 'title is required' });
     return;
+  }
+  // slug 留空 → 服务端自动生成 p-{timestamp36}-{random36}
+  if (!row.slug) {
+    const ts = Date.now().toString(36);
+    const rnd = Math.random().toString(36).slice(2, 6);
+    row.slug = `p-${ts}-${rnd}`;
   }
   // slug 简单合法性检查（防止 /a/b 路径注入）
   if (!/^[a-z0-9][a-z0-9-_]{0,127}$/i.test(row.slug)) {
